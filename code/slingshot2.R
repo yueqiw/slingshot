@@ -295,8 +295,10 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
           pcurve <- pcurves[[l]]
           ind <- clus.labels %in% lineages[[l]]
           x <- pcurve$lambda
-          d1 <- density(x)
-          d2 <- density(x[clus.labels[ind] == clID], bw = d1$bw)
+          #d1 <- density(x)
+          #d2 <- density(x[clus.labels[ind] == clID], bw = d1$bw)
+          d2 <- density(x[clus.labels[ind] == clID])
+          d1 <- density(x, bw = d2$bw)
           scale <- sum(clus.labels[ind] == clID)/length(x)
           pct.l <- sapply(x,function(x){
             (approx(d2$x,d2$y,xout = x, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = x, yleft = 0, yright = 0)$y

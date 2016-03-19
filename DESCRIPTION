@@ -1,0 +1,28 @@
+Package: slingshot
+Title: Tools for ordering single-cell sequencing
+Version: 0.0.0.9005
+Description: This package provides functions for determining lineage structure
+    and ordering cellular progressions in single-cell sequencing data.
+Authors@R: c(person("Kelly", "Street", email = "kstreet@berkeley.edu",
+            role = c("aut", "cre", "cph")))
+Author: Kelly Street [aut, cre, cph]
+Maintainer: Kelly Street <kstreet@berkeley.edu>
+BugReports: https://github.com/kstreet13/slingshot/issues
+License: Artistic-2.0
+Depends:
+    R (>= 2.10),
+    Biobase
+Imports:
+    BiocGenerics,
+    RColorBrewer,
+    ape,
+    princurve,
+    igraph,
+    stats
+Suggests:
+    knitr,
+    rmarkdown,
+    diagram
+VignetteBuilder: knitr
+LazyData: true
+RoxygenNote: 5.0.1

@@ -47,16 +47,21 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
   
   # determine whether to use full covariance matrix or componentwise for distances
   min.clus.size <- min(table(clus.labels))
-  if(min.clus.size < ncol(X)+1){
+  if(min.clus.size <= ncol(X)){
     # componentwise
-    message('Using diagonal covariance matrix')
+    message('Using adjusted diagonal covariance matrix')
     dist.fun <- function(clus1, clus2){
       mu1 <- colMeans(clus1)
       mu2 <- colMeans(clus2)
       diff <- mu1 - mu2
-      s1 <- diag(diag(cov(clus1)))
-      s2 <- diag(diag(cov(clus2)))
-      return(t(diff) %*% solve(s1 + s2) %*% diff)
+      s1 <- cov(clus1); s1diag <- diag(s1)
+      s2 <- cov(clus2); s2diag <- diag(s2)
+      jointCov <- s1 + s2
+      jointCov[min.clus.size:ncol(X),] <- 0
+      jointCov[,min.clus.size:ncol(X)] <- 0
+      diag(jointCov) <- s1diag + s2diag
+      print(jointCov)
+      return(t(diff) %*% solve(jointCov) %*% diff)
     }
   }else{
     # full covariance

@@ -333,9 +333,10 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
           })
           return(pct.l)
         })
+        names(pct) <- lines
         pcurves.shrink <- lapply(lines,function(l){
           pcurve <- pcurves[[l]]
-          pct.i <- pct[[l]]
+          pct.i <- pct[[which(names(pct) == l)]]
           s <- t(sapply(1:length(pcurve$lambda),function(i){
             lam <- pcurve$lambda[i]
             sapply(1:p,function(jj){

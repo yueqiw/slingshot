@@ -47,7 +47,7 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
   
   # determine whether to use full covariance matrix or componentwise for distances
   min.clus.size <- min(table(clus.labels))
-  if(min.clus.size <= ncol(X)+1){
+  if(min.clus.size < ncol(X)+1){
     # componentwise
     message('Using diagonal covariance matrix')
     dist.fun <- function(clus1, clus2){

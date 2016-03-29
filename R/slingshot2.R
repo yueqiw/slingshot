@@ -60,7 +60,6 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
       jointCov[min.clus.size:ncol(X),] <- 0
       jointCov[,min.clus.size:ncol(X)] <- 0
       diag(jointCov) <- s1diag + s2diag
-      print(jointCov)
       return(t(diff) %*% solve(jointCov) %*% diff)
     }
   }else{

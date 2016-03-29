@@ -70,18 +70,18 @@ project_points_to_lineage <- function(lineage,pts){
       p <- pts[i,]
       return(project_point_to_segment(lineage[1,],lineage[2,], p))
     })
-    return(t(projs))
-  }
-  dists <- t(apply(pts,1,function(p){
-    sapply(1:(K-1),function(k){
-      dist_point_to_segment(lineage[k,],lineage[k+1,],p)
+  }else{
+    dists <- t(apply(pts,1,function(p){
+      sapply(1:(K-1),function(k){
+        dist_point_to_segment(lineage[k,],lineage[k+1,],p)
+      })
+    }))
+    projs <- sapply(1:n, function(i){
+      k <- which.min(dists[i,])
+      p <- pts[i,]
+      return(project_point_to_segment(lineage[k,],lineage[k+1,], p))
     })
-  }))
-  projs <- sapply(1:n, function(i){
-    k <- which.min(dists[i,])
-    p <- pts[i,]
-    return(project_point_to_segment(lineage[k,],lineage[k+1,], p))
-  })
+  }
   return(t(projs))
 }
 dist_points_to_lineage <- function(lineage,pts){

@@ -136,7 +136,7 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
   ntree <- 0
   while(length(unused) > 0){
     ntree <- ntree + 1
-    newtree <- get_connections(unused[1], forest)
+    newtree <- .get_connections(unused[1], forest)
     trees[[ntree]] <- newtree
     unused <- unused[! unused %in% newtree]
   }
@@ -273,12 +273,12 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     x.sub <- X[clus.labels %in% lineages[[l]],]
     line.centers <- centers[clusters %in% lineages[[l]],]
     line.centers <- line.centers[match(lineages[[l]],rownames(line.centers)),]
-    s <- project_points_to_lineage(line.centers, x.sub)
-    dist <- sum(dist_points_to_lineage(line.centers, x.sub)^2)
+    s <- .project_points_to_lineage(line.centers, x.sub)
+    dist <- sum(.dist_points_to_lineage(line.centers, x.sub)^2)
     lambda <- apply(s,1,function(sp){
       K <- nrow(line.centers)
       dists <- sapply(1:(K-1), function(k){
-        dist_point_to_segment(line.centers[k,],line.centers[k+1,],sp)
+        .dist_point_to_segment(line.centers[k,],line.centers[k+1,],sp)
       })
       seg <- which.min(dists)
       if(seg == 1){
@@ -286,7 +286,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
       }else{
         partial <- rbind(line.centers[1:(seg-1),],sp)
       }
-      return(lineage_length(partial))
+      return(.lineage_length(partial))
     })
     tag <- order(lambda)
     start <- list(s = s, tag = tag, lambda = lambda, dist = dist)
@@ -318,7 +318,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
       clID <- clusters[c]
       if(sum(C[c,]) > 1){
         lines <- which(C[c,]==1)
-        avg <- avg.curves(pcurves[lines])
+        avg <- .avg_curves(pcurves[lines])
         pct <- lapply(lines,function(l){
           pcurve <- pcurves[[l]]
           ind <- clus.labels %in% lineages[[l]]
@@ -365,12 +365,12 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   for(l in 1:L){
     x.sub <- X[clus.labels %in% lineages[[l]],]
     line <- pcurves[[l]]$s[pcurves[[l]]$tag,]
-    s <- project_points_to_lineage(line,x.sub)
+    s <- .project_points_to_lineage(line,x.sub)
     rownames(s) <- rownames(x.sub)
     lambda <- apply(s,1,function(sp){
       K <- nrow(line)
       dists <- sapply(1:(K-1), function(k){
-        dist_point_to_segment(line[k,],line[k+1,],sp)
+        .dist_point_to_segment(line[k,],line[k+1,],sp)
       })
       seg <- which.min(dists)
       if(seg == 1){
@@ -378,7 +378,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
       }else{
         partial <- rbind(line[1:(seg-1),],sp)
       }
-      return(lineage_length(partial))
+      return(.lineage_length(partial))
     })
     names(lambda) <- rownames(x.sub)
     tag <- order(lambda)

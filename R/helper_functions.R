@@ -1,7 +1,7 @@
 #########################
 ### Helper functions for Slingshot
 #########################
-project_point_to_segment <- function(A,B,p){
+.project_point_to_segment <- function(A,B,p){
   AB <- B-A
   AB_squared <- sum(AB*AB)
   if(AB_squared==0){
@@ -17,7 +17,7 @@ project_point_to_segment <- function(A,B,p){
   }
   return(A + t*AB)
 }
-project_points_to_segment <- function(A,B,pts){
+.project_points_to_segment <- function(A,B,pts){
   if(class(pts)=='numeric'){
     pts <- matrix(pts,ncol=length(pts))
   }
@@ -45,7 +45,7 @@ project_points_to_segment <- function(A,B,pts){
   colnames(final) <- colnames(pts)
   return(final[order(t),])
 }
-dist_point_to_segment <- function(A,B,p){
+.dist_point_to_segment <- function(A,B,p){
   AB <- B-A
   AB_squared <- sum(AB*AB)
   if(AB_squared==0){
@@ -62,38 +62,38 @@ dist_point_to_segment <- function(A,B,p){
   q <- (A + t*AB)
   return(sqrt(sum((q-p)^2)))
 }
-project_points_to_lineage <- function(lineage,pts){
+.project_points_to_lineage <- function(lineage,pts){
   n <- nrow(pts)
   K <- nrow(lineage)
   if(K == 2){
     projs <- sapply(1:n, function(i){
       p <- pts[i,]
-      return(project_point_to_segment(lineage[1,],lineage[2,], p))
+      return(.project_point_to_segment(lineage[1,],lineage[2,], p))
     })
   }else{
     dists <- t(apply(pts,1,function(p){
       sapply(1:(K-1),function(k){
-        dist_point_to_segment(lineage[k,],lineage[k+1,],p)
+        .dist_point_to_segment(lineage[k,],lineage[k+1,],p)
       })
     }))
     projs <- sapply(1:n, function(i){
       k <- which.min(dists[i,])
       p <- pts[i,]
-      return(project_point_to_segment(lineage[k,],lineage[k+1,], p))
+      return(.project_point_to_segment(lineage[k,],lineage[k+1,], p))
     })
   }
   return(t(projs))
 }
-dist_points_to_lineage <- function(lineage,pts){
+.dist_points_to_lineage <- function(lineage,pts){
   d <- apply(pts,1,function(p){
     K <- nrow(lineage)
     min(sapply(1:(K-1),function(k){
-      dist_point_to_segment(lineage[k,],lineage[k+1,],p)
+      .dist_point_to_segment(lineage[k,],lineage[k+1,],p)
     }))
   })
   return(d)
 }
-lineage_length <- function(lineage){
+.lineage_length <- function(lineage){
   if(class(lineage)=="numeric"){
     return(0)
   }
@@ -104,7 +104,7 @@ lineage_length <- function(lineage){
   }
   return(d)
 }
-get_connections <- function(clus, forest, parent = NULL){
+.get_connections <- function(clus, forest, parent = NULL){
   children.idx <- forest[,clus] == 1
   children <- rownames(forest)[children.idx]
   if(is.null(parent)){
@@ -121,10 +121,10 @@ get_connections <- function(clus, forest, parent = NULL){
   }
   return(out)
 }
-scale01 <- function(x){
+.scale01 <- function(x){
   return((x - min(x,na.rm=T))/max(x - min(x,na.rm=T)))
 }
-avg.curves <- function(pcurves){
+.avg_curves <- function(pcurves){
   p <- ncol(pcurves[[1]]$s)
   lambdas.all <- lapply(pcurves, function(pcv){pcv$lambda})
   lambdas.all <- unique(unlist(lambdas.all))

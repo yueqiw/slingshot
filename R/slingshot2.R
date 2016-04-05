@@ -28,7 +28,7 @@ require(princurve); require(ape); require(igraph)
 #' get_lineages(X, clus.labels, start.clus = 'a')
 #' 
 
-get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clus = NULL){
+get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clus = NULL, distout = FALSE){
   # set up, remove unclustered cells (-1's)
   X.original <- X
   X <- X[clus.labels != -1,]
@@ -209,6 +209,9 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
   rownames(C) <- clusters
   # should probably come up with a better name than C
   out$C <- C
+  if(distout){
+    out$dist <- D
+  }
   return(out)
 }
 

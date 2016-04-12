@@ -45,6 +45,28 @@
   colnames(final) <- colnames(pts)
   return(final[order(t),])
 }
+.project_points_to_line <- function(A,B,pts){
+  if(class(pts)=='numeric'){
+    pts <- matrix(pts,ncol=length(pts))
+  }
+  n <- nrow(pts)
+  bigA <- t(matrix(A,nrow=length(A),ncol=n))
+  bigB <- t(matrix(B,nrow=length(A),ncol=n))
+  AB <- B-A
+  bigAB <- t(matrix(AB,nrow=length(A),ncol=n))
+  AB_squared <- sum(AB*AB)
+  if(AB_squared==0){
+    return(bigA)
+  }
+  bigAp <- pts-bigA
+  t <- diag(bigAp %*% t(bigAB))/AB_squared
+  final <- t(sapply(t,function(ti){
+    A + ti*AB
+  }))
+  rownames(final) <- rownames(pts)
+  colnames(final) <- colnames(pts)
+  return(final[order(t),])
+}
 .dist_point_to_segment <- function(A,B,p){
   AB <- B-A
   AB_squared <- sum(AB*AB)
@@ -62,7 +84,7 @@
   q <- (A + t*AB)
   return(sqrt(sum((q-p)^2)))
 }
-.project_points_to_lineage <- function(lineage,pts){
+.project_points_to_lineage <- function(lineage,pts, extend.ends=FALSE){
   n <- nrow(pts)
   K <- nrow(lineage)
   if(K == 2){
@@ -82,7 +104,14 @@
       return(.project_point_to_segment(lineage[k,],lineage[k+1,], p))
     })
   }
-  return(t(projs))
+  projs <- t(projs)
+  if(extend.ends){
+    group1idx <- apply(projs,1,function(x){identical(x,lineage[1,])})
+    group2idx <- apply(projs,1,function(x){identical(x,lineage[K,])})
+    projs[group1idx,] <- .project_points_to_line(lineage[1,],lineage[2,], pts[group1idx,])
+    projs[group2idx,] <- .project_points_to_line(lineage[K-1,],lineage[K,], pts[group2idx,])
+  }
+  return(projs)
 }
 .dist_points_to_lineage <- function(lineage,pts){
   d <- apply(pts,1,function(p){

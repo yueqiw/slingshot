@@ -243,7 +243,7 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
 #' 
 
 
-get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, trace = FALSE){
+get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, trace = FALSE, shrink = FALSE){
   smoother <- "smooth.spline"
   smootherFcn <- function(lambda, xj, ..., df = 5) {
     o <- order(lambda)
@@ -276,7 +276,19 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     x.sub <- X[clus.labels %in% lineages[[l]],]
     line.centers <- centers[clusters %in% lineages[[l]],]
     line.centers <- line.centers[match(lineages[[l]],rownames(line.centers)),]
+    K <- nrow(line.centers)
     s <- .project_points_to_lineage(line.centers, x.sub)
+    # adjust - extend lineage past endpoint cluster centers (prevents clumping at ends)
+    group1idx <- apply(s,1,function(x){identical(x,line.centers[1,])})
+    group2idx <- apply(s,1,function(x){identical(x,line.centers[K,])})
+    s[group1idx,] <- .project_points_to_line(line.centers[1,],line.centers[2,], x.sub[group1idx,])
+    s[group2idx,] <- .project_points_to_line(line.centers[K-1,],line.centers[K,], x.sub[group2idx,])
+    # adjust line.centers to reflect extended lineage
+    group1.dist2center <- apply(s[group1idx,],1,function(p){.dist_point_to_segment(line.centers[1,],line.centers[2,],p)})
+    group2.dist2center <- apply(s[group2idx,],1,function(p){.dist_point_to_segment(line.centers[K-1,],line.centers[K,],p)})
+    line.centers <- rbind(s[group1idx,][which.max(group1.dist2center),], line.centers)
+    line.centers <- rbind(line.centers, s[group2idx,][which.max(group2.dist2center),])
+    # get total squared distance to lineage
     dist <- sum(.dist_points_to_lineage(line.centers, x.sub)^2)
     lambda <- apply(s,1,function(sp){
       K <- nrow(line.centers)
@@ -284,11 +296,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
         .dist_point_to_segment(line.centers[k,],line.centers[k+1,],sp)
       })
       seg <- which.min(dists)
-      if(seg == 1){
-        partial <- rbind(line.centers[1,],sp)
-      }else{
-        partial <- rbind(line.centers[1:(seg-1),],sp)
-      }
+      partial <- rbind(line.centers[1:seg,],sp)
       return(.lineage_length(partial))
     })
     tag <- order(lambda)

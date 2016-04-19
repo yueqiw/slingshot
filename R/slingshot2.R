@@ -41,7 +41,7 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
   ###############################
   # get cluster centers
   centers <- t(sapply(clusters,function(clID){
-    x.sub <- X[clus.labels == clID,]
+    x.sub <- X[clus.labels == clID, ,drop = FALSE]
     return(colMeans(x.sub))
   }))
   
@@ -54,12 +54,15 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
       mu1 <- colMeans(clus1)
       mu2 <- colMeans(clus2)
       diff <- mu1 - mu2
-      s1 <- cov(clus1); s1diag <- diag(s1)
-      s2 <- cov(clus2); s2diag <- diag(s2)
+      s1 <- if(nrow(clus1) == 1) {matrix(0,ncol(clus1),ncol(clus1))} else {cov(clus1)}
+      s1diag <- diag(s1)
+      s2 <- if(nrow(clus2) == 1) {matrix(0,ncol(clus1),ncol(clus1))} else {cov(clus2)}
+      s2diag <- diag(s2)
       jointCov <- s1 + s2
       jointCov[min.clus.size:ncol(X),] <- 0
       jointCov[,min.clus.size:ncol(X)] <- 0
       diag(jointCov) <- s1diag + s2diag
+      if(all(jointCov == 0)) {jointCov <- diag(ncol(jointCov))}
       return(t(diff) %*% solve(jointCov) %*% diff)
     }
   }else{
@@ -77,8 +80,8 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
   ### get pairwise cluster distance matrix
   D <- sapply(clusters,function(clID1){
     sapply(clusters,function(clID2){
-      clus1 <- X[clus.labels == clID1,]
-      clus2 <- X[clus.labels == clID2,]
+      clus1 <- X[clus.labels == clID1, ,drop = FALSE]
+      clus2 <- X[clus.labels == clID2, ,drop = FALSE]
       return(dist.fun(clus1, clus2))
     })
   })
@@ -266,15 +269,15 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   clusters <- unique(clus.labels)
   nclus <- length(clusters) # number of clusters
   centers <- t(sapply(clusters,function(clID){
-    x.sub <- X[clus.labels == clID,]
+    x.sub <- X[clus.labels == clID, ,drop = FALSE]
     return(colMeans(x.sub))
   }))
   rownames(centers) <- clusters
   
   # initial curves are piecewise linear paths through the tree
   pcurves <- lapply(1:L,function(l){
-    x.sub <- X[clus.labels %in% lineages[[l]],]
-    line.centers <- centers[clusters %in% lineages[[l]],]
+    x.sub <- X[clus.labels %in% lineages[[l]], ,drop = FALSE]
+    line.centers <- centers[clusters %in% lineages[[l]], , drop = FALSE]
     line.centers <- line.centers[match(lineages[[l]],rownames(line.centers)),]
     K <- nrow(line.centers)
     s <- .project_points_to_lineage(line.centers, x.sub)

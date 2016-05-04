@@ -21,8 +21,7 @@ Imports:
     stats
 Suggests:
     knitr,
-    rmarkdown,
-    diagram
+    rmarkdown
 VignetteBuilder: knitr
 LazyData: true
 RoxygenNote: 5.0.1

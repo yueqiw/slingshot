@@ -27,6 +27,10 @@ require(princurve); require(ape); require(igraph)
 #' get_lineages(X, clus.labels)
 #' get_lineages(X, clus.labels, start.clus = 'a')
 #' 
+#' @export
+#' 
+#' @importFrom ape mst
+#' 
 
 get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clus = NULL, distout = FALSE){
   # set up, remove unclustered cells (-1's)
@@ -244,7 +248,8 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
 #' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
 #' get_curves(X, clus.labels, lineages)
 #' 
-
+#' @export
+#' 
 
 get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, trace = FALSE, shrink = FALSE){
   smoother <- "smooth.spline"

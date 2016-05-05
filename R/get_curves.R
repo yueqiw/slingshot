@@ -15,6 +15,7 @@
 #' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
 #' get_curves(X, clus.labels, lineages)
 #' 
+#' @importFrom princurve get.lam
 #' @export
 #' 
 
@@ -98,7 +99,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
       for (jj in 1:p) {
         s[, jj] <- smootherFcn(pcurve$lambda, x.sub[,jj])
       }
-      pcurve <- get.lam(x.sub, s = s, stretch = stretch)
+      pcurve <- princurve::get.lam(x.sub, s = s, stretch = stretch)
       pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
       pcurves[[l]] <- pcurve
     }

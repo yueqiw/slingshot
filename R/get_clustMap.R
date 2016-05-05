@@ -5,14 +5,13 @@
 #' @param X numeric, the nxp matrix of samples in a reduced dimensionality space
 #' @param clus.labels character, a vector of length n denoting cluster labels
 #' @param map.args (optional) list of additional arguments for controlling how mapping is performed.
-#' @param omega (optional) numeric between 0 and 1 or Inf. This granularity parameter determines the distance between every real cluster and the artificial cluster, OMEGA. It is parameterized as a fraction of the largest distance between two real clusters (hence, any value greater than 1 would result in a single tree being returned and would be equivalent to setting omega = Inf, the default)
-#' @param start.clus (optional) character, indicates the cluster(s) *from* which lineages will be drawn
-#' @param end.clus (optional) character, indicates the cluster(s) which will be forced leaf nodes in their trees
-#' 
+
 #' @details The \code{forest} is learned by fitting a (possibly constrained) minimum-spanning tree on the clusters and the artificial cluster, OMEGA, which is a distance \code{omega} from every real cluster.
 #'
 #' Optional arguments to be passed via \code{map.args}:
 #' @param omega (optional) numeric between 0 and 1 or Inf. This granularity parameter determines the distance between every real cluster and the artificial cluster, OMEGA. It is parameterized as a fraction of the largest distance between two real clusters (hence, any value greater than 1 would result in a single tree being returned and would be equivalent to setting omega = Inf, the default)
+#' @param start.clus (optional) character, indicates the cluster(s) *from* which lineages will be drawn
+#' @param end.clus (optional) character, indicates the cluster(s) which will be forced leaf nodes in their trees
 #'
 #' @return A KxK connectivity matrix, where K is the number of clusters, representing the learned graph structure.
 #'
@@ -32,6 +31,8 @@ get_clustMap <- function(X, clus.labels, map.args = list(), distout = FALSE){
   }else{
     omega <- map.args$omega
   }
+  start.clus <- map.args$start.clus
+  end.clus <- map.args$end.clus
   # set up, remove unclustered cells (-1's)
   X.original <- X
   X <- X[clus.labels != -1,]

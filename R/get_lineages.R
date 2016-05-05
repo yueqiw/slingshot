@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' data("toy_data")
-#' map <- get_clustMap(X, clus.labels)
+#' map <- get_clustMap(X, cluster)
 #' get_lineages(map, start.clus = 'a')
 #' 
 #' @export
@@ -21,7 +21,7 @@
 #' 
 
 get_lineages <- function(map, start.clus = NULL, end.clus = NULL){
-  clusters <- rownames(map)
+  clus.names <- rownames(map)
   lineages <- list()
   
   # identify trees
@@ -96,11 +96,11 @@ get_lineages <- function(map, start.clus = NULL, end.clus = NULL){
   # include "map" and clusters x lineages (C) matrices
   out$map <- map
   C <- sapply(lineages,function(lin){
-    sapply(clusters,function(clID){
+    sapply(clus.names,function(clID){
       as.numeric(clID %in% lin)
     })
   })
-  rownames(C) <- clusters
+  rownames(C) <- clus.names
   # should probably come up with a better name than C
   out$C <- C
   return(out)

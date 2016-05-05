@@ -169,3 +169,26 @@ avg_curves <- function(pcurves){
   ind <- !duplicated(lambdas.all)
   return(list(avg=avg[ind,],lambda=lambdas.all[ind]))
 }
+dist_clusters_full <- function(c1,c2){
+  mu1 <- colMeans(c1)
+  mu2 <- colMeans(c2)
+  diff <- mu1 - mu2
+  s1 <- cov(c1)
+  s2 <- cov(c2)
+  return(t(diff) %*% solve(s1 + s2) %*% diff)
+}
+dist_clusters_partial <- function(c1,c2,k){
+  mu1 <- colMeans(c1)
+  mu2 <- colMeans(c2)
+  diff <- mu1 - mu2
+  s1 <- if(nrow(c1) == 1) {matrix(0,ncol(c1),ncol(c1))} else {cov(c1)}
+  s1diag <- diag(s1)
+  s2 <- if(nrow(c2) == 1) {matrix(0,ncol(c1),ncol(c1))} else {cov(c2)}
+  s2diag <- diag(s2)
+  jointCov <- s1 + s2
+  jointCov[k:ncol(X),] <- 0
+  jointCov[,k:ncol(X)] <- 0
+  diag(jointCov) <- s1diag + s2diag
+  if(all(jointCov == 0)) {jointCov <- diag(ncol(jointCov))}
+  return(t(diff) %*% solve(jointCov) %*% diff)
+}

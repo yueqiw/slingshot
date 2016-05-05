@@ -3,7 +3,7 @@
 #' @description This function takes a reduced data matrix nxp, a vector of cluster identities (optionally including -1's for "unclustered"), and a set of lineages consisting of paths through a forest constructed on the clusters. It constructs smooth curves for each lineage and returns the points along these curves corresponding to the orthogonal projections of each data point, along with lambda (pseudotime) values.
 #' 
 #' @param X numeric, the nxp matrix of samples in a reduced dimensionality space
-#' @param clus.labels character, a vector of length n denoting cluster labels
+#' @param cluster character, a vector of length n denoting cluster labels
 #' @param lineages list, denotes which lineages each cluster is a part of and contains the matrix defining the forest structure drawn on the clusters by \code{get_lineages}.
 #' 
 #' @details TODO
@@ -12,14 +12,14 @@
 #'
 #' @examples
 #' data("toy_data")
-#' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-#' get_curves(X, clus.labels, lineages)
+#' lineages <- get_lineages(X, cluster, start.clus = 'a')
+#' get_curves(X, cluster, lineages)
 #' 
 #' @importFrom princurve get.lam
 #' @export
 #' 
 
-get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
+get_curves <- function(X, cluster, lineages, shrink = FALSE){
   thresh = 0.0001
   maxit = 100
   stretch = 2
@@ -33,27 +33,27 @@ get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
   }
   # remove unclustered cells
   X.original <- X
-  clus.labels.original <- clus.labels
-  X <- X[clus.labels != -1,]
-  clus.labels <- clus.labels[clus.labels != -1]
+  cluster.original <- cluster
+  X <- X[cluster != -1,]
+  cluster <- cluster[cluster != -1]
   # setup
   C <- lineages$C
   d <- dim(X)
   n <- d[1]
   p <- d[2]
   L <- ncol(C) # number of lineages
-  clusters <- unique(clus.labels)
-  nclus <- length(clusters) # number of clusters
-  centers <- t(sapply(clusters,function(clID){
-    x.sub <- X[clus.labels == clID, ,drop = FALSE]
+  clus.names <- unique(cluster)
+  nclus <- length(clus.names) # number of clusters
+  centers <- t(sapply(clus.names,function(clID){
+    x.sub <- X[cluster == clID, ,drop = FALSE]
     return(colMeans(x.sub))
   }))
-  rownames(centers) <- clusters
+  rownames(centers) <- clus.names
   
   # initial curves are piecewise linear paths through the tree
   pcurves <- lapply(1:L,function(l){
-    x.sub <- X[clus.labels %in% lineages[[l]], ,drop = FALSE]
-    line.centers <- centers[clusters %in% lineages[[l]], , drop = FALSE]
+    x.sub <- X[cluster %in% lineages[[l]], ,drop = FALSE]
+    line.centers <- centers[clus.names %in% lineages[[l]], , drop = FALSE]
     line.centers <- line.centers[match(lineages[[l]],rownames(line.centers)),]
     K <- nrow(line.centers)
     s <- project_points_to_lineage(line.centers, x.sub)
@@ -95,7 +95,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
     for(l in 1:L){
       pcurve <- pcurves[[l]]
       s <- pcurve$s
-      x.sub <- X[clus.labels %in% lineages[[l]],]
+      x.sub <- X[cluster %in% lineages[[l]],]
       for (jj in 1:p) {
         s[, jj] <- smootherFcn(pcurve$lambda, x.sub[,jj])
       }
@@ -105,19 +105,19 @@ get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
     }
     # shrink together lineages near shared clusters
     for(c in 1:nclus){
-      clID <- clusters[c]
+      clID <- clus.names[c]
       if(sum(C[c,]) > 1){
         lines <- which(C[c,]==1)
         avg <- avg_curves(pcurves[lines])
         pct <- lapply(lines,function(l){
           pcurve <- pcurves[[l]]
-          ind <- clus.labels %in% lineages[[l]]
+          ind <- cluster %in% lineages[[l]]
           x <- pcurve$lambda
           #d1 <- density(x)
-          #d2 <- density(x[clus.labels[ind] == clID], bw = d1$bw)
-          d2 <- density(x[clus.labels[ind] == clID])
+          #d2 <- density(x[cluster[ind] == clID], bw = d1$bw)
+          d2 <- density(x[cluster[ind] == clID])
           d1 <- density(x, bw = d2$bw)
-          scale <- sum(clus.labels[ind] == clID)/length(x)
+          scale <- sum(cluster[ind] == clID)/length(x)
           pct.l <- sapply(x,function(x){
             (approx(d2$x,d2$y,xout = x, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = x, yleft = 0, yright = 0)$y
           })
@@ -153,7 +153,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
   # lines are set, but because shrinking happens second, the points defining
   # the lines are not the projections of the data points yet
   for(l in 1:L){
-    x.sub <- X[clus.labels %in% lineages[[l]],]
+    x.sub <- X[cluster %in% lineages[[l]],]
     line <- pcurves[[l]]$s[pcurves[[l]]$tag,]
     s <- project_points_to_lineage(line,x.sub)
     rownames(s) <- rownames(x.sub)

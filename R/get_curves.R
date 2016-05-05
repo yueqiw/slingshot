@@ -5,10 +5,6 @@
 #' @param X numeric, the nxp matrix of samples in a reduced dimensionality space
 #' @param clus.labels character, a vector of length n denoting cluster labels
 #' @param lineages list, denotes which lineages each cluster is a part of and contains the matrix defining the forest structure drawn on the clusters by \code{get_lineages}.
-#' @param thresh (optional) 
-#' @param maxit (optional)
-#' @param stretch (optional)
-#' @param trace (optional)
 #' 
 #' @details TODO
 #'
@@ -22,7 +18,10 @@
 #' @export
 #' 
 
-get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, trace = FALSE, shrink = FALSE){
+get_curves <- function(X, clus.labels, lineages, shrink = FALSE){
+  thresh = 0.0001
+  maxit = 100
+  stretch = 2
   smoother <- "smooth.spline"
   smootherFcn <- function(lambda, xj, ..., df = 5) {
     o <- order(lambda)

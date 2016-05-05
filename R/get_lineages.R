@@ -30,7 +30,7 @@ get_lineages <- function(map, start.clus = NULL, end.clus = NULL){
   ntree <- 0
   while(length(unused) > 0){
     ntree <- ntree + 1
-    newtree <- .get_connections(unused[1], map)
+    newtree <- get_connections(unused[1], map)
     trees[[ntree]] <- newtree
     unused <- unused[! unused %in% newtree]
   }

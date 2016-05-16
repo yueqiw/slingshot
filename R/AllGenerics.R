@@ -18,13 +18,13 @@ setGeneric(
 )
 setGeneric(
   name = "get_clusters",
-  def = function(x,  ...) {
+  def = function(X,  ...) {
     standardGeneric("get_clusters")
   }
 )
 setGeneric(
   name = "get_clustMap",
-  def = function(x,  ...) {
+  def = function(X,  ...) {
     standardGeneric("get_clustMap")
   }
 )
@@ -36,7 +36,7 @@ setGeneric(
 )
 setGeneric(
   name = "get_curves",
-  def = function(x,  ...) {
+  def = function(X,  ...) {
     standardGeneric("get_curves")
   }
 )

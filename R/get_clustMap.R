@@ -124,3 +124,12 @@ setMethod(
   }
 )
 
+setMethod(
+  f = "get_clustMap",
+  signature = signature(X = "CellLineages"),
+  definition = function(X, ...) {
+    out <- X
+    out$clustMap <- get_clustMap(reducedDim(X),colData(X)$cluster,...)
+    return(out)
+  }
+)

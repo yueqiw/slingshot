@@ -266,12 +266,18 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   X <- X[clus.labels != -1,]
   clus.labels <- clus.labels[clus.labels != -1]
   # setup
-  C <- lineages$C
+  L <- sum(sapply(lineages,class)=='character') # number of lineages
+  clusters <- unique(clus.labels)
+  C <- sapply(lineages[1:L],function(lin){
+    sapply(clusters,function(clID){
+      as.numeric(clID %in% lin)
+    })
+  })
+  rownames(C) <- clusters
+  
   d <- dim(X)
   n <- d[1]
   p <- d[2]
-  L <- ncol(C) # number of lineages
-  clusters <- unique(clus.labels)
   nclus <- length(clusters) # number of clusters
   centers <- t(sapply(clusters,function(clID){
     x.sub <- X[clus.labels == clID, ,drop = FALSE]

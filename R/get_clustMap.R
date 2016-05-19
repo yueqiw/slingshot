@@ -28,7 +28,7 @@
 setMethod(
   f = "get_clustMap",
   signature = signature(X = "matrix", cluster = "character"),
-  definition = function(X, cluster, dist.fun = NULL, map.args = list(), distout = FALSE) {
+  definition = function(X, cluster, dist.fun = NULL, map.args = list()) {
     if(is.null(map.args$omega)){
       omega <- Inf
     }else{
@@ -44,7 +44,7 @@ setMethod(
     nclus <- length(clus.names)
     
     ###############################
-    ### get the connectivity matrix that defines the "forest"
+    ### get the connectivity matrix that defines the "map"
     ###############################
     # get cluster centers
     centers <- t(sapply(clus.names,function(clID){
@@ -97,30 +97,25 @@ setMethod(
     }
     # (add in endpoint clusters)
     if(! is.null(end.clus)){
-      forest <- D
-      forest[forest != 0] <- 0
-      forest[-end.idx, -end.idx] <- mstree
+      map <- D
+      map[map != 0] <- 0
+      map[-end.idx, -end.idx] <- mstree
       for(clID in end.clus){
         cl.idx <- which(clus.names == clID)
         dists <- D[! rownames(D) %in% end.clus, cl.idx]
         closest <- names(dists)[which.min(dists)] # get closest non-endpoint cluster
         closest.idx <- which.max(clus.names == closest)
-        forest[cl.idx, closest.idx] <- 1
-        forest[closest.idx, cl.idx] <- 1
+        map[cl.idx, closest.idx] <- 1
+        map[closest.idx, cl.idx] <- 1
       }
     }else{
-      forest <- mstree
+      map <- mstree
     }
-    forest <- forest[1:nclus, 1:nclus] # remove OMEGA
-    rownames(forest) <- clus.names
-    colnames(forest) <- clus.names
+    map <- map[1:nclus, 1:nclus] # remove OMEGA
+    rownames(map) <- clus.names
+    colnames(map) <- clus.names
     
-    out <- list()
-    out$map <- forest
-    if(distout){
-      out$dist <- D
-    }
-    return(out)
+    return(map)
   }
 )
 
@@ -129,7 +124,7 @@ setMethod(
   signature = signature(X = "CellLineages"),
   definition = function(X, ...) {
     out <- X
-    out$clustMap <- get_clustMap(reducedDim(X),colData(X)$cluster,...)
+    out@clustMap <- get_clustMap(reducedDim(X),colData(X)$cluster,...)
     return(out)
   }
 )

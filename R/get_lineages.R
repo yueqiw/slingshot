@@ -19,39 +19,57 @@
 #' 
 #' @import igraph
 #' 
-
-get_lineages <- function(map, start.clus = NULL, end.clus = NULL){
-  clus.names <- rownames(map)
-  lineages <- list()
-  
-  # identify trees
-  unused <- rownames(map)
-  trees <- list()
-  ntree <- 0
-  while(length(unused) > 0){
-    ntree <- ntree + 1
-    newtree <- get_connections(unused[1], map)
-    trees[[ntree]] <- newtree
-    unused <- unused[! unused %in% newtree]
-  }
-  trees <- trees[order(sapply(trees,length),decreasing = T)]
-  
-  # identify lineages (paths through trees)
-  for(tree in trees){
-    if(length(tree) == 1){
-      next # don't draw a lineage for a single-cluster tree
-    }
-    tree.ind <- rownames(map) %in% tree
-    tree.graph <- map[tree.ind, tree.ind]
-    degree <- rowSums(tree.graph)
-    g <- igraph::graph.adjacency(tree.graph, mode="undirected")
+setMethod(
+  f = "get_lineages",
+  signature = signature(map = "matrix"),
+  definition = function(map, start.clus = NULL, end.clus = NULL) {
+    clus.names <- rownames(map)
+    lineages <- list()
     
-    # if you have starting cluster(s) in this tree, draw lineages to each leaf
-    if(! is.null(start.clus)){
-      if(sum(start.clus %in% tree) > 0){
-        starts <- start.clus[start.clus %in% tree]
-        ends <- rownames(tree.graph)[degree == 1 & ! rownames(tree.graph) %in% starts]
-        for(st in starts){
+    # identify trees
+    unused <- rownames(map)
+    trees <- list()
+    ntree <- 0
+    while(length(unused) > 0){
+      ntree <- ntree + 1
+      newtree <- get_connections(unused[1], map)
+      trees[[ntree]] <- newtree
+      unused <- unused[! unused %in% newtree]
+    }
+    trees <- trees[order(sapply(trees,length),decreasing = T)]
+    
+    # identify lineages (paths through trees)
+    for(tree in trees){
+      if(length(tree) == 1){
+        next # don't draw a lineage for a single-cluster tree
+      }
+      tree.ind <- rownames(map) %in% tree
+      tree.graph <- map[tree.ind, tree.ind]
+      degree <- rowSums(tree.graph)
+      g <- igraph::graph.adjacency(tree.graph, mode="undirected")
+      
+      # if you have starting cluster(s) in this tree, draw lineages to each leaf
+      if(! is.null(start.clus)){
+        if(sum(start.clus %in% tree) > 0){
+          starts <- start.clus[start.clus %in% tree]
+          ends <- rownames(tree.graph)[degree == 1 & ! rownames(tree.graph) %in% starts]
+          for(st in starts){
+            paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+            for(p in paths){
+              lineages[[length(lineages)+1]] <- names(p)
+            }
+          }
+        }else{
+          # else, need a criteria for picking root
+          # highest average length (~parsimony, but this was just the easiest thing I came up with)
+          leaves <- rownames(tree.graph)[degree == 1]
+          avg.lineage.length <- sapply(leaves,function(l){
+            ends <- leaves[leaves != l]
+            paths <- igraph::shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+            mean(sapply(paths, length))
+          })
+          st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
+          ends <- leaves[leaves != st]
           paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
           for(p in paths){
             lineages[[length(lineages)+1]] <- names(p)
@@ -63,45 +81,29 @@ get_lineages <- function(map, start.clus = NULL, end.clus = NULL){
         leaves <- rownames(tree.graph)[degree == 1]
         avg.lineage.length <- sapply(leaves,function(l){
           ends <- leaves[leaves != l]
-          paths <- igraph::shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+          paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
           mean(sapply(paths, length))
         })
         st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
         ends <- leaves[leaves != st]
-        paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+        paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
         for(p in paths){
           lineages[[length(lineages)+1]] <- names(p)
         }
       }
-    }else{
-      # else, need a criteria for picking root
-      # highest average length (~parsimony, but this was just the easiest thing I came up with)
-      leaves <- rownames(tree.graph)[degree == 1]
-      avg.lineage.length <- sapply(leaves,function(l){
-        ends <- leaves[leaves != l]
-        paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
-        mean(sapply(paths, length))
-      })
-      st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
-      ends <- leaves[leaves != st]
-      paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
-      for(p in paths){
-        lineages[[length(lineages)+1]] <- names(p)
-      }
     }
-  }
-  # sort by number of clusters included
-  lineages <- lineages[order(sapply(lineages, length), decreasing = TRUE)]
-  out <- lineages
-  # include "map" and clusters x lineages (C) matrices
-  out$map <- map
-  C <- sapply(lineages,function(lin){
-    sapply(clus.names,function(clID){
-      as.numeric(clID %in% lin)
-    })
+    # sort by number of clusters included
+    lineages <- lineages[order(sapply(lineages, length), decreasing = TRUE)]
+    return(lineages)
   })
-  rownames(C) <- clus.names
-  # should probably come up with a better name than C
-  out$C <- C
-  return(out)
-}
+
+
+setMethod(
+  f = "get_lineages",
+  signature = signature(map = "CellLineages"),
+  definition = function(X, ...) {
+    out <- X
+    out@lineages <- get_lineages(X@map, ...)
+    return(out)
+  }
+)

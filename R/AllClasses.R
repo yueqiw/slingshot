@@ -70,9 +70,11 @@ setClass(
   Class = "CellLineages",
   contains = "SummarizedExperiment",
   slots = list(
-    reducedDim = "matrixOrNULL",
-    clusterMap = "matrixOrNULL",
+    cluster = "character",
+    reducedDim = "matrix",
+    clusterMap = "matrix",
     lineages = "list",
+    pseudotime = "matrix",
     curves = "list"
   )
 )

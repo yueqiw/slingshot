@@ -1,5 +1,5 @@
 # load in necessary packages
-require(princurve); require(ape); require(igraph)
+#require(princurve); require(ape); require(igraph)
 #source('helper_functions.R')
 
 #########################
@@ -28,7 +28,8 @@ require(princurve); require(ape); require(igraph)
 #' get_lineages(X, clus.labels, start.clus = 'a')
 #' 
 #' @export
-#' 
+#'
+#' @import igraph 
 #' @importFrom ape mst
 #' 
 
@@ -192,12 +193,12 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
       leaves <- rownames(tree.graph)[degree == 1]
       avg.lineage.length <- sapply(leaves,function(l){
         ends <- leaves[leaves != l]
-        paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+        paths <- igraph::shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
         mean(sapply(paths, length))
       })
       st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
       ends <- leaves[leaves != st]
-      paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+      paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
       for(p in paths){
         lineages[[length(lineages)+1]] <- names(p)
       }
@@ -249,6 +250,8 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
 #' get_curves(X, clus.labels, lineages)
 #' 
 #' @export
+#'
+#' @importFrom princurve get.lam
 #' 
 
 get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, trace = FALSE, shrink = TRUE){

@@ -5,7 +5,7 @@
 \title{Infer Lineage Structure from Clustered Samples}
 \usage{
 get_lineages(X, clus.labels, omega = Inf, start.clus = NULL,
-  end.clus = NULL)
+  end.clus = NULL, distout = FALSE)
 }
 \arguments{
 \item{X}{numeric, the nxp matrix of samples in a reduced dimensionality space}
@@ -33,5 +33,6 @@ Once the \code{forest} is known, lineages are identified in any tree with at lea
 data("toy_data")
 get_lineages(X, clus.labels)
 get_lineages(X, clus.labels, start.clus = 'a')
+
 }
 

@@ -5,7 +5,7 @@
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
 get_curves(X, clus.labels, lineages, thresh = 1e-04, maxit = 100,
-  stretch = 2, trace = FALSE)
+  stretch = 2, trace = FALSE, shrink = TRUE)
 }
 \arguments{
 \item{X}{numeric, the nxp matrix of samples in a reduced dimensionality space}
@@ -35,5 +35,6 @@ TODO
 data("toy_data")
 lineages <- get_lineages(X, clus.labels, start.clus = 'a')
 get_curves(X, clus.labels, lineages)
+
 }
 

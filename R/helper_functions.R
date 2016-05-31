@@ -178,13 +178,21 @@
   diff <- mu1 - mu2
   s1 <- cov(c1)
   s2 <- cov(c2)
-  return(t(diff) %*% solve(s1 + s2) %*% diff)
+  return(as.numeric(t(diff) %*% solve(s1 + s2) %*% diff))
 }
 .dist_clusters_diag <- function(c1,c2){
   mu1 <- colMeans(c1)
   mu2 <- colMeans(c2)
   diff <- mu1 - mu2
-  s1 <- ifelse(nrow(c1)==1, diag(ncol(c1)), diag(diag(cov(c1))))
-  s2 <- ifelse(nrow(c2)==1, diag(ncol(c2)), diag(diag(cov(c2))))
-  return(t(diff) %*% solve(s1 + s2) %*% diff)
+  if(nrow(c1)==1){
+    s1 <-  diag(ncol(c1))
+  }else{
+    s1 <- diag(diag(cov(c1)))
+  }
+  if(nrow(c2)==1){
+    s2 <-  diag(ncol(c2))
+  }else{
+    s2 <- diag(diag(cov(c2)))
+  }
+  return(as.numeric(t(diff) %*% solve(s1 + s2) %*% diff))
 }

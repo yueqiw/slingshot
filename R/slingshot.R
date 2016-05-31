@@ -1,5 +1,5 @@
 # load in necessary packages
-#require(princurve); require(ape); require(igraph)
+require(princurve); require(ape); require(igraph)
 #source('helper_functions.R')
 
 #########################
@@ -8,13 +8,14 @@
 
 #' @title Infer Lineage Structure from Clustered Samples
 #' 
-#' @description Given a reduced data matrix nxp and a vector of cluster identities (optionally including -1's for "unclustered"), this function infers a forest structure on the clusters and returns paths through the forest that can be interpreted as lineages.
+#' @description Given a reduced data matrix $n \times p$ and a vector of cluster identities (potentially including -1's for "unclustered"), this function infers a forest structure on the clusters and returns paths through the forest that can be interpreted as lineages.
 #' 
 #' @param X numeric, the nxp matrix of samples in a reduced dimensionality space
-#' @param clus.labels character, a vector of length n denoting cluster labels
+#' @param clus.labels character, a vector of length n denoting cluster labels, potentially including -1's for "unclustered."
+#' @param start.clus (optional) character, indicates the cluster(s) *from* which lineages will be drawn.
+#' @param end.clus (optional) character, indicates the cluster(s) which will be forced leaf nodes in their trees.
+#' @param dist.fun (optional) function, method for calculating distances between clusters. Must take two matrices as input, corresponding to points in reduced-dimensional space. If the minimum cluster size is larger than the number dimensions, the default is to use the joint covariance matrix to find squared distance between cluster centers. If not, the default is to use the diagonal of the joint covariance matrix.
 #' @param omega (optional) numeric between 0 and 1 or Inf. This granularity parameter determines the distance between every real cluster and the artificial cluster, OMEGA. It is parameterized as a fraction of the largest distance between two real clusters (hence, any value greater than 1 would result in a single tree being returned and would be equivalent to setting omega = Inf, the default)
-#' @param start.clus (optional) character, indicates the cluster(s) *from* which lineages will be drawn
-#' @param end.clus (optional) character, indicates the cluster(s) which will be forced leaf nodes in their trees
 #' 
 #' @details The \code{forest} is learned by fitting a (possibly constrained) minimum-spanning tree on the clusters and the artificial cluster, OMEGA, which is a distance \code{omega} from every real cluster.
 #'
@@ -33,7 +34,7 @@
 #' @importFrom ape mst
 #' 
 
-get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clus = NULL, distout = FALSE){
+get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = Inf, distout = FALSE){
   # set up, remove unclustered cells (-1's)
   X.original <- X
   X <- X[clus.labels != -1,]
@@ -50,38 +51,18 @@ get_lineages <- function(X, clus.labels, omega = Inf, start.clus = NULL, end.clu
     return(colMeans(x.sub))
   }))
   
-  # determine whether to use full covariance matrix or componentwise for distances
-  min.clus.size <- min(table(clus.labels))
-  if(min.clus.size <= ncol(X)){
-    # componentwise
-    message('Using adjusted diagonal covariance matrix')
-    dist.fun <- function(clus1, clus2){
-      mu1 <- colMeans(clus1)
-      mu2 <- colMeans(clus2)
-      diff <- mu1 - mu2
-      s1 <- if(nrow(clus1) == 1) {matrix(0,ncol(clus1),ncol(clus1))} else {cov(clus1)}
-      s1diag <- diag(s1)
-      s2 <- if(nrow(clus2) == 1) {matrix(0,ncol(clus1),ncol(clus1))} else {cov(clus2)}
-      s2diag <- diag(s2)
-      jointCov <- s1 + s2
-      jointCov[min.clus.size:ncol(X),] <- 0
-      jointCov[,min.clus.size:ncol(X)] <- 0
-      diag(jointCov) <- s1diag + s2diag
-      if(all(jointCov == 0)) {jointCov <- diag(ncol(jointCov))}
-      return(t(diff) %*% solve(jointCov) %*% diff)
-    }
-  }else{
-    # full covariance
-    dist.fun <- function(clus1, clus2){
-      mu1 <- colMeans(clus1)
-      mu2 <- colMeans(clus2)
-      diff <- mu1 - mu2
-      s1 <- cov(clus1)
-      s2 <- cov(clus2)
-      return(t(diff) %*% solve(s1 + s2) %*% diff)
+  # determine the distance function
+  if(is.null(dist.fun)){
+    min.clus.size <- min(table(clus.labels))
+    if(min.clus.size <= ncol(X)){
+      message('Using diagonal covariance matrix')
+      dist.fun <- function(c1,c2) .dist_clusters_diag(c1,c2)
+    }else{
+      message('Using full covariance matrix')
+      dist.fun <- function(c1,c2) .dist_clusters_full(c1,c2)
     }
   }
-
+  
   ### get pairwise cluster distance matrix
   D <- sapply(clusters,function(clID1){
     sapply(clusters,function(clID2){

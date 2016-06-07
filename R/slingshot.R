@@ -349,18 +349,14 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
         pcurves.shrink <- lapply(lines,function(l){
           pcurve <- pcurves[[l]]
           pct.i <- pct[[which(names(pct) == l)]]
-          s <- t(sapply(1:length(pcurve$lambda),function(i){
-            lam <- pcurve$lambda[i]
-            sapply(1:p,function(jj){
-              if(lam %in% avg$lambda){
-                avg.jj <- avg$line[avg$lambda == lam,jj]
-                orig.jj <- pcurve$s[i,jj]
-                return(avg.jj * pct.i[i] + orig.jj * (1-pct.i[i]))
-              }else{
-                return(pcurve$s[i,jj])
-              }
-            })
-          }))
+          s <- sapply(1:p,function(jj){
+            lam <- pcurve$lambda
+            avg.jj <- avg$line[match(lam,avg$lambda),jj]
+            orig.jj <- pcurve$s[,jj]
+            out <- avg.jj * pct.i + orig.jj * (1-pct.i)
+            out[is.na(out)] <- orig.jj[is.na(out)]
+            return(out)
+          })
           pcurve$s <- s
           return(pcurve)
         })

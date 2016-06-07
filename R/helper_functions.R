@@ -169,8 +169,7 @@
     dim.all <- sapply(1:length(pcurves.dense),function(i){ pcurves.dense[[i]][,jj] })
     return(rowMeans(dim.all))
   })
-  ind <- !duplicated(lambdas.all)
-  return(list(avg=avg[ind,],lambda=lambdas.all[ind]))
+  return(list(line=avg,lambda=lambdas.all))
 }
 .dist_clusters_full <- function(c1,c2){
   mu1 <- colMeans(c1)
@@ -203,6 +202,7 @@
   d1 <- lineage.density
   scale <- mean(share.idx)
   pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
+  pct.l[is.na(pct.l)] <- 0
   return(pct.l)
 }
 .shrink_to_avg <- function(pcurve, avg.curve, pct){

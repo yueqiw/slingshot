@@ -188,6 +188,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   # sort by number of clusters included
   lineages <- lineages[order(sapply(lineages, length), decreasing = TRUE)]
   out <- lineages
+  names(out) <- paste('lineage',1:length(lineages),sep='')
   # include "forest" and clusters x lineages (C) matrices
   out$forest <- forest
   C <- sapply(lineages,function(lin){
@@ -352,7 +353,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
             lam <- pcurve$lambda[i]
             sapply(1:p,function(jj){
               if(lam %in% avg$lambda){
-                avg.jj <- avg$avg[avg$lambda == lam,jj]
+                avg.jj <- avg$line[avg$lambda == lam,jj]
                 orig.jj <- pcurve$s[i,jj]
                 return(avg.jj * pct.i[i] + orig.jj * (1-pct.i[i]))
               }else{

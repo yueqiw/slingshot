@@ -198,6 +198,8 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   rownames(C) <- clusters
   # should probably come up with a better name than C
   out$C <- C
+  out$start.clus <- start.clus
+  out$end.clus <- end.clus
   if(distout){
     out$dist <- D
   }

@@ -196,3 +196,24 @@
   }
   return(as.numeric(t(diff) %*% solve(s1 + s2) %*% diff))
 }
+.percent_shrinkage <- function(pst, lineage.density, share.idx, bw){
+  #d1 <- density(pst)
+  #d2 <- density(pst[share.idx], bw = bw.med)
+  d2 <- density(pst[share.idx], bw = bw)
+  d1 <- lineage.density
+  scale <- mean(share.idx)
+  pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
+  return(pct.l)
+}
+.shrink_to_avg <- function(pcurve, avg.curve, pct){
+  lam <- pcurve$lambda
+  avg.curve$avg <- avg.curve$avg[avg.curve$lambda %in% lam,]
+  avg.curve$lambda <- avg.curve$lambda[avg.curve$lambda %in% lam]
+  s <- sapply(1:p,function(jj){
+    avg.jj <- avg.curve$avg[,jj]
+    orig.jj <- pcurve$s[,jj]
+    return(avg.jj * pct + orig.jj * (1-pct))
+  })
+  pcurve$s <- s
+  return(pcurve)
+}

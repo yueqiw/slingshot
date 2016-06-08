@@ -62,15 +62,15 @@ new_get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 10
       partial <- rbind(line.centers[1:seg,],sp)
       return(.lineage_length(partial))
     })
-    #tag <- order(lambda)
-    ord <- order(lambda)
-    s <- s[ord,]
-    lambda <- lambda[ord]
-    start <- list(s = s, lambda = lambda, dist = dist)
+    tag <- order(lambda)
+    #ord <- order(lambda)
+    #s <- s[ord,]
+    #lambda <- lambda[ord]
+    start <- list(s = s, lambda = lambda, tag = tag, dist = dist)
     return(start)
   })
   
-  for(i in 1:length(pcurves)){lines3d(pcurves[[i]]$s,lwd=2)}
+  #for(i in 1:length(pcurves)){lines(pcurves[[i]]$s[pcurves[[i]]$tag,],lwd=2)}
   
   # track distances between curves and data points to determine convergence
   dist.new <- sum(sapply(pcurves, function(pcv){ pcv$dist }))
@@ -86,76 +86,80 @@ new_get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 10
       s <- pcurve$s
       x.sub <- X[clus.labels %in% lineages[[l]],]
       for(jj in 1:p){
-        s[, jj] <- smootherFcn(pcurve$lambda, x.sub[,jj]) # ordering problem !!!!
+        s[, jj] <- smootherFcn(pcurve$lambda, x.sub[,jj]) # !!! ordering problem !!!
       }
-      true.pcurve <- get.lam(x.sub, s = s, stretch = stretch)
-      pcurve$lambda <- true.pcurve$lambda - min(true.pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
-      ord <- order(pcurve$lambda)
-      pcurve$s <- true.pcurve$s[ord,]
-      pcurve$lambda <- pcurve$lambda[ord]
-      pcurve$dist <- true.pcurve$dist
-      pcurves[[l]] <- pcurve
+      new.pcurve <- get.lam(x.sub, s = s, stretch = stretch)
+      new.pcurve$lambda <- new.pcurve$lambda - min(new.pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
+      pcurves[[l]] <- new.pcurve
     }
     
     # shrink together lineages near shared clusters
-    segmnts <- unique(C[rowSums(C)>1,])
-    segmnts <- segmnts[order(rowSums(segmnts),decreasing = TRUE),,drop = FALSE]
-    avg.lines <- lapply(1:nrow(segmnts),function(i){
-      ind <- which(segmnts[i,] == 1)
-      .avg_curves(pcurves[ind])
-    })
-    bws <- sapply(1:nclus,function(cl){sapply(1:L,function(l){
-      if(C[cl,l]==1){
-        ind <- clus.labels %in% lineages[[l]]
-        x <- pcurves[[l]]$lambda
-        out <- tryCatch(bw.SJ(x[clus.labels[ind] == clusters[cl]]), error=function(e) 0)
-        return(out)
-      }else{
-        return(0)
-      }
-    })})
-    bw.med <- median(bws[bws > 0])
-    den.lines <- lapply(1:L,function(l) density(pcurves[[l]]$lambda, bw=bw.med))
-    
-    for(i in 1:nrow(segmnts)){
-      seg <- segmnts[i,]
-      lines <- which(seg==1)
-      cls <- rownames(C)[apply(C,1,function(x){all(x==seg)})]
-      avg <- avg.lines[[i]]
-      pct <- lapply(lines,function(l){
-        pcurve <- pcurves[[l]]
-        ind <- clus.labels %in% lineages[[l]]
-        pst <- pcurve$lambda
-        return(.percent_shrinkage(pst, den.lines[[i]], clus.labels[ind] %in% cls, bw.med))
+    if(max(rowSums(C)) > 1){
+      segmnts <- unique(C[rowSums(C)>1,])
+      segmnts <- segmnts[order(rowSums(segmnts),decreasing = TRUE),,drop = FALSE]
+      avg.lines <- lapply(1:nrow(segmnts),function(i){
+        ind <- which(segmnts[i,] == 1)
+        .avg_curves(pcurves[ind])
       })
-      names(pct) <- lines
-      pcurves.shrink <- lapply(lines,function(l){
-        pcurve <- pcurves[[l]]
-        pct.i <- pct[[which(names(pct) == l)]]
-        s <- sapply(1:p,function(jj){
-          lam <- pcurve$lambda
-          avg.jj <- avg$line[match(lam,avg$lambda),jj]
-          orig.jj <- pcurve$s[,jj]
-          out <- avg.jj * pct.i + orig.jj * (1-pct.i)
-          out[is.na(out)] <- orig.jj[is.na(out)]
-          return(out)
+      bws <- sapply(1:nrow(segmnts),function(ii){
+        seg <- segmnts[ii,]
+        sapply(1:L,function(l){
+          if(seg[l]==1){
+            cls <- rownames(C)[apply(C,1,function(x){all(x==seg)})]
+            ind <- clus.labels %in% lineages[[l]]
+            x <- pcurves[[l]]$lambda
+            out <- tryCatch(bw.SJ(x[clus.labels[ind] %in% cls]), error=function(e) 0)
+            return(out)
+          }else{
+            return(0)
+          }
         })
-        pcurve$s <- s
-        return(pcurve)
       })
-      pcurves[lines] <- pcurves.shrink
+      bw.med <- median(bws[bws > 0])
+      den.lines <- lapply(1:L,function(l) density(pcurves[[l]]$lambda, bw=bw.med))
+      
+      for(i in 1:nrow(segmnts)){
+        seg <- segmnts[i,]
+        lines <- which(seg==1)
+        cls <- rownames(C)[apply(C,1,function(x){all(x==seg)})]
+        avg <- avg.lines[[i]]
+        pct <- lapply(lines,function(l){
+          pcurve <- pcurves[[l]]
+          ind <- clus.labels %in% lineages[[l]]
+          pst <- pcurve$lambda
+          return(.percent_shrinkage(pst, den.lines[[l]], clus.labels[ind] %in% cls, bw.med))
+        })
+        names(pct) <- lines
+        pcurves.shrink <- lapply(lines,function(l){
+          pcurve <- pcurves[[l]]
+          pct.i <- pct[[which(names(pct) == l)]]
+          s <- sapply(1:p,function(jj){
+            lam <- pcurve$lambda
+            avg.jj <- avg$line[match(lam,avg$lambda),jj]
+            orig.jj <- pcurve$s[,jj]
+            out <- avg.jj * pct.i + orig.jj * (1-pct.i)
+            out[is.na(out)] <- orig.jj[is.na(out)]
+            return(out)
+          })
+          pcurve$s <- s
+          pcurve$tag <- order(pcurve$lambda)
+          return(pcurve)
+        })
+        pcurves[lines] <- pcurves.shrink
+      }
     }
     
     dist.new <- sum(sapply(pcurves, function(pcv){ pcv$dist }))
     hasConverged <- (abs((dist.old - dist.new)/dist.old) <= thresh) || (it >= maxit)
     hasConverged
-    for(i in 1:length(pcurves)){lines3d(pcurves[[i]]$s,lwd=2)}
+    #for(i in 1:length(pcurves)){lines(pcurves[[i]]$s[pcurves[[i]]$tag,],lwd=2)}
   }
   # lines are set, but because shrinking happens second, the points defining
   # the lines are not the projections of the data points yet
   for(l in 1:L){
+    pcurve <- pcurves[[l]]
     x.sub <- X[clus.labels %in% lineages[[l]],]
-    line <- pcurves[[l]]$s #[pcurves[[l]]$tag,]
+    line <- pcurve$s[pcurve$tag,]
     s <- .project_points_to_lineage(line,x.sub)
     rownames(s) <- rownames(x.sub)
     lambda <- apply(s,1,function(sp){
@@ -172,11 +176,12 @@ new_get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 10
       return(.lineage_length(partial))
     })
     names(lambda) <- rownames(x.sub)
-    #tag <- order(lambda)
-    #names(tag) <- rownames(x.sub)
-    #pcurves[[l]]$s <- s[tag,]
-    #pcurves[[l]]$lambda <- lambda[tag]
-    #pcurves[[l]]$tag <- tag[tag]
+    tag <- order(lambda)
+    names(tag) <- rownames(x.sub)
+    pcurve$s <- s
+    pcurve$lambda <- lambda
+    pcurve$tag <- tag
+    pcurves[[l]] <- pcurve
   }
   return(pcurves)
 }

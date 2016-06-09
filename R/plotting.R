@@ -2,7 +2,7 @@ require(RColorBrewer)
 require(rgl)
 
 
-plot_tree <- function(X, clus.labels, lineages, threeD = TRUE, dim = NA, col = NA, labels = TRUE){
+plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = NA, labels = TRUE){
   forest <- lineages$forest
   clusters <- rownames(forest)
   nclus <- nrow(forest)
@@ -43,30 +43,42 @@ plot_tree <- function(X, clus.labels, lineages, threeD = TRUE, dim = NA, col = N
       text3d(centers, texts = rownames(centers), adj = c(1,1), add = TRUE, color = text.col)
     }
   }else{
-    pairs(X[,1:dim],pch=16,col=clus.col,panel = function(x,y,...){
-      points(x,y,...)
-      centers <- t(sapply(rownames(forest),function(clID){
-        x.sub <- cbind(x,y)[clus.labels == clID,]
-        return(colMeans(x.sub))
-      }))
-      for(i in 1:(nclus-1)){
-        for(j in (i+1):nclus){
-          if(forest[i,j]==1){
-            if(clusters[i] %in% lineages$start.clus | clusters[j] %in% lineages$start.clus){
-              seg.col <- brewer.pal(4,'Set1')[3]
-            }else if(clusters[i] %in% lineages$end.clus | clusters[j] %in% lineages$end.clus){
-              seg.col <- brewer.pal(4,'Set1')[1]
-            }else{
-              seg.col <- 1
-            }
-            lines(centers[c(i,j),1], centers[c(i,j),2], lwd=1.5, col = seg.col)
+    if(is.na(dim)){
+      dim <- ncol(X)
+    }
+    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.5,.5))
+    for(ii in 1:(dim-1)){
+      for(jj in 2:dim){
+        if(ii<jj){
+          y <- X[,ii]; x <- X[,jj]
+          if(abs(ii-jj)>1){
+            plot(x,y,col=clus.col,pch=16,asp=1,ylab='',xlab='',axes=F); box()
+          }else{
+            plot(x,y,col=clus.col,pch=16,asp=1,ylab=colnames(X)[ii],xlab=colnames(X)[jj])
           }
+          for(i in 1:(nclus-1)){
+            for(j in (i+1):nclus){
+              if(forest[i,j]==1){
+                if(clusters[i] %in% lineages$start.clus | clusters[j] %in% lineages$start.clus){
+                  seg.col <- brewer.pal(4,'Set1')[3]
+                }else if(clusters[i] %in% lineages$end.clus | clusters[j] %in% lineages$end.clus){
+                  seg.col <- brewer.pal(4,'Set1')[1]
+                }else{
+                  seg.col <- 1
+                }
+                lines(centers[c(i,j),jj], centers[c(i,j),ii], lwd=1.5, col = seg.col)
+              }
+            }
+          }
+          points(centers[,jj],centers[,ii])
+          points(centers[,jj],centers[,ii],pch=16,col=center.col)
+          #text(centers, labels = rownames(centers))
+        }else{
+          plot.new()
         }
       }
-      #   points(centers)
-      #   points(centers,pch=16,col=center.col)
-      text(centers, labels = rownames(centers))
-    }, lower.panel = NULL)
+    }
+    par(mfrow=c(1,1),mar=c(5.1,4.1,4.1,2.1))
   }
 }
 

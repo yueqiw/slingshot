@@ -396,10 +396,10 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     x.sub <- X[clus.labels %in% lineages[[l]],]
     new.pcurve <- get.lam(x.sub, s = pcurve$s, tag = pcurve$tag, stretch = stretch)
     new.pcurve$lambda <- new.pcurve$lambda - min(new.pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
+    new.pcurve$pseudotime <- new.pcurve$lambda
     ord <- new.pcurve$tag
     new.pcurve$s <- new.pcurve$s[ord,]
     new.pcurve$lambda <- new.pcurve$lambda[ord]
-    new.pcurve$tag <- new.pcurve$s[ord]
     # line <- pcurve$s[pcurve$tag,]
     # s <- .project_points_to_lineage(line,x.sub)
     # rownames(s) <- rownames(x.sub)

@@ -323,7 +323,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
       s <- pcurve$s
       x.sub <- X[clus.labels %in% lineages[[l]],]
       for(jj in 1:p){
-        s[, jj] <- smootherFcn(pcurve$lambda, x.sub[,jj]) # !!! ordering problem !!!
+        s[, jj] <- smootherFcn(pcurve$lambda, x.sub[,jj])
       }
       new.pcurve <- get.lam(x.sub, s = s, stretch = stretch)
       new.pcurve$lambda <- new.pcurve$lambda - min(new.pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
@@ -394,29 +394,36 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   for(l in 1:L){
     pcurve <- pcurves[[l]]
     x.sub <- X[clus.labels %in% lineages[[l]],]
-    line <- pcurve$s[pcurve$tag,]
-    s <- .project_points_to_lineage(line,x.sub)
-    rownames(s) <- rownames(x.sub)
-    lambda <- apply(s,1,function(sp){
-      K <- nrow(line)
-      dists <- sapply(1:(K-1), function(k){
-        .dist_point_to_segment(line[k,],line[k+1,],sp)
-      })
-      seg <- which.min(dists)
-      if(seg == 1){
-        partial <- rbind(line[1,],sp)
-      }else{
-        partial <- rbind(line[1:(seg-1),],sp)
-      }
-      return(.lineage_length(partial))
-    })
-    names(lambda) <- rownames(x.sub)
-    tag <- order(lambda)
-    names(tag) <- rownames(x.sub)
-    pcurve$s <- s[tag,]
-    pcurve$lambda <- lambda[tag]
-    pcurve$tag <- tag[tag]
-    pcurves[[l]] <- pcurve
+    new.pcurve <- get.lam(x.sub, s = pcurve$s, tag = pcurve$tag, stretch = stretch)
+    new.pcurve$lambda <- new.pcurve$lambda - min(new.pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
+    ord <- new.pcurve$tag
+    new.pcurve$s <- new.pcurve$s[ord,]
+    new.pcurve$lambda <- new.pcurve$lambda[ord]
+    new.pcurve$tag <- new.pcurve$s[ord]
+    # line <- pcurve$s[pcurve$tag,]
+    # s <- .project_points_to_lineage(line,x.sub)
+    # rownames(s) <- rownames(x.sub)
+    # lambda <- apply(s,1,function(sp){
+    #   K <- nrow(line)
+    #   dists <- sapply(1:(K-1), function(k){
+    #     .dist_point_to_segment(line[k,],line[k+1,],sp)
+    #   })
+    #   seg <- which.min(dists)
+    #   if(seg == 1){
+    #     partial <- rbind(line[1,],sp)
+    #   }else{
+    #     partial <- rbind(line[1:(seg-1),],sp)
+    #   }
+    #   return(.lineage_length(partial))
+    # })
+    # names(lambda) <- rownames(x.sub)
+    # tag <- order(lambda)
+    # names(tag) <- rownames(x.sub)
+    # pcurve$s <- s[tag,]
+    # pcurve$lambda <- lambda[tag]
+    # pcurve$tag <- tag[tag]
+    # pcurves[[l]] <- pcurve
+    pcurves[[l]] <- new.pcurve
   }
   return(pcurves)
 }

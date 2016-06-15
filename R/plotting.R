@@ -61,7 +61,7 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
               if(forest[i,j]==1){
                 if(clusters[i] %in% lineages$start.clus | clusters[j] %in% lineages$start.clus){
                   seg.col <- brewer.pal(4,'Set1')[3]
-                }else if(clusters[i] %in% lineages$end.clus | clusters[j] %in% lineages$end.clus){
+                }else if(clusters[i] %in% lineages$end.clus[lineages$end.given] | clusters[j] %in% lineages$end.clus[lineages$end.given]){
                   seg.col <- brewer.pal(4,'Set1')[1]
                 }else{
                   seg.col <- 1
@@ -96,5 +96,27 @@ plot_curves <- function(X,clus.labels,curves, threeD = TRUE, dim = NA, col = NA)
   if(threeD){
     plot3d(X[,1:3],col=cc[as.factor(clus.labels)],size=5,box=FALSE,aspect='iso')
     for(i in 1:length(curves)){lines3d(curves[[i]]$s,lwd=3)}
+  }else{
+    if(is.na(dim)){
+      dim <- ncol(X)
+    }
+    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.5,.5))
+    for(ii in 1:(dim-1)){
+      for(jj in 2:dim){
+        if(ii<jj){
+          y <- X[,ii]; x <- X[,jj]
+          if(abs(ii-jj)>1){
+            plot(x,y,col=clus.col,pch=16,asp=1,ylab='',xlab='',axes=F); box()
+          }else{
+            plot(x,y,col=clus.col,pch=16,asp=1,ylab=colnames(X)[ii],xlab=colnames(X)[jj])
+          }
+          for(i in 1:length(curves)){lines(curves[[i]]$s[,c(jj,ii)],lwd=2)}
+        }else{
+          plot.new()
+        }
+      }
+    }
+    par(mfrow=c(1,1),mar=c(5.1,4.1,4.1,2.1))
   }
 }
+

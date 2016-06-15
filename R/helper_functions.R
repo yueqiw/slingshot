@@ -217,3 +217,12 @@
   pcurve$s <- s
   return(pcurve)
 }
+.sq_segment_lengths <- function(from, to){
+  if(any(dim(from) != dim(to))){
+    stop('input matrices must have same dimensions')
+  }
+  sqdists <- sapply(1:nrow(from),function(i){
+    sum((from[i,]-to[i,])^2)
+  })
+  return(sqdists)
+}

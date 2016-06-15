@@ -189,6 +189,16 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   lineages <- lineages[order(sapply(lineages, length), decreasing = TRUE)]
   out <- lineages
   names(out) <- paste('lineage',1:length(lineages),sep='')
+
+  first <- unique(sapply(out,function(l){l[1]}))
+  last <- unique(sapply(out,function(l){l[length(l)]}))
+  start.given <- first %in% start.clus
+  end.given <- last %in% end.clus
+  out$start.clus <- first
+  out$start.given <- start.given
+  out$end.clus <- last
+  out$end.given <- end.given
+  
   # include "forest" and clusters x lineages (C) matrices
   out$forest <- forest
   C <- sapply(lineages,function(lin){
@@ -199,8 +209,6 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   rownames(C) <- clusters
   # should probably come up with a better name than C
   out$C <- C
-  out$start.clus <- start.clus
-  out$end.clus <- end.clus
   if(distout){
     out$dist <- D
   }

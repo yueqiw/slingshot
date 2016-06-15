@@ -1,30 +1,56 @@
-# load in necessary packages
-require(princurve); require(ape); require(igraph)
-#source('helper_functions.R')
-
-#########################
-### get_lineages()
-#########################
-
 #' @title Infer Lineage Structure from Clustered Samples
 #' 
-#' @description Given a reduced data matrix $n \times p$ and a vector of cluster identities (potentially including -1's for "unclustered"), this function infers a forest structure on the clusters and returns paths through the forest that can be interpreted as lineages.
+#' @description Given a reduced-dimension data matrix \code{n x p} and a vector of
+#' cluster identities (potentially including -1's for "unclustered"), this function
+#' infers a forest structure on the clusters and returns paths through the forest
+#' that can be interpreted as lineages.
 #' 
-#' @param X numeric, the nxp matrix of samples in a reduced dimensionality space
-#' @param clus.labels character, a vector of length n denoting cluster labels, potentially including -1's for "unclustered."
-#' @param start.clus (optional) character, indicates the cluster(s) *from* which lineages will be drawn.
-#' @param end.clus (optional) character, indicates the cluster(s) which will be forced leaf nodes in their trees.
-#' @param dist.fun (optional) function, method for calculating distances between clusters. Must take two matrices as input, corresponding to points in reduced-dimensional space. If the minimum cluster size is larger than the number dimensions, the default is to use the joint covariance matrix to find squared distance between cluster centers. If not, the default is to use the diagonal of the joint covariance matrix.
-#' @param omega (optional) numeric between 0 and 1 or Inf. This granularity parameter determines the distance between every real cluster and the artificial cluster, OMEGA. It is parameterized as a fraction of the largest distance between two real clusters (hence, any value greater than 1 would result in a single tree being returned and would be equivalent to setting omega = Inf, the default)
+#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
+#'   space.
+#' @param clus.labels character, a vector of length n denoting cluster labels,
+#'   potentially including -1's for "unclustered."
+#' @param start.clus (optional) character, indicates the cluster(s) *from* which
+#'   lineages will be drawn.
+#' @param end.clus (optional) character, indicates the cluster(s) which will be
+#'   forced leaf nodes in their trees.
+#' @param dist.fun (optional) function, method for calculating distances between
+#'   clusters. Must take two matrices as input, corresponding to points in
+#'   reduced-dimensional space. If the minimum cluster size is larger than the
+#'   number dimensions, the default is to use the joint covariance matrix to find
+#'   squared distance between cluster centers. If not, the default is to use the
+#'   diagonal of the joint covariance matrix.
+#' @param omega (optional) numeric between 0 and 1 or Inf. This granularity
+#'   parameter determines the distance between every real cluster and the artificial
+#'   cluster, OMEGA. It is parameterized as a fraction of the largest distance
+#'   between two real clusters (hence, any value greater than 1 would result in a
+#'   single tree being returned and would be equivalent to setting omega = Inf, the
+#'   default)
+#' @param distout (optional) logical, indicating whether the distance matrix between
+#'   the clusters should be included with output.
 #' 
-#' @details The \code{forest} is learned by fitting a (possibly constrained) minimum-spanning tree on the clusters and the artificial cluster, OMEGA, which is a distance \code{omega} from every real cluster.
+#' @details The connectivity matrix, denoted \code{forest}, is learned by fitting a
+#'   (possibly constrained) minimum-spanning tree on the clusters and the artificial
+#'   cluster, OMEGA, which is a distance \code{omega} from every real cluster.
 #'
-#' Once the \code{forest} is known, lineages are identified in any tree with at least two clusters. For a given tree, if there is an annotated starting cluster, every possible path out of a starting cluster and ending in a leaf that isn't another starting cluster will be returned. If no starting cluster is annotated, every leaf will be considered as a potential starting cluster and whichever configuration produces the longest average lineage length (in terms of number of clusters included) will be returned.
+#' @details Once the \code{forest} is known, lineages are identified in any tree
+#'   with at least two clusters. For a given tree, if there is an annotated starting
+#'   cluster, every possible path out of a starting cluster and ending in a leaf
+#'   that isn't another starting cluster will be returned. If no starting cluster is
+#'   annotated, every leaf will be considered as a potential starting cluster and
+#'   whichever configuration produces the longest average lineage length (in terms
+#'   of number of clusters included) will be returned.
 #'
-#' @return a list with L+2 items where L is the number of lineages identified. The first L items are character vectors with the names of the clusters included in that lineage. The last two items are \code{forest}, the connectivity matrix, and \code{C}, a clusters x lineages identity matrix.
+#' @return a list with at least \code{L} items where \code{L} is the number of
+#'   lineages identified. Each lineage is represented by a character vector with the
+#'   names of the clusters included in that lineage. Additional items may include:
+#'   \code{forest}, the connectivity matrix; \code{C}, a clusters x lineages
+#'   identity matrix; \code{start.clus} and \code{end.clus}, the starting and ending
+#'   cluster(s); \code{start.given} and \code{end.given}, logical values indicating
+#'   whether the starting and ending clusters were specified a priori; \code{dist},
+#'   the pairwise cluster distance matrix.
 #'
 #' @examples
-#' data("toy_data")
+#' data("slingshot_example")
 #' get_lineages(X, clus.labels)
 #' get_lineages(X, clus.labels, start.clus = 'a')
 #' 
@@ -42,9 +68,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   clusters <- unique(clus.labels)
   nclus <- length(clusters)
   
-  ###############################
-  ### get the connectivity matrix that defines the "forest"
-  ###############################
+  ### get the connectivity matrix
   # get cluster centers
   centers <- t(sapply(clusters,function(clID){
     x.sub <- X[clus.labels == clID, ,drop = FALSE]
@@ -216,28 +240,31 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 }
 
 
-#########################
-### get_curves()
-#########################
-
 #' @title Construct Smooth Curves for Each Lineage
 #' 
-#' @description This function takes a reduced data matrix nxp, a vector of cluster identities (optionally including -1's for "unclustered"), and a set of lineages consisting of paths through a forest constructed on the clusters. It constructs smooth curves for each lineage and returns the points along these curves corresponding to the orthogonal projections of each data point, along with lambda (pseudotime) values.
+#' @description This function takes a reduced data matrix \code{n x p}, a vector of
+#'   cluster identities (optionally including -1's for "unclustered"), and a set of
+#'   lineages consisting of paths through a forest constructed on the clusters. It
+#'   constructs smooth curves for each lineage and returns the points along these
+#'   curves corresponding to the orthogonal projections of each data point, along
+#'   with lambda (pseudotime) values.
 #' 
-#' @param X numeric, the nxp matrix of samples in a reduced dimensionality space
-#' @param clus.labels character, a vector of length n denoting cluster labels
-#' @param lineages list, denotes which lineages each cluster is a part of and contains the matrix defining the forest structure drawn on the clusters by \code{get_lineages}.
-#' @param thresh (optional) 
-#' @param maxit (optional)
-#' @param stretch (optional)
-#' @param trace (optional)
+#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality
+#'   space.
+#' @param clus.labels character, a vector of length n denoting cluster labels.
+#' @param lineages list, denotes which lineages each cluster is a part of and
+#'   contains the matrix defining the forest structure drawn on the clusters by
+#'   \code{\link{get_lineages}}.
+#' @param thresh (optional) see documentation for \code{\link{principal.curve}}.
+#' @param maxit (optional) see documentation for \code{\link{principal.curve}}.
+#' @param stretch (optional) see documentation for \code{\link{principal.curve}}.
 #' 
 #' @details TODO
 #'
 #' @return TODO
 #'
 #' @examples
-#' data("toy_data")
+#' data("slingshot_example")
 #' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
 #' get_curves(X, clus.labels, lineages)
 #' 
@@ -246,7 +273,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @importFrom princurve get.lam
 #' 
 
-get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, trace = FALSE, shrink = TRUE){
+get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, shrink = TRUE){
   smoother <- "smooth.spline"
   smootherFcn <- function(lambda, xj, ..., df = 5) {
     o <- order(lambda)

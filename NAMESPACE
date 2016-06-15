@@ -2,6 +2,10 @@
 
 export(get_curves)
 export(get_lineages)
+export(plot_curves)
+export(plot_tree)
+import(RColorBrewer)
 import(igraph)
+import(rgl)
 importFrom(ape,mst)
 importFrom(princurve,get.lam)

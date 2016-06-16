@@ -34,13 +34,15 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
     return(colMeans(x.sub))
   }))
   rownames(centers) <- clusters
+  X <- X[clus.labels %in% clusters,]
+  clus.labels <- clus.labels[clus.labels %in% clusters]
   if(is.na(col)){
     cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
     center.col <- cc[1:nclus]
   }else{
     center.col <- rep_len(col, length.out = nclus)
   }
-  clus.col <- sapply(clus.labels,function(clID){center.col[which(clusters==clID)]})
+  clus.col <- vapply(clus.labels,function(clID) {center.col[which(clusters==clID)]}, character(1))
   if(threeD){
     plot3d(X[,1:3],col=clus.col,size=5,box=FALSE,aspect = 'iso')
     for(i in 1:(nclus-1)){
@@ -135,6 +137,8 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
 #' 
 
 plot_curves <- function(X,clus.labels,curves, threeD = TRUE, dim = NA, col = NA){
+  X <- X[clus.labels != '-1',]
+  clus.labels <- clus.labels[clus.labels != '-1']
   clusters <- unique(clus.labels)
   nclus <- length(clusters)
   if(is.na(col)){

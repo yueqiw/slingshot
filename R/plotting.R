@@ -50,7 +50,7 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
         if(forest[i,j]==1){
           if(clusters[i] %in% lineages$start.clus | clusters[j] %in% lineages$start.clus){
             seg.col <- brewer.pal(4,'Set1')[3]
-          }else if(clusters[i] %in% lineages$end.clus | clusters[j] %in% lineages$end.clus){
+          }else if(clusters[i] %in% lineages$end.clus[lineages$end.given] | clusters[j] %in% lineages$end.clus[lineages$end.given]){
             seg.col <- brewer.pal(4,'Set1')[1]
           }else{
             seg.col <- 1
@@ -63,8 +63,8 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
     plot3d(centers, size=9, add = TRUE)
     if(labels){
       text.col <- rep(1,nclus)
-      text.col[rownames(centers) %in% lineages$start.clus] <- brewer.pal(4,'Set1')[3]
-      text.col[rownames(centers) %in% lineages$end.clus] <- brewer.pal(4,'Set1')[1]
+      #text.col[rownames(centers) %in% lineages$start.clus] <- brewer.pal(4,'Set1')[3]
+      #text.col[rownames(centers) %in% lineages$end.clus] <- brewer.pal(4,'Set1')[1]
       text3d(centers, texts = rownames(centers), adj = c(1,1), add = TRUE, color = text.col)
     }
   }else{

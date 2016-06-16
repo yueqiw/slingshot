@@ -125,7 +125,7 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
 #' @examples
 #' data("slingshot_example")
 #' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-#' get_curves(X, clus.labels, lineages)
+#' curves <- get_curves(X, clus.labels, lineages)
 #' plot_curves(X, clus.labels, curves, threeD = FALSE)
 #' 
 #' @export

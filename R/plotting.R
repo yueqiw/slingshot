@@ -71,7 +71,7 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
     if(is.na(dim)){
       dim <- ncol(X)
     }
-    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.5,.5))
+    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.2,.2))
     for(ii in 1:(dim-1)){
       for(jj in 2:dim){
         if(ii<jj){
@@ -155,7 +155,7 @@ plot_curves <- function(X,clus.labels,curves, threeD = FALSE, dim = NA, col = NA
     if(is.na(dim)){
       dim <- ncol(X)
     }
-    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.5,.5))
+    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.2,.2))
     for(ii in 1:(dim-1)){
       for(jj in 2:dim){
         if(ii<jj){

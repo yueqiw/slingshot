@@ -164,7 +164,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
     tree.ind <- rownames(forest) %in% tree
     tree.graph <- forest[tree.ind, tree.ind]
     degree <- rowSums(tree.graph)
-    g <- igraph::graph.adjacency(tree.graph, mode="undirected")
+    g <- graph.adjacency(tree.graph, mode="undirected")
     
     # if you have starting cluster(s) in this tree, draw lineages to each leaf
     if(! is.null(start.clus)){
@@ -172,7 +172,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
         starts <- start.clus[start.clus %in% tree]
         ends <- rownames(tree.graph)[degree == 1 & ! rownames(tree.graph) %in% starts]
         for(st in starts){
-          paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+          paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
           for(p in paths){
             lineages[[length(lineages)+1]] <- names(p)
           }
@@ -183,12 +183,12 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
         leaves <- rownames(tree.graph)[degree == 1]
         avg.lineage.length <- sapply(leaves,function(l){
           ends <- leaves[leaves != l]
-          paths <- igraph::shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+          paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
           mean(sapply(paths, length))
         })
         st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
         ends <- leaves[leaves != st]
-        paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+        paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
         for(p in paths){
           lineages[[length(lineages)+1]] <- names(p)
         }
@@ -199,12 +199,12 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
       leaves <- rownames(tree.graph)[degree == 1]
       avg.lineage.length <- sapply(leaves,function(l){
         ends <- leaves[leaves != l]
-        paths <- igraph::shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+        paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
         mean(sapply(paths, length))
       })
       st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
       ends <- leaves[leaves != st]
-      paths <- igraph::shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+      paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
       for(p in paths){
         lineages[[length(lineages)+1]] <- names(p)
       }

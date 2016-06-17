@@ -136,7 +136,7 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
 #' @import rgl
 #' 
 
-plot_curves <- function(X,clus.labels,curves, threeD = TRUE, dim = NA, col = NA){
+plot_curves <- function(X,clus.labels,curves, threeD = FALSE, dim = NA, col = NA){
   X <- X[clus.labels != '-1',]
   clus.labels <- clus.labels[clus.labels != '-1']
   clusters <- unique(clus.labels)

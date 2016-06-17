@@ -461,6 +461,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     # pcurves[[l]] <- pcurve
     pcurves[[l]] <- new.pcurve
   }
+  names(pcurves) <- paste('curve',1:length(pcurves),sep='')
   return(pcurves)
 }
 

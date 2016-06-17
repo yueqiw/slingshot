@@ -56,7 +56,8 @@
 #' 
 #' @export
 #'
-#' @import igraph 
+#' @importFrom igraph graph.adjacency
+#' @importFrom igraph shortest_paths
 #' @importFrom ape mst
 #' 
 
@@ -105,7 +106,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
     if(omega >= 0 & omega <= 1){
       omega <- omega * max(D)
     }else{
-      stop("as it's currently set up, omega must be between 0 and 1")
+      stop("omega must be between 0 and 1")
     }
   }
   D <- rbind(D, rep(omega, ncol(D)) )

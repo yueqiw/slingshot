@@ -5,8 +5,8 @@ Functions for identifying and characterizing continuous developmental trajectori
 ## Installation
 
 ```r
-library(devtools)
-install_github("kstreet13/slingshot")
+source("https://bioconductor.org/biocLite.R")
+biocLite("BiocParallel")
 ```
 
 ## Issues and bug reports

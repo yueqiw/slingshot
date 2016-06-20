@@ -434,6 +434,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     new.pcurve$lambda <- new.pcurve$lambda - min(new.pcurve$lambda, na.rm = TRUE) # start at 0 instead of mean 0
     new.pcurve$pseudotime <- new.pcurve$lambda
     names(new.pcurve$pseudotime) <- rownames(x.sub)
+    new.pcurve$pseudotime <- new.pcurve$pseudotime[match(rownames(X), names(new.pcurve$pseudotime))]
     rownames(new.pcurve$s) <- rownames(x.sub)
     names(new.pcurve$lambda) <- rownames(x.sub)
     ord <- new.pcurve$tag

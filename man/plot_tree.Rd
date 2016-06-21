@@ -5,7 +5,7 @@
 \title{Plot cluster connectivity}
 \usage{
 plot_tree(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
-  col = NA, labels = TRUE)
+  col.clus = NULL, labels = TRUE)
 }
 \arguments{
 \item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
@@ -23,9 +23,9 @@ package.}
 \item{dim}{total number of dimensions to be shown in a series of two-dimensional 
 plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
 
-\item{col}{(optional) vector of colors to use for denoting clusters.}
-
 \item{labels}{logical indicating whether to include labels on cluster centers.}
+
+\item{col}{(optional) vector of colors to use for denoting clusters.}
 }
 \value{
 returns \code{NULL}.

@@ -39,7 +39,7 @@
 #' @import rgl
 #' 
 
-plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA, col = NULL, labels = TRUE){
+plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA, col.clus = NULL, labels = TRUE){
   forest <- lineages$forest
   clusters <- rownames(forest)
   nclus <- nrow(forest)
@@ -50,11 +50,11 @@ plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
   rownames(centers) <- clusters
   X <- X[clus.labels %in% clusters,]
   clus.labels <- clus.labels[clus.labels %in% clusters]
-  if(is.null(col)){
+  if(is.null(col.clus)){
     cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
     center.col <- cc[1:nclus]
   }else{
-    center.col <- rep_len(col, length.out = nclus)
+    center.col <- rep_len(col.clus, length.out = nclus)
   }
   clus.col <- vapply(clus.labels,function(clID) {center.col[which(clusters==clID)]}, character(1))
   if(threeD){
@@ -138,7 +138,8 @@ plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
 #'  package.
 #' @param dim total number of dimensions to be shown in a series of two-dimensional 
 #'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
-#' @param col (optional) vector of colors to use for denoting clusters.
+#' @param col.clus (optional) vector of colors to use for denoting clusters.
+#' @param col.lin (optional) vector of colors to use for denoting lineages.
 #' 
 #' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
 #'  If a \code{curves} argument is given, the plot will include curves representing
@@ -163,21 +164,26 @@ plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
 #' @import rgl
 #' 
 
-plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA, col = NULL){
+plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA, col.clus = NULL, col.lin = NULL){
   X <- X[clus.labels != '-1',]
   clus.labels <- clus.labels[clus.labels != '-1']
   clusters <- unique(clus.labels)
   nclus <- length(clusters)
-  if(is.null(col)){
+  if(is.null(col.clus)){
     cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
     center.col <- cc[1:nclus]
   }else{
-    center.col <- rep_len(col, length.out = nclus)
+    center.col <- rep_len(col.clus, length.out = nclus)
+  }
+  if(! is.null(col.lin)){
+    lin.col <- rep_len(col.lin, length.out = length(curves))
+  }else{
+    lin.col <- rep(1, length(curves))
   }
   clus.col <- sapply(clus.labels,function(clID){center.col[which(clusters==clID)]})
   if(threeD){
-    plot3d(X[,1:3],col=cc[as.factor(clus.labels)],size=5,box=FALSE,aspect='iso')
-    for(i in 1:length(curves)){lines3d(curves[[i]]$s,lwd=3)}
+    plot3d(X[,1:3],col=clus.col,size=5,box=FALSE,aspect='iso')
+    for(i in 1:length(curves)){lines3d(curves[[i]]$s,lwd=3, col=lin.col[i])}
   }else{
     if(is.na(dim)){
       dim <- ncol(X)
@@ -192,7 +198,7 @@ plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA,
           }else{
             plot(x,y,col=clus.col,pch=16,asp=1,ylab=colnames(X)[ii],xlab=colnames(X)[jj])
           }
-          for(i in 1:length(curves)){lines(curves[[i]]$s[,c(jj,ii)],lwd=2)}
+          for(i in 1:length(curves)){lines(curves[[i]]$s[,c(jj,ii)],lwd=2, col = lin.col[i])}
         }else{
           plot.new()
         }

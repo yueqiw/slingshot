@@ -5,7 +5,7 @@
 \title{Plot smooth curves}
 \usage{
 plot_curves(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA,
-  col = NA)
+  col.clus = NULL, col.lin = NULL)
 }
 \arguments{
 \item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
@@ -22,7 +22,9 @@ package.}
 \item{dim}{total number of dimensions to be shown in a series of two-dimensional 
 plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
 
-\item{col}{(optional) vector of colors to use for denoting clusters.}
+\item{col.clus}{(optional) vector of colors to use for denoting clusters.}
+
+\item{col.lin}{(optional) vector of colors to use for denoting lineages.}
 }
 \value{
 returns \code{NULL}.

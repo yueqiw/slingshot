@@ -53,8 +53,8 @@
 #' @examples
 #' data("slingshot_example")
 #' get_lineages(X, clus.labels)
-#' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-#' plot_tree(X, clus.labels, lineages)
+#' lin <- get_lineages(X, clus.labels, start.clus = 'a')
+#' plot_tree(X, clus.labels, lin)
 #' 
 #' @export
 #'
@@ -281,9 +281,9 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #'
 #' @examples
 #' data("slingshot_example")
-#' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-#' curves <- get_curves(X, clus.labels, lineages)
-#' plot_curves(X, clus.labels, curves)
+#' lin <- get_lineages(X, clus.labels, start.clus = 'a')
+#' crv <- get_curves(X, clus.labels, lin)
+#' plot_curves(X, clus.labels, crv)
 #' 
 #' @export
 #'

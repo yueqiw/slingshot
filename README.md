@@ -6,7 +6,7 @@ Functions for identifying and characterizing continuous developmental trajectori
 
 ```r
 source("https://bioconductor.org/biocLite.R")
-biocLite("BiocParallel")
+biocLite("kstreet13/slingshot")
 ```
 
 ## Issues and bug reports

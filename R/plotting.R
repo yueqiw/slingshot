@@ -1,16 +1,30 @@
 #' @title Plot cluster connectivity
 #' 
-#' @description \code{plot_tree} visualizes the output from \code{\link{get_lineages}}, showing cells (colored by cluster) in a reduced-dimensional space with connecting lines between cluster centers representing the inferred structure.
+#' @description \code{plot_tree} visualizes the output from \code{\link{get_lineages}}, 
+#' showing cells (colored by cluster) in a reduced-dimensional space with connecting 
+#' lines between cluster centers representing the inferred structure.
 #' 
-#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality space.
+#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
+#'  space.
 #' @param clus.labels character, a vector of length n denoting cluster labels.
-#' @param lineages list, the out put of \code{\link{get_lineages}}, this list denotes which clusters belong to each lineage and contains the inferred connectivity between clusters.
-#' @param threeD, logical indicates whether to make a 3D plot with the \code{rgl} package.
-#' @param dim, total number of dimensions to be shown in a series of two-dimensional plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
+#' @param lineages list, the out put of \code{\link{get_lineages}}, this list denotes 
+#'  which clusters belong to each lineage and contains the inferred connectivity 
+#'  between clusters.
+#' @param threeD, logical indicates whether to make a 3D plot with the \code{rgl} 
+#'  package.
+#' @param dim, total number of dimensions to be shown in a series of two-dimensional 
+#'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
 #' @param col, (optional) vector of colors to use for denoting clusters.
 #' @param labels, logical indicating whether to include labels on cluster centers.
 #' 
-#' @details TODO
+#' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
+#'  If a \code{lineages} argument is given, the plot will include straight lines
+#'  between cluster centers for connections between clusters.
+#'
+#' @details The default behavior is to produce a series of 2-D plots representing
+#'  all pairwise combinations of dimensions in \code{X}, or the first \code{dim}
+#'  dimensions. If \code{threeD=TRUE}, a three-dimensional plot will be created,
+#'  using the \code{rgl} package.
 #'
 #' @return returns \code{NULL}.
 #'
@@ -25,7 +39,7 @@
 #' @import rgl
 #' 
 
-plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = NA, labels = TRUE){
+plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA, col = NA, labels = TRUE){
   forest <- lineages$forest
   clusters <- rownames(forest)
   nclus <- nrow(forest)
@@ -111,16 +125,29 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
 
 #' @title Plot smooth curves
 #' 
-#' @description \code{plot_curves} visualizes the output from \code{\link{get_curves}}, showing cells (colored by cluster) in a reduced-dimensional space with smooth curves representing each inferred lineage.
+#' @description \code{plot_curves} visualizes the output from \code{\link{get_curves}}, 
+#'  showing cells (colored by cluster) in a reduced-dimensional space with smooth 
+#'  curves representing each inferred lineage.
 #' 
-#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality space.
+#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
+#'  space.
 #' @param clus.labels character, a vector of length n denoting cluster labels.
-#' @param curves list, the output of \code{\link{get_curves}}, this list includes matrices for each curve in the reduced-dimensional space.
-#' @param threeD, logical indicates whether to make a 3D plot with the \code{rgl} package.
-#' @param dim, total number of dimensions to be shown in a series of two-dimensional plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
+#' @param curves list, the output of \code{\link{get_curves}}, this list includes 
+#'  matrices for each curve in the reduced-dimensional space.
+#' @param threeD, logical indicates whether to make a 3D plot with the \code{rgl} 
+#'  package.
+#' @param dim, total number of dimensions to be shown in a series of two-dimensional 
+#'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
 #' @param col, (optional) vector of colors to use for denoting clusters.
 #' 
-#' @details TODO
+#' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
+#'  If a \code{curves} argument is given, the plot will include curves representing
+#'  each lineage.
+#'
+#' @details The default behavior is to produce a series of 2-D plots representing
+#'  all pairwise combinations of dimensions in \code{X}, or the first \code{dim}
+#'  dimensions. If \code{threeD=TRUE}, a three-dimensional plot will be created,
+#'  using the \code{rgl} package.
 #'
 #' @return returns \code{NULL}.
 #'
@@ -136,7 +163,7 @@ plot_tree <- function(X, clus.labels, lineages, threeD = FALSE, dim = NA, col = 
 #' @import rgl
 #' 
 
-plot_curves <- function(X,clus.labels,curves, threeD = FALSE, dim = NA, col = NA){
+plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA, col = NA){
   X <- X[clus.labels != '-1',]
   clus.labels <- clus.labels[clus.labels != '-1']
   clusters <- unique(clus.labels)

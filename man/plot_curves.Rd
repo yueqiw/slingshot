@@ -4,18 +4,23 @@
 \alias{plot_curves}
 \title{Plot smooth curves}
 \usage{
-plot_curves(X, clus.labels, curves, threeD = FALSE, dim = NA, col = NA)
+plot_curves(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA,
+  col = NA)
 }
 \arguments{
-\item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality space.}
+\item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
+space.}
 
 \item{clus.labels}{character, a vector of length n denoting cluster labels.}
 
-\item{curves}{list, the output of \code{\link{get_curves}}, this list includes matrices for each curve in the reduced-dimensional space.}
+\item{curves}{list, the output of \code{\link{get_curves}}, this list includes 
+matrices for each curve in the reduced-dimensional space.}
 
-\item{threeD, }{logical indicates whether to make a 3D plot with the \code{rgl} package.}
+\item{threeD, }{logical indicates whether to make a 3D plot with the \code{rgl} 
+package.}
 
-\item{dim, }{total number of dimensions to be shown in a series of two-dimensional plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
+\item{dim, }{total number of dimensions to be shown in a series of two-dimensional 
+plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
 
 \item{col, }{(optional) vector of colors to use for denoting clusters.}
 }
@@ -23,10 +28,19 @@ plot_curves(X, clus.labels, curves, threeD = FALSE, dim = NA, col = NA)
 returns \code{NULL}.
 }
 \description{
-\code{plot_curves} visualizes the output from \code{\link{get_curves}}, showing cells (colored by cluster) in a reduced-dimensional space with smooth curves representing each inferred lineage.
+\code{plot_curves} visualizes the output from \code{\link{get_curves}}, 
+ showing cells (colored by cluster) in a reduced-dimensional space with smooth 
+ curves representing each inferred lineage.
 }
 \details{
-TODO
+Plots cells as points in a reduced-dimensional space, colored by cluster.
+ If a \code{curves} argument is given, the plot will include curves representing
+ each lineage.
+
+The default behavior is to produce a series of 2-D plots representing
+ all pairwise combinations of dimensions in \code{X}, or the first \code{dim}
+ dimensions. If \code{threeD=TRUE}, a three-dimensional plot will be created,
+ using the \code{rgl} package.
 }
 \examples{
 data("slingshot_example")

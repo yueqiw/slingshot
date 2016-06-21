@@ -24,7 +24,16 @@ contains the matrix defining the forest structure drawn on the clusters by
 \item{stretch}{(optional) see documentation for \code{\link{principal.curve}}.}
 }
 \value{
-TODO
+A list of length \code{L}, equal to the number of lineages. Each element
+  is an object of class \code{principal.curve} containing the following objects: 
+  \itemize{ \item{\code{s}}{ a matrix of points along the curve corresponding to
+  the projections of points in \code{X} onto the curve, ordered by pseudotime.}
+  \item{\code{lambda}}{ a vector of pseudotime values in the same order as 
+  \code{s}, representing each point's arclength along the curve.}
+  \item{\code{dist}}{ the total squared distance between points used in the 
+  construction of the curve and their projections onto the curve.}
+  \item{\code{pseudotime}}{ a vector of pseudotime values of length \code{n},
+  containing \code{NA} values for cells not represented by this lineage} }
 }
 \description{
 This function takes a reduced data matrix \code{n x p}, a vector of
@@ -32,15 +41,20 @@ This function takes a reduced data matrix \code{n x p}, a vector of
   lineages consisting of paths through a forest constructed on the clusters. It
   constructs smooth curves for each lineage and returns the points along these
   curves corresponding to the orthogonal projections of each data point, along
-  with lambda (pseudotime) values.
+  with corresponding arclength (\code{pseudotime} or \code{lambda}) values.
 }
 \details{
-TODO
+When there is only a single lineage, the curve-fitting algorithm is
+  identical to that of \code{\link{principal.curve}}. When there are multiple
+  lineages and \code{shrink=TRUE}, an additional step is added to the iterative 
+  procedure, forcing curves to be similar in the neighborhood of shared points
+  (ie., before they branch).
 }
 \examples{
 data("slingshot_example")
 lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-get_curves(X, clus.labels, lineages)
+curves <- get_curves(X, clus.labels, lineages)
+plot_curves(X, clus.labels, curves)
 
 }
 

@@ -4,7 +4,7 @@
 \alias{plot_curves}
 \title{Plot smooth curves}
 \usage{
-plot_curves(X, clus.labels, curves, threeD = TRUE, dim = NA, col = NA)
+plot_curves(X, clus.labels, curves, threeD = FALSE, dim = NA, col = NA)
 }
 \arguments{
 \item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality space.}

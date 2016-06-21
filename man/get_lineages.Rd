@@ -41,11 +41,12 @@ the clusters should be included with output.}
 a list with at least \code{L} items where \code{L} is the number of
   lineages identified. Each lineage is represented by a character vector with the
   names of the clusters included in that lineage. Additional items may include:
-  \code{forest}, the connectivity matrix; \code{C}, a clusters x lineages
-  identity matrix; \code{start.clus} and \code{end.clus}, the starting and ending
-  cluster(s); \code{start.given} and \code{end.given}, logical values indicating
-  whether the starting and ending clusters were specified a priori; \code{dist},
-  the pairwise cluster distance matrix.
+  \itemize{\item{\code{forest}}{ the inferred connectivity matrix.} 
+  \item{\code{C}}{ a \code{clusters x lineages} matrix indicating each cluster's
+  inclusion in each lineage.} \item{\code{start.clus},\code{end.clus}}{ the 
+  starting and ending cluster(s)} \item{\code{start.given},\code{end.given}}
+  { logical values indicating whether the starting and ending clusters were 
+  specified a priori} \item{\code{dist}}{ the pairwise cluster distance matrix.}}
 }
 \description{
 Given a reduced-dimension data matrix \code{n x p} and a vector of
@@ -69,7 +70,8 @@ Once the \code{forest} is known, lineages are identified in any tree
 \examples{
 data("slingshot_example")
 get_lineages(X, clus.labels)
-get_lineages(X, clus.labels, start.clus = 'a')
+lineages <- get_lineages(X, clus.labels, start.clus = 'a')
+plot_tree(X, clus.labels, lineages)
 
 }
 

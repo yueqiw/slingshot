@@ -43,16 +43,18 @@
 #' @return a list with at least \code{L} items where \code{L} is the number of
 #'   lineages identified. Each lineage is represented by a character vector with the
 #'   names of the clusters included in that lineage. Additional items may include:
-#'   \code{forest}, the connectivity matrix; \code{C}, a clusters x lineages
-#'   identity matrix; \code{start.clus} and \code{end.clus}, the starting and ending
-#'   cluster(s); \code{start.given} and \code{end.given}, logical values indicating
-#'   whether the starting and ending clusters were specified a priori; \code{dist},
-#'   the pairwise cluster distance matrix.
+#'   \itemize{\item{\code{forest}}{ the inferred connectivity matrix.} 
+#'   \item{\code{C}}{ a \code{clusters x lineages} matrix indicating each cluster's
+#'   inclusion in each lineage.} \item{\code{start.clus},\code{end.clus}}{ the 
+#'   starting and ending cluster(s)} \item{\code{start.given},\code{end.given}}
+#'   { logical values indicating whether the starting and ending clusters were 
+#'   specified a priori} \item{\code{dist}}{ the pairwise cluster distance matrix.}}
 #'
 #' @examples
 #' data("slingshot_example")
 #' get_lineages(X, clus.labels)
-#' get_lineages(X, clus.labels, start.clus = 'a')
+#' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
+#' plot_tree(X, clus.labels, lineages)
 #' 
 #' @export
 #'
@@ -248,7 +250,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #'   lineages consisting of paths through a forest constructed on the clusters. It
 #'   constructs smooth curves for each lineage and returns the points along these
 #'   curves corresponding to the orthogonal projections of each data point, along
-#'   with lambda (pseudotime) values.
+#'   with corresponding arclength (\code{pseudotime} or \code{lambda}) values.
 #' 
 #' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality
 #'   space.
@@ -260,14 +262,28 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @param maxit (optional) see documentation for \code{\link{principal.curve}}.
 #' @param stretch (optional) see documentation for \code{\link{principal.curve}}.
 #' 
-#' @details TODO
+#' @details When there is only a single lineage, the curve-fitting algorithm is
+#'   identical to that of \code{\link{principal.curve}}. When there are multiple
+#'   lineages and \code{shrink=TRUE}, an additional step is added to the iterative 
+#'   procedure, forcing curves to be similar in the neighborhood of shared points
+#'   (ie., before they branch).
 #'
-#' @return TODO
+#' @return A list of length \code{L}, equal to the number of lineages. Each element
+#'   is an object of class \code{principal.curve} containing the following objects: 
+#'   \itemize{ \item{\code{s}}{ a matrix of points along the curve corresponding to
+#'   the projections of points in \code{X} onto the curve, ordered by pseudotime.}
+#'   \item{\code{lambda}}{ a vector of pseudotime values in the same order as 
+#'   \code{s}, representing each point's arclength along the curve.}
+#'   \item{\code{dist}}{ the total squared distance between points used in the 
+#'   construction of the curve and their projections onto the curve.}
+#'   \item{\code{pseudotime}}{ a vector of pseudotime values of length \code{n},
+#'   containing \code{NA} values for cells not represented by this lineage} }
 #'
 #' @examples
 #' data("slingshot_example")
 #' lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-#' get_curves(X, clus.labels, lineages)
+#' curves <- get_curves(X, clus.labels, lineages)
+#' plot_curves(X, clus.labels, curves)
 #' 
 #' @export
 #'
@@ -441,6 +457,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     ord <- new.pcurve$tag
     new.pcurve$s <- new.pcurve$s[ord,]
     new.pcurve$lambda <- new.pcurve$lambda[ord]
+    new.pcurve$tag <- NULL
     # line <- pcurve$s[pcurve$tag,]
     # s <- .project_points_to_lineage(line,x.sub)
     # rownames(s) <- rownames(x.sub)

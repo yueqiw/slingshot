@@ -17,15 +17,15 @@ space.}
 which clusters belong to each lineage and contains the inferred connectivity 
 between clusters.}
 
-\item{threeD, }{logical indicates whether to make a 3D plot with the \code{rgl} 
+\item{threeD}{logical indicates whether to make a 3D plot with the \code{rgl} 
 package.}
 
-\item{dim, }{total number of dimensions to be shown in a series of two-dimensional 
+\item{dim}{total number of dimensions to be shown in a series of two-dimensional 
 plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
 
-\item{col, }{(optional) vector of colors to use for denoting clusters.}
+\item{col}{(optional) vector of colors to use for denoting clusters.}
 
-\item{labels, }{logical indicating whether to include labels on cluster centers.}
+\item{labels}{logical indicating whether to include labels on cluster centers.}
 }
 \value{
 returns \code{NULL}.

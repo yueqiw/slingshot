@@ -10,12 +10,12 @@
 #' @param lineages list, the out put of \code{\link{get_lineages}}, this list denotes 
 #'  which clusters belong to each lineage and contains the inferred connectivity 
 #'  between clusters.
-#' @param threeD, logical indicates whether to make a 3D plot with the \code{rgl} 
+#' @param threeD logical indicates whether to make a 3D plot with the \code{rgl} 
 #'  package.
-#' @param dim, total number of dimensions to be shown in a series of two-dimensional 
+#' @param dim total number of dimensions to be shown in a series of two-dimensional 
 #'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
-#' @param col, (optional) vector of colors to use for denoting clusters.
-#' @param labels, logical indicating whether to include labels on cluster centers.
+#' @param col (optional) vector of colors to use for denoting clusters.
+#' @param labels logical indicating whether to include labels on cluster centers.
 #' 
 #' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
 #'  If a \code{lineages} argument is given, the plot will include straight lines
@@ -39,7 +39,7 @@
 #' @import rgl
 #' 
 
-plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA, col = NA, labels = TRUE){
+plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA, col = NULL, labels = TRUE){
   forest <- lineages$forest
   clusters <- rownames(forest)
   nclus <- nrow(forest)
@@ -50,7 +50,7 @@ plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
   rownames(centers) <- clusters
   X <- X[clus.labels %in% clusters,]
   clus.labels <- clus.labels[clus.labels %in% clusters]
-  if(is.na(col)){
+  if(is.null(col)){
     cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
     center.col <- cc[1:nclus]
   }else{
@@ -134,11 +134,11 @@ plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
 #' @param clus.labels character, a vector of length n denoting cluster labels.
 #' @param curves list, the output of \code{\link{get_curves}}, this list includes 
 #'  matrices for each curve in the reduced-dimensional space.
-#' @param threeD, logical indicates whether to make a 3D plot with the \code{rgl} 
+#' @param threeD logical indicates whether to make a 3D plot with the \code{rgl} 
 #'  package.
-#' @param dim, total number of dimensions to be shown in a series of two-dimensional 
+#' @param dim total number of dimensions to be shown in a series of two-dimensional 
 #'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
-#' @param col, (optional) vector of colors to use for denoting clusters.
+#' @param col (optional) vector of colors to use for denoting clusters.
 #' 
 #' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
 #'  If a \code{curves} argument is given, the plot will include curves representing
@@ -163,12 +163,12 @@ plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA,
 #' @import rgl
 #' 
 
-plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA, col = NA){
+plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA, col = NULL){
   X <- X[clus.labels != '-1',]
   clus.labels <- clus.labels[clus.labels != '-1']
   clusters <- unique(clus.labels)
   nclus <- length(clusters)
-  if(is.na(col)){
+  if(is.null(col)){
     cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
     center.col <- cc[1:nclus]
   }else{

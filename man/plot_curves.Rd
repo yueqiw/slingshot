@@ -16,13 +16,13 @@ space.}
 \item{curves}{list, the output of \code{\link{get_curves}}, this list includes 
 matrices for each curve in the reduced-dimensional space.}
 
-\item{threeD, }{logical indicates whether to make a 3D plot with the \code{rgl} 
+\item{threeD}{logical indicates whether to make a 3D plot with the \code{rgl} 
 package.}
 
-\item{dim, }{total number of dimensions to be shown in a series of two-dimensional 
+\item{dim}{total number of dimensions to be shown in a series of two-dimensional 
 plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
 
-\item{col, }{(optional) vector of colors to use for denoting clusters.}
+\item{col}{(optional) vector of colors to use for denoting clusters.}
 }
 \value{
 returns \code{NULL}.

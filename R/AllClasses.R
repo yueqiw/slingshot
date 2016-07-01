@@ -1,13 +1,13 @@
-#' @title Class CellLineages
+#' @title Class LineagesExperiment
 #'
-#' @description \code{CellLineages} is a class that extends
+#' @description \code{LineagesExperiment} is a class that extends
 #' \code{SummarizedExperiment} and is used to store 
 #'
 #' @docType class
-#' @aliases CellLineages CellLineages-class cellLineages
+#' @aliases LineagesExperiment LineagesExperiment-class lineagesExperiment
 #'
 #' @description In addition to the slots of the \code{SummarizedExperiment}
-#' class, the \code{CellLineages} object has the additional slots described
+#' class, the \code{LineagesExperiment} object has the additional slots described
 #' in the Slots section.
 #'
 #' @description There are several methods implemented for this class. The most
@@ -59,20 +59,19 @@
 #' samples to be used for plotting of samples. Usually set internally by other
 #' functions.
 #'
-#' @name CellLineages-class
-#' @aliases CellLineages
-#' @rdname CellLineages-class
+#' @name LineagesExperiment-class
+#' @aliases LineagesExperiment
+#' @rdname LineagesExperiment-class
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @export
 #'
 setClass(
-  Class = "CellLineages",
+  Class = "LineageExperiment",
   contains = "SummarizedExperiment",
   slots = list(
     cluster = "character",
     reducedDim = "matrix",
-    clusterMap = "matrix",
     lineages = "list",
     pseudotime = "matrix",
     curves = "list"
@@ -80,12 +79,11 @@ setClass(
 )
 
 
-setValidity("CellLineages", function(object){
+setValidity("LineageExperiment", function(object){
   #browser()
-  # reducedDim
   if(!is.null(object@reducedDim)){
-    if(!(nrow(object@reducedDim) == ncol(object))){
-      return("If present, `reducedDim` must have as many rows as cells.")
+    if(nrow(object@reducedDim) != ncol(object)){
+      return("`reducedDim` matrix should have as many rows as there are columns in `assayData`.")
     }
   }
   
@@ -93,13 +91,6 @@ setValidity("CellLineages", function(object){
   if(!is.null(cluster)){
     clusterNames <- unique(cluster[! cluster %in% c(-1,NA)])
     K <- length(clusterNames)
-    
-    # clusterMap
-    if(!is.null(object@clusterMap) &&
-       (nrow(object@clusterMap) != ncol(object@clusterMap)
-        | ncol(object@clusterMap) != K)) {
-      return("`clusterMap` must be a cluster by cluster matrix.")
-    }
     
     # lineages
     if(!is.null(lineages)){

@@ -195,6 +195,9 @@
   }
   return(as.numeric(t(diff) %*% solve(s1 + s2) %*% diff))
 }
+.cumMin <- function(x,time){
+  sapply(seq_along(x),function(i){ min(x[time <= time[i]]) })
+}
 .percent_shrinkage <- function(pst, lineage.density, share.idx, bw){
   #d1 <- density(pst)
   #d2 <- density(pst[share.idx], bw = bw.med)
@@ -203,6 +206,7 @@
   scale <- mean(share.idx)
   pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
   pct.l[is.na(pct.l)] <- 0
+  pst <- .cumMin(pct.l, pst)
   return(pct.l)
 }
 .shrink_to_avg <- function(pcurve, avg.curve, pct){
@@ -226,3 +230,4 @@
   })
   return(sqdists)
 }
+

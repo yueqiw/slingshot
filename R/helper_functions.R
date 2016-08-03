@@ -17,7 +17,7 @@
   }
   return(A + t*AB)
 }
-.project_points_to_segment <- function(A,B,pts){
+.project_points_to_segment <- function(A,B,pts,order=TRUE){
   if(class(pts)=='numeric'){
     pts <- matrix(pts,ncol=length(pts))
   }
@@ -43,9 +43,12 @@
   }))
   rownames(final) <- rownames(pts)
   colnames(final) <- colnames(pts)
-  return(final[order(t),])
+  if(order){
+    return(final[order(t),])
+  }
+  return(final)
 }
-.project_points_to_line <- function(A,B,pts){
+.project_points_to_line <- function(A,B,pts,order=TRUE){
   if(class(pts)=='numeric'){
     pts <- matrix(pts,ncol=length(pts))
   }
@@ -65,7 +68,38 @@
   }))
   rownames(final) <- rownames(pts)
   colnames(final) <- colnames(pts)
-  return(final[order(t),])
+  if(order){
+    return(final[order(t),])
+  }
+  return(final)
+}
+.project_points_to_ray <- function(A,B,pts,order=TRUE){
+  if(class(pts)=='numeric'){
+    pts <- matrix(pts,ncol=length(pts))
+  }
+  n <- nrow(pts)
+  bigA <- t(matrix(A,nrow=length(A),ncol=n))
+  bigB <- t(matrix(B,nrow=length(A),ncol=n))
+  AB <- B-A
+  bigAB <- t(matrix(AB,nrow=length(A),ncol=n))
+  AB_squared <- sum(AB*AB)
+  if(AB_squared==0){
+    return(bigA)
+  }
+  bigAp <- pts-bigA
+  t <- diag(bigAp %*% t(bigAB))/AB_squared
+  final <- t(sapply(t,function(ti){
+    if(ti < 0){
+      return(A)
+    }
+    return(A + ti*AB)
+  }))
+  rownames(final) <- rownames(pts)
+  colnames(final) <- colnames(pts)
+  if(order){
+    return(final[order(t),])
+  }
+  return(final)
 }
 .dist_point_to_segment <- function(A,B,p){
   AB <- B-A

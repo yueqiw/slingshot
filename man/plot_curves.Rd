@@ -46,9 +46,9 @@ The default behavior is to produce a series of 2-D plots representing
 }
 \examples{
 data("slingshot_example")
-lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-curves <- get_curves(X, clus.labels, lineages)
-plot_curves(X, clus.labels, curves, threeD = FALSE)
+lin <- get_lineages(X, clus.labels, start.clus = 'a')
+crv <- get_curves(X, clus.labels, lin)
+plot_curves(X, clus.labels, crv, threeD = FALSE)
 
 }
 

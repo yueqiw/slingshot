@@ -70,8 +70,8 @@ Once the \code{forest} is known, lineages are identified in any tree
 \examples{
 data("slingshot_example")
 get_lineages(X, clus.labels)
-lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-plot_tree(X, clus.labels, lineages)
+lin <- get_lineages(X, clus.labels, start.clus = 'a')
+plot_tree(X, clus.labels, lin)
 
 }
 

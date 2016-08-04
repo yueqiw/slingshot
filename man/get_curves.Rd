@@ -5,7 +5,7 @@
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
 get_curves(X, clus.labels, lineages, thresh = 1e-04, maxit = 100,
-  stretch = 2, shrink = TRUE)
+  stretch = 2, shrink = TRUE, extend = "y")
 }
 \arguments{
 \item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality
@@ -22,6 +22,13 @@ contains the matrix defining the forest structure drawn on the clusters by
 \item{maxit}{(optional) see documentation for \code{\link{principal.curve}}.}
 
 \item{stretch}{(optional) see documentation for \code{\link{principal.curve}}.}
+
+\item{shrink}{logical, whether or not to enforce similarity between branching
+curves prior to the split.}
+
+\item{extend}{character, how to handle root and leaf clusters of lineages when
+constructing the initial, piece-wise linear curve. Accepted values are 'n'
+(default), 'y', and 'pc1'. See 'Details' for more.}
 }
 \value{
 A list of length \code{L}, equal to the number of lineages. Each element
@@ -49,12 +56,23 @@ When there is only a single lineage, the curve-fitting algorithm is
   lineages and \code{shrink=TRUE}, an additional step is added to the iterative 
   procedure, forcing curves to be similar in the neighborhood of shared points
   (ie., before they branch).
+
+The \code{extend} argument determines how to construct the piece-wise
+  linear curve used to initiate the recursive algorithm. The initial curve is
+  always based on the lines between cluster centers and if \code{extend = 'n'}, 
+  this curve will terminate at the center of the endpoint clusters. Setting 
+  \code{extend = 'y'} will allow the first and last segments to extend beyond
+  the cluster center to the orthogonal projection of the furthest point. Setting
+  \code{extend = 'pc1'} is similar to \code{'y'}, but uses the first principal
+  component of the cluster to determine the direction of the curve beyond the
+  cluster center. These options typically have little to no impact on the final
+  curve, but can occasionally help with stability issues.
 }
 \examples{
 data("slingshot_example")
-lineages <- get_lineages(X, clus.labels, start.clus = 'a')
-curves <- get_curves(X, clus.labels, lineages)
-plot_curves(X, clus.labels, curves)
+lin <- get_lineages(X, clus.labels, start.clus = 'a')
+crv <- get_curves(X, clus.labels, lin)
+plot_curves(X, clus.labels, crv)
 
 }
 

@@ -264,8 +264,8 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @param shrink logical, whether or not to enforce similarity between branching
 #'   curves prior to the split.
 #' @param extend character, how to handle root and leaf clusters of lineages when
-#'   constructing the initial, piece-wise linear curve. Accepted values are 'n'
-#'   (default), 'y', and 'pc1'. See 'Details' for more. 
+#'   constructing the initial, piece-wise linear curve. Accepted values are 'y'
+#'   (default), 'n', and 'pc1'. See 'Details' for more. 
 #' 
 #' @details When there is only a single lineage, the curve-fitting algorithm is
 #'   identical to that of \code{\link{principal.curve}}. When there are multiple

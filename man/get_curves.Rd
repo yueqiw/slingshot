@@ -27,8 +27,8 @@ contains the matrix defining the forest structure drawn on the clusters by
 curves prior to the split.}
 
 \item{extend}{character, how to handle root and leaf clusters of lineages when
-constructing the initial, piece-wise linear curve. Accepted values are 'n'
-(default), 'y', and 'pc1'. See 'Details' for more.}
+constructing the initial, piece-wise linear curve. Accepted values are 'y'
+(default), 'n', and 'pc1'. See 'Details' for more.}
 }
 \value{
 A list of length \code{L}, equal to the number of lineages. Each element

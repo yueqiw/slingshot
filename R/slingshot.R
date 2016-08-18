@@ -261,8 +261,8 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @param thresh (optional) see documentation for \code{\link{principal.curve}}.
 #' @param maxit (optional) see documentation for \code{\link{principal.curve}}.
 #' @param stretch (optional) see documentation for \code{\link{principal.curve}}.
-#' @param shrink logical, whether or not to enforce similarity between branching
-#'   curves prior to the split.
+#' @param shrink logical or numeric between 0 and 1, determines whether and how 
+#'   much to shrink branching lineages toward their average prior to the split.
 #' @param extend character, how to handle root and leaf clusters of lineages when
 #'   constructing the initial, piece-wise linear curve. Accepted values are 'y'
 #'   (default), 'n', and 'pc1'. See 'Details' for more. 
@@ -307,7 +307,11 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @importFrom princurve get.lam
 #' 
 
-get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, shrink = TRUE, extend = 'y'){
+get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, shrink = .5, extend = 'y'){
+  shrink <- as.numeric(shrink)
+  if(shrink < 0 | shrink > 1){
+    stop("shrink must be logical or numeric between 0 and 1")
+  }
   smoother <- "smooth.spline"
   smootherFcn <- function(lambda, xj, ..., df = 5) {
     o <- order(lambda)
@@ -434,15 +438,15 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     }
     
     # shrink together lineages near shared clusters
-    if(shrink){
+    if(shrink > 0){
       if(max(rowSums(C)) > 1){
+        
         segmnts <- unique(C[rowSums(C)>1,])
-        segmnts <- segmnts[order(rowSums(segmnts),decreasing = TRUE),,drop = FALSE]
-        avg.lines <- lapply(1:nrow(segmnts),function(i){
-          ind <- which(segmnts[i,] == 1)
-          .avg_curves(pcurves[ind])
-        })
-        bws <- sapply(1:nrow(segmnts),function(ii){
+        segmnts <- segmnts[order(rowSums(segmnts),decreasing = FALSE),,drop = FALSE]
+        seg.mix <- segmnts
+        avg.lines <- list()
+        
+        bws <- sapply(seq_len(nrow(segmnts)),function(ii){
           seg <- segmnts[ii,]
           sapply(1:L,function(l){
             if(seg[l]==1){
@@ -459,11 +463,29 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
         bw.med <- median(bws[bws > 0])
         den.lines <- lapply(1:L,function(l) density(pcurves[[l]]$lambda, bw=bw.med))
         
-        for(i in 1:nrow(segmnts)){
+        # Calculate two curves' avg, shrink, repeat.
+        for(i in seq_len(nrow(segmnts))){
           seg <- segmnts[i,]
           lines <- which(seg==1)
-          cls <- rownames(C)[apply(C,1,function(x){all(x==seg)})]
-          avg <- avg.lines[[i]]
+          ind <- seg.mix[i,] == 1
+          ns <- colnames(seg.mix)[ind]
+          to.avg <- lapply(ns,function(n){
+            if(grepl('lineage',n)){
+              l.ind <- as.numeric(gsub('lineage','',n))
+              return(pcurves[[l.ind]])
+            }
+            if(grepl('average',n)){
+              a.ind <- as.numeric(gsub('average','',n))
+              return(avg.lines[[a.ind]])
+            }
+          })
+          avg <- .avg_curves(to.avg)
+          avg.lines[[i]] <- avg
+          new.col <- rowMeans(seg.mix[,ind, drop = FALSE])
+          seg.mix <- cbind(seg.mix[, !ind, drop = FALSE],new.col)
+          colnames(seg.mix)[ncol(seg.mix)] <- paste('average',i,sep='')
+          
+          cls <- rownames(C)[apply(C,1,function(x){all(x[ind]==1)})]
           pct <- lapply(lines,function(l){
             pcurve <- pcurves[[l]]
             ind <- clus.labels %in% lineages[[l]]
@@ -473,10 +495,10 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
           names(pct) <- lines
           pcurves.shrink <- lapply(lines,function(l){
             pcurve <- pcurves[[l]]
-            pct.i <- pct[[which(names(pct) == l)]]
+            pct.i <- pct[[which(names(pct) == l)]] * shrink
             s <- sapply(1:p,function(jj){
               lam <- pcurve$lambda
-              avg.jj <- avg$line[match(lam,avg$lambda),jj]
+              avg.jj <- avg$s[match(lam,avg$lambda),jj]
               orig.jj <- pcurve$s[,jj]
               out <- avg.jj * pct.i + orig.jj * (1-pct.i)
               out[is.na(out)] <- orig.jj[is.na(out)]
@@ -488,6 +510,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
           })
           pcurves[lines] <- pcurves.shrink
         }
+        
       }
     }
     
@@ -516,6 +539,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   names(pcurves) <- paste('curve',1:length(pcurves),sep='')
   return(pcurves)
 }
+
 
 
 

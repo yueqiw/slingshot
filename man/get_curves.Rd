@@ -5,7 +5,7 @@
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
 get_curves(X, clus.labels, lineages, thresh = 1e-04, maxit = 100,
-  stretch = 2, shrink = TRUE, extend = "y")
+  stretch = 2, shrink = 0.5, extend = "y")
 }
 \arguments{
 \item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality
@@ -23,8 +23,8 @@ contains the matrix defining the forest structure drawn on the clusters by
 
 \item{stretch}{(optional) see documentation for \code{\link{principal.curve}}.}
 
-\item{shrink}{logical, whether or not to enforce similarity between branching
-curves prior to the split.}
+\item{shrink}{logical or numeric between 0 and 1, determines whether and how 
+much to shrink branching lineages toward their average prior to the split.}
 
 \item{extend}{character, how to handle root and leaf clusters of lineages when
 constructing the initial, piece-wise linear curve. Accepted values are 'y'

@@ -264,4 +264,22 @@
   })
   return(sqdists)
 }
-
+.get_lam <- function(x, s, tag, stretch = 2){
+  storage.mode(x) <- "double"
+  storage.mode(s) <- "double"
+  storage.mode(stretch) <- "double"
+  if (!missing(tag)) 
+    s <- s[tag, ]
+  np <- dim(x)
+  if (length(np) != 2) 
+    stop("get.lam needs a matrix input")
+  n <- np[1]
+  p <- np[2]
+  tt <- .Fortran("getlam", n, p, x, s = x, lambda = double(n), 
+                 tag = integer(n), dist = double(n), as.integer(nrow(s)), 
+                 s, stretch, double(p), double(p), PACKAGE = "princurve")[c("s", 
+                                                                            "tag", "lambda", "dist")]
+  #tt$dist <- sum(tt$dist)
+  class(tt) <- "principal.curve"
+  tt
+}

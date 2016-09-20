@@ -307,38 +307,75 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @importFrom princurve get.lam
 #' 
 
-get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, shrink = .5, extend = 'y'){
+get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, shrink = .5, extend = 'y', smoother = 'smooth.spline'){
+  # CHECKS
   shrink <- as.numeric(shrink)
   if(shrink < 0 | shrink > 1){
     stop("shrink must be logical or numeric between 0 and 1")
   }
-  smoother <- "smooth.spline"
-  smootherFcn <- function(lambda, xj, ..., df = 5) {
-    o <- order(lambda)
-    lambda <- lambda[o]
-    xj <- xj[o]
-    fit <- smooth.spline(x = lambda, y = xj, ..., df = df, keep.data = FALSE)
-    predict(fit, x = lambda)$y
+  if(nrow(X) != length(clus.labels)){
+    stop('nrow(X) must equal length(clus.labels)')
+  }
+  if(is.null(rownames(X))){
+    rownames(X) <- paste('cell',seq_len(nrow(X)),sep='-')
+  }
+  if(is.null(colnames(X))){
+    colnames(X) <- paste('dim',seq_len(ncol(X)),sep='-')
+  }
+  # DEFINE SMOOTHER FUNCTION
+  if(is.function(smoother)){
+    smootherFcn <- smoother
+  }
+  else{
+    smooth.list <- c("smooth.spline", "lowess", "periodic.lowess")
+    smoother <- match.arg(smoother, smooth.list)
+    smootherFcn <- NULL
+  }
+  stretches <- c(2, 2, 0)
+  if(is.function(smoother)){
+    if(is.null(stretch)) 
+      stop("Argument 'stretch' must be given if 'smoother' is a function.")
+  }
+  else{
+    if(missing(stretch) || is.null(stretch)){
+      stretch <- stretches[match(smoother, smooth.list)]
+    }
+  }
+  if(is.null(smootherFcn)){
+    smootherFcn <- switch(smoother, lowess = function(lambda, xj, ...){
+      lowess(lambda, xj, ...)$y
+    }, smooth.spline = function(lambda, xj, ..., df = 5){
+      o <- order(lambda)
+      lambda <- lambda[o]
+      xj <- xj[o]
+      fit <- smooth.spline(lambda, xj, ..., df = df, keep.data = FALSE)
+      predict(fit, x = lambda)$y
+    }, periodic.lowess = function(lambda, xj, ...){
+      periodic.lowess(lambda, xj, ...)$y
+    })
+    biasCorrectCurve <- (smoother == "periodic.lowess")
+  }
+  else {
+    biasCorrectCurve <- FALSE
   }
   # remove unclustered cells
   X.original <- X
   clus.labels.original <- clus.labels
   X <- X[clus.labels != -1,]
   clus.labels <- clus.labels[clus.labels != -1]
-  # setup
+  # SETUP
   L <- length(grep("lineage",names(lineages))) # number of lineages
   clusters <- unique(clus.labels)
   C <- sapply(lineages[1:L],function(lin){
     sapply(clusters,function(clID){
       as.numeric(clID %in% lin)
     })
-  })
+  }) # lineages x clusters control matrix
   rownames(C) <- clusters
-  clust.sizes <- table(clus.labels)
+  clust.sizes <- sapply(clusters, function(clID){ sum(clus.labels==clID) })
+  names(clust.sizes) <- clusters
   
-  d <- dim(X)
-  n <- d[1]
-  p <- d[2]
+  d <- dim(X); n <- d[1]; p <- d[2]
   nclus <- length(clusters) # number of clusters
   centers <- t(sapply(clusters,function(clID){
     x.sub <- X[clus.labels == clID, ,drop = FALSE]

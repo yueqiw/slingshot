@@ -307,6 +307,11 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @importFrom princurve get.lam
 #' 
 
+# for testing purposes only. remove after done editing.
+require(slingshot); source('R/helper_functions.R')
+data('slingshot_example'); lineages <- get_lineages(X,clus.labels,start.clus = 'a')
+thresh = 0.0001; maxit = 100; stretch = 2; shrink = .5; extend = 'y'; smoother = 'smooth.spline'
+
 get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, stretch = 2, shrink = .5, extend = 'y', smoother = 'smooth.spline'){
   # CHECKS
   shrink <- as.numeric(shrink)
@@ -325,8 +330,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   # DEFINE SMOOTHER FUNCTION
   if(is.function(smoother)){
     smootherFcn <- smoother
-  }
-  else{
+  }else{
     smooth.list <- c("smooth.spline", "lowess", "periodic.lowess")
     smoother <- match.arg(smoother, smooth.list)
     smootherFcn <- NULL
@@ -335,8 +339,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
   if(is.function(smoother)){
     if(is.null(stretch)) 
       stop("Argument 'stretch' must be given if 'smoother' is a function.")
-  }
-  else{
+  }else{
     if(missing(stretch) || is.null(stretch)){
       stretch <- stretches[match(smoother, smooth.list)]
     }
@@ -354,8 +357,7 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
       periodic.lowess(lambda, xj, ...)$y
     })
     biasCorrectCurve <- (smoother == "periodic.lowess")
-  }
-  else {
+  }else {
     biasCorrectCurve <- FALSE
   }
   # remove unclustered cells
@@ -382,56 +384,38 @@ get_curves <- function(X, clus.labels, lineages, thresh = 0.0001, maxit = 100, s
     return(colMeans(x.sub))
   }))
   rownames(centers) <- clusters
+  W <- sapply(seq_len(L),function(l){as.numeric(clus.labels %in% lineages[[l]])}) # weighting matrix
   
   # initial curves are piecewise linear paths through the tree
   pcurves <- lapply(1:L,function(l){
-    x.sub <- X[clus.labels %in% lineages[[l]], ,drop = FALSE]
-    clus.sub <- clus.labels[clus.labels %in% lineages[[l]]]
+    clus.sub <- clus.labels[W[,l] > 0]
     line.initial <- centers[clusters %in% lineages[[l]], , drop = FALSE]
     line.initial <- line.initial[match(lineages[[l]],rownames(line.initial)),]
     K <- nrow(line.initial)
     
     if(extend == 'y'){
-      s <- .project_points_to_lineage(line.initial, x.sub)
-      group1idx <- apply(s, 1, function(x){
-        identical(x, line.initial[1, ])
-      }) & (clus.sub == lineages[[l]][1])
-      group2idx <- apply(s, 1, function(x){
-        identical(x, line.initial[K, ])
-      }) & (clus.sub == lineages[[l]][K])
-      proj1 <- .project_points_to_ray(line.initial[2,], line.initial[1,], x.sub[group1idx, ])
-      proj2 <- .project_points_to_ray(line.initial[K-1,], line.initial[K,], x.sub[group2idx, ])
-      line.initial <- rbind(proj1[nrow(proj1), ], line.initial)
-      line.initial <- rbind(line.initial, proj2[nrow(proj2), ])
-      s <- .project_points_to_lineage(line.initial, x.sub)
+      curve <- .get_lam(X[W[,l] > 0, ,drop = FALSE], s = line.initial, stretch = 9999)
     }
     if(extend == 'n'){
-      s <- .project_points_to_lineage(line.initial, x.sub)
+      curve <- .get_lam(X[W[,l] > 0, ,drop = FALSE], s = line.initial, stretch = 0)
     }
     if(extend == 'pc1'){
-      s <- .project_points_to_lineage(line.initial, x.sub)
-      group1idx <- apply(s, 1, function(x){
-        identical(x, line.initial[1, ])
-      }) & (clus.sub == lineages[[l]][1])
-      group2idx <- apply(s, 1, function(x){
-        identical(x, line.initial[K, ])
-      }) & (clus.sub == lineages[[l]][K])
-      pc1.1 <- prcomp(X[clus.labels == lineages[[l]][1]])$rotation[,1]
+      pc1.1 <- prcomp(X[clus.labels == lineages[[l]][1],])
+      pc1.1 <- pc1.1$rotation[,1] * pc1.1$sdev[1]^2
       leg1 <- line.initial[2,] - line.initial[1,]
       # pick the direction most "in line with" the first branch
       if(sum(pc1.1*leg1) > 0){ # dot prod < 0 => cos(theta) < 0 => larger angle
         pc1.1 <- -pc1.1 
       }
-      pc1.2 <- prcomp(X[clus.labels == lineages[[l]][K]])$rotation[,1]
+      pc1.2 <- prcomp(X[clus.labels == lineages[[l]][K],])
+      pc1.2 <- pc1.2$rotation[,1] * pc1.2$sdev[1]^2
       leg2 <- line.initial[K-1,] - line.initial[K,]
       if(sum(pc1.2*leg2) > 0){ # dot prod < 0 => cos(theta) < 0 => larger angle
         pc1.2 <- -pc1.2 
       }
-      proj1 <- .project_points_to_ray(line.initial[1,], line.initial[1,]+pc1.1, x.sub[group1idx, ])
-      proj2 <- .project_points_to_ray(line.initial[K,], line.initial[K,]+pc1.2, x.sub[group2idx, ])
-      line.initial <- rbind(proj1[nrow(proj1), ], line.initial)
-      line.initial <- rbind(line.initial, proj2[nrow(proj2), ])
-      s <- .project_points_to_lineage(line.initial, x.sub)
+      line.initial <- rbind(line.initial[1] + pc1.1, line.initial)
+      line.initial <- rbind(line.initial, line.initial[K] + pc1.2)
+      curve <- .get_lam(X[W[,l] > 0, ,drop = FALSE], s = line.initial, stretch = 9999)
     }
     
     # get total squared distance to lineage

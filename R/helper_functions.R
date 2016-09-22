@@ -73,7 +73,7 @@
   }
   return(final)
 }
-.project_points_to_ray <- function(A,B,pts,order=TRUE){
+.project_points_to_ray <- function(A,B,pts,order=FALSE){
   if(class(pts)=='numeric'){
     pts <- matrix(pts,ncol=length(pts))
   }

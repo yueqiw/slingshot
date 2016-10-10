@@ -184,26 +184,28 @@
   }
   return(out)
 }
-.scale01 <- function(x){
-  return((x - min(x,na.rm=T))/max(x - min(x,na.rm=T)))
+.scaleAB <- function(x,a=0,b=1){
+  ((x-min(x,na.rm=TRUE))/(max(x,na.rm=TRUE)-min(x,na.rm=TRUE)))*(b-a)+a
 }
-.avg_curves <- function(pcurves){
+.avg_curves <- function(pcurves, X, stretch = 2){
   p <- ncol(pcurves[[1]]$s)
   lambdas.all <- lapply(pcurves, function(pcv){pcv$lambda})
   lambdas.all <- unique(unlist(lambdas.all))
   max.shared.lambda <- min(sapply(pcurves, function(pcv){max(pcv$lambda)}))
   lambdas.all <- sort(lambdas.all[lambdas.all <= max.shared.lambda])
   pcurves.dense <- lapply(pcurves,function(pcv){
-    sapply(1:p,function(jj){
+    sapply(seq_len(p),function(jj){
       interpolated <- approx(pcv$lambda, pcv$s[,jj], xout = lambdas.all)$y
       return(interpolated)
     })
   })
-  avg <- sapply(1:p,function(jj){
+  avg <- sapply(seq_len(p),function(jj){
     dim.all <- sapply(1:length(pcurves.dense),function(i){ pcurves.dense[[i]][,jj] })
     return(rowMeans(dim.all))
   })
-  return(list(s=avg,lambda=lambdas.all))
+  avg.curve <- .get_lam(X, avg, stretch=stretch)
+  avg.curve$w <- rowMeans(sapply(pcurves, function(p){ p$w }))
+  return(avg.curve)
 }
 .dist_clusters_full <- function(c1,c2){
   mu1 <- colMeans(c1)
@@ -232,27 +234,46 @@
 .cumMin <- function(x,time){
   sapply(seq_along(x),function(i){ min(x[time <= time[i]]) })
 }
-.percent_shrinkage <- function(pst, lineage.density, share.idx, bw){
-  #d1 <- density(pst)
-  #d2 <- density(pst[share.idx], bw = bw.med)
-  d2 <- density(pst[share.idx], bw = bw)
-  d1 <- lineage.density
-  scale <- mean(share.idx)
-  pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
-  pct.l[is.na(pct.l)] <- 0
-  pct.l <- .cumMin(pct.l, pst)
+.percent_shrinkage <- function(crv, share.idx, method = 'cosine'){
+  pst <- crv$lambda
+  if(method %in% eval(formals(density.default)$kernel)){
+    dens <- density(0, bw=1, kernel = method)
+    surv <- list(x = dens$x, y = (sum(dens$y) - cumsum(dens$y))/sum(dens$y))
+    surv$x <- .scaleAB(surv$x, a = min(pst,na.rm=TRUE), b = max(pst[share.idx],na.rm=TRUE))
+    pct.l <- approx(surv$x, surv$y, pst, rule = 2)$y
+  }
+  if(method == 'tricube'){
+    tc <- function(x){ ifelse(abs(x) <= 1, (70/81)*((1-abs(x)^3)^3), 0) }
+    dens <- list(x = seq(-3,3,length.out = 512))
+    dens$y <- tc(dens$x)
+    surv <- list(x = dens$x, y = (sum(dens$y) - cumsum(dens$y))/sum(dens$y))
+    surv$x <- .scaleAB(surv$x, a = min(pst,na.rm=TRUE), b = max(pst[share.idx],na.rm=TRUE))
+    pct.l <- approx(surv$x, surv$y, pst, rule = 2)$y
+  }
+  if(method == 'density'){
+    bw1 <- bw.SJ(pst)
+    bw2 <- bw.SJ(pst[share.idx])
+    bw <- (bw1 + bw2) / 2
+    d2 <- density(pst[share.idx], bw = bw, weights = crv$w[share.idx]/sum(crv$w[share.idx]))
+    d1 <- density(pst, bw = bw, weights = crv$w/sum(crv$w))
+    scale <- sum(crv$w[share.idx]) / sum(crv$w)
+    pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
+    pct.l[is.na(pct.l)] <- 0
+    pct.l <- .cumMin(pct.l, pst)
+  }
   return(pct.l)
 }
-.shrink_to_avg <- function(pcurve, avg.curve, pct){
+.shrink_to_avg <- function(pcurve, avg.curve, pct, X, stretch = 2){
+  p <- ncol(pcurve$s)
   lam <- pcurve$lambda
-  avg.curve$avg <- avg.curve$avg[avg.curve$lambda %in% lam,]
-  avg.curve$lambda <- avg.curve$lambda[avg.curve$lambda %in% lam]
   s <- sapply(1:p,function(jj){
-    avg.jj <- avg.curve$avg[,jj]
     orig.jj <- pcurve$s[,jj]
+    avg.jj <- approx(x = avg.curve$lambda, y = avg.curve$s[,jj], xout = lam, rule = 2)$y
     return(avg.jj * pct + orig.jj * (1-pct))
   })
-  pcurve$s <- s
+  w <- pcurve$w
+  pcurve <- .get_lam(X, s, pcurve$tag, stretch = stretch)
+  pcurve$w <- w
   return(pcurve)
 }
 .sq_segment_lengths <- function(from, to){

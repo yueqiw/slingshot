@@ -256,16 +256,28 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #'   space.
 #' @param clus.labels character, a vector of length n denoting cluster labels.
 #' @param lineages list, denotes which lineages each cluster is a part of and
-#'   contains the matrix defining the forest structure drawn on the clusters by
+#'   contains the \code{K x K} connectivity matrix constructed on the clusters by
 #'   \code{\link{get_lineages}}.
-#' @param thresh (optional) see documentation for \code{\link{principal.curve}}.
-#' @param maxit (optional) see documentation for \code{\link{principal.curve}}.
-#' @param stretch (optional) see documentation for \code{\link{principal.curve}}.
+#' @param thresh (optional) see \code{\link{principal.curve}}.
+#' @param maxit (optional) see \code{\link{principal.curve}}.
+#' @param stretch (optional) see \code{\link{principal.curve}}.
+#' @param smoother (optional) see \code{\link{principal.curve}} 
 #' @param shrink logical or numeric between 0 and 1, determines whether and how 
 #'   much to shrink branching lineages toward their average prior to the split.
 #' @param extend character, how to handle root and leaf clusters of lineages when
 #'   constructing the initial, piece-wise linear curve. Accepted values are 'y'
-#'   (default), 'n', and 'pc1'. See 'Details' for more. 
+#'   (default), 'n', and 'pc1'. See 'Details' for more.
+#' @param reweight logical, whether to allow cells shared between lineages to be
+#'   reweighted during curve-fitting. If \code{TRUE}, cells shared between
+#'   lineages will be weighted by: distance to nearest curve / distance to curve.
+#' @param dropout logical, whether to drop shared cells from lineages which do 
+#'   not fit them well. If \code{TRUE}, shared cells with a distance to one 
+#'   lineage above the 90th percentile and another below the 50th will be dropped
+#'   from the further lineage.
+#' @param shrink.method character denoting how to determine the appropriate amount
+#'   of shrinkage for a branching lineage. Accepted values are the same as for
+#'   \code{kernel} in \code{\link{density}} (default is \code{"cosine"}), as well 
+#'   as \code{"tricube"} and \code{"density"}. See 'Details' for more.
 #' 
 #' @details When there is only a single lineage, the curve-fitting algorithm is
 #'   identical to that of \code{\link{principal.curve}}. When there are multiple
@@ -283,6 +295,8 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #'   component of the cluster to determine the direction of the curve beyond the
 #'   cluster center. These options typically have little to no impact on the final
 #'   curve, but can occasionally help with stability issues.
+#'   
+#' @details *** Explain shrink.method ***
 #'   
 #'
 #' @return A list of length \code{L}, equal to the number of lineages. Each element
@@ -317,7 +331,7 @@ lineages <- get_lineages(X, clus.labels, start.clus = '1', end.clus = c('4'))
 thresh = 0.0001; maxit = 15; stretch = 2; shrink = .5; extend = 'y'; smoother = 'smooth.spline'
 reweight = FALSE; dropout = TRUE; shrink.method = 'cosine'
 
-new_get_curves <- function(X, clus.labels, lineages, thresh = 0.001, maxit = 15, stretch = 2, shrink = .5, extend = 'y', smoother = 'smooth.spline', reweight = TRUE, dropout = TRUE, shrink.method = 'cosine', ...){
+new_get_curves <- function(X, clus.labels, lineages, thresh = 0.001, maxit = 15, stretch = 2, shrink = TRUE, extend = 'y', smoother = 'smooth.spline', reweight = TRUE, dropout = TRUE, shrink.method = 'cosine', ...){
   # CHECKS
   shrink <- as.numeric(shrink)
   if(shrink < 0 | shrink > 1){

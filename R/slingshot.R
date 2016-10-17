@@ -304,6 +304,8 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #'   curve, but can occasionally help with stability issues.
 #'   
 #' @details *** Explain shrink.method ***
+#' 
+#' @details *** acknowledge princurve ***
 #'   
 #'
 #' @return A list of length \code{L}, equal to the number of lineages. Each element
@@ -323,6 +325,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' crv <- get_curves(X, clus.labels, lin)
 #' plot_curves(X, clus.labels, crv)
 #' 
+#' @useDynLib slingshot
 #' @export
 #' 
 

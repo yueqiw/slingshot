@@ -14,7 +14,7 @@
 #'  package.
 #' @param dim total number of dimensions to be shown in a series of two-dimensional 
 #'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
-#' @param col (optional) vector of colors to use for denoting clusters.
+#' @param col.clus (optional) vector of colors to use for denoting clusters.
 #' @param labels logical indicating whether to include labels on cluster centers.
 #' 
 #' @details Plots cells as points in a reduced-dimensional space, colored by cluster.

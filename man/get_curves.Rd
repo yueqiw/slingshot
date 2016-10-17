@@ -4,8 +4,9 @@
 \alias{get_curves}
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
-get_curves(X, clus.labels, lineages, thresh = 1e-04, maxit = 100,
-  stretch = 2, shrink = 0.5, extend = "y")
+get_curves(X, clus.labels, lineages, shrink = TRUE, extend = "y",
+  reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15,
+  stretch = 2, smoother = "smooth.spline", shrink.method = "cosine", ...)
 }
 \arguments{
 \item{X}{numeric, the \code{n x p} matrix of samples in a reduced dimensionality
@@ -14,14 +15,8 @@ space.}
 \item{clus.labels}{character, a vector of length n denoting cluster labels.}
 
 \item{lineages}{list, denotes which lineages each cluster is a part of and
-contains the matrix defining the forest structure drawn on the clusters by
+contains the \code{K x K} connectivity matrix constructed on the clusters by
 \code{\link{get_lineages}}.}
-
-\item{thresh}{(optional) see documentation for \code{\link{principal.curve}}.}
-
-\item{maxit}{(optional) see documentation for \code{\link{principal.curve}}.}
-
-\item{stretch}{(optional) see documentation for \code{\link{principal.curve}}.}
 
 \item{shrink}{logical or numeric between 0 and 1, determines whether and how 
 much to shrink branching lineages toward their average prior to the split.}
@@ -29,6 +24,38 @@ much to shrink branching lineages toward their average prior to the split.}
 \item{extend}{character, how to handle root and leaf clusters of lineages when
 constructing the initial, piece-wise linear curve. Accepted values are 'y'
 (default), 'n', and 'pc1'. See 'Details' for more.}
+
+\item{reweight}{logical, whether to allow cells shared between lineages to be
+reweighted during curve-fitting. If \code{TRUE}, cells shared between
+lineages will be weighted by: distance to nearest curve / distance to curve.}
+
+\item{drop.multi}{logical, whether to drop shared cells from lineages which do 
+not fit them well. If \code{TRUE}, shared cells with a distance to one 
+lineage above the 90th percentile and another below the 50th will be dropped
+from the further lineage.}
+
+\item{thresh}{numeric, determines the convergence criterion. Percent change in
+the total distance from cells to their projections along curves must be less
+than \code{thresh}. Default is \code{0.001}, similar to
+\code{\link{principal.curve}}.}
+
+\item{maxit}{numeric, maximum number of iterations, see
+\code{\link{principal.curve}}.}
+
+\item{stretch}{numeric factor by which curves can be extrapolated beyond
+endpoints. Default is \code{2}, see \code{\link{principal.curve}}.}
+
+\item{smoother, }{choice of scatter plot smoother. Same as
+\code{\link{principal.curve}}, but \code{"lowess"} option is replaced with
+\code{"loess"} for additional flexibility.}
+
+\item{shrink.method}{character denoting how to determine the appropriate amount
+of shrinkage for a branching lineage. Accepted values are the same as for
+\code{kernel} in \code{\link{density}} (default is \code{"cosine"}), as well 
+as \code{"tricube"} and \code{"density"}. See 'Details' for more.}
+
+\item{...}{Additional parameters to pass to scatter plot smoothing function,
+\code{smoother}.}
 }
 \value{
 A list of length \code{L}, equal to the number of lineages. Each element
@@ -67,6 +94,10 @@ The \code{extend} argument determines how to construct the piece-wise
   component of the cluster to determine the direction of the curve beyond the
   cluster center. These options typically have little to no impact on the final
   curve, but can occasionally help with stability issues.
+
+*** Explain shrink.method ***
+
+*** acknowledge princurve ***
 }
 \examples{
 data("slingshot_example")

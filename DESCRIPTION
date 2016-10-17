@@ -18,10 +18,11 @@ Imports:
     ape,
     princurve,
     igraph,
+    rgl,
     stats
 Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-LazyData: true
+LazyData: false
 RoxygenNote: 5.0.1

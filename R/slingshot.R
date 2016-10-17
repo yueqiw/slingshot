@@ -285,6 +285,8 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #'   of shrinkage for a branching lineage. Accepted values are the same as for
 #'   \code{kernel} in \code{\link{density}} (default is \code{"cosine"}), as well 
 #'   as \code{"tricube"} and \code{"density"}. See 'Details' for more.
+#' @param ... Additional parameters to pass to scatter plot smoothing function,
+#'   \code{smoother}.
 #' 
 #' @details When there is only a single lineage, the curve-fitting algorithm is
 #'   identical to that of \code{\link{principal.curve}}. When there are multiple

@@ -23,9 +23,9 @@ package.}
 \item{dim}{total number of dimensions to be shown in a series of two-dimensional 
 plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).}
 
-\item{labels}{logical indicating whether to include labels on cluster centers.}
+\item{col.clus}{(optional) vector of colors to use for denoting clusters.}
 
-\item{col}{(optional) vector of colors to use for denoting clusters.}
+\item{labels}{logical indicating whether to include labels on cluster centers.}
 }
 \value{
 returns \code{NULL}.

@@ -53,6 +53,9 @@ endpoints. Default is \code{2}, see \code{\link{principal.curve}}.}
 of shrinkage for a branching lineage. Accepted values are the same as for
 \code{kernel} in \code{\link{density}} (default is \code{"cosine"}), as well 
 as \code{"tricube"} and \code{"density"}. See 'Details' for more.}
+
+\item{...}{Additional parameters to pass to scatter plot smoothing function,
+\code{smoother}.}
 }
 \value{
 A list of length \code{L}, equal to the number of lineages. Each element

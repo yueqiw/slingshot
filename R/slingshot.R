@@ -258,10 +258,17 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @param lineages list, denotes which lineages each cluster is a part of and
 #'   contains the \code{K x K} connectivity matrix constructed on the clusters by
 #'   \code{\link{get_lineages}}.
-#' @param thresh (optional) see \code{\link{principal.curve}}.
-#' @param maxit (optional) see \code{\link{principal.curve}}.
-#' @param stretch (optional) see \code{\link{principal.curve}}.
-#' @param smoother (optional) see \code{\link{principal.curve}} 
+#' @param thresh numeric, determines the convergence criterion. Percent change in
+#'   the total distance from cells to their projections along curves must be less
+#'   than \code{thresh}. Default is \code{0.001}, similar to
+#'   \code{\link{principal.curve}}.
+#' @param maxit numeric, maximum number of iterations, see
+#'   \code{\link{principal.curve}}.
+#' @param stretch numeric factor by which curves can be extrapolated beyond
+#'   endpoints. Default is \code{2}, see \code{\link{principal.curve}}.
+#' @param smoother, choice of scatter plot smoother. Same as
+#'   \code{\link{principal.curve}}, but \code{"lowess"} option is replaced with
+#'   \code{"loess"} for additional flexibility.
 #' @param shrink logical or numeric between 0 and 1, determines whether and how 
 #'   much to shrink branching lineages toward their average prior to the split.
 #' @param extend character, how to handle root and leaf clusters of lineages when
@@ -270,7 +277,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @param reweight logical, whether to allow cells shared between lineages to be
 #'   reweighted during curve-fitting. If \code{TRUE}, cells shared between
 #'   lineages will be weighted by: distance to nearest curve / distance to curve.
-#' @param dropout logical, whether to drop shared cells from lineages which do 
+#' @param drop.multi logical, whether to drop shared cells from lineages which do 
 #'   not fit them well. If \code{TRUE}, shared cells with a distance to one 
 #'   lineage above the 90th percentile and another below the 50th will be dropped
 #'   from the further lineage.
@@ -319,19 +326,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' @export
 #' 
 
-# for testing purposes only. remove after done editing.
-require(slingshot); source('R/helper_functions.R')
-data('slingshot_example'); lineages <- get_lineages(X,clus.labels,start.clus = 'a')
-thresh = 0.0001; maxit = 15; stretch = 2; shrink = .5; extend = 'y'; smoother = 'smooth.spline'
-# for testing the actual data
-load('~/Projects/slingshot-paper/data/E4c2b_slingshot_wsforkelly.RData')
-rm(cols,curves,dplot,drop_cl,Eh,Emv,En,Es9,Esus,i,keepcl,kocols,lineages,maxN,mergeCl,n,out_dir,pcax,socols,sval,wtcols)
-X <- X[,1:5]
-lineages <- get_lineages(X, clus.labels, start.clus = '1', end.clus = c('4'))
-thresh = 0.0001; maxit = 15; stretch = 2; shrink = .5; extend = 'y'; smoother = 'smooth.spline'
-reweight = FALSE; dropout = TRUE; shrink.method = 'cosine'
-
-new_get_curves <- function(X, clus.labels, lineages, thresh = 0.001, maxit = 15, stretch = 2, shrink = TRUE, extend = 'y', smoother = 'smooth.spline', reweight = TRUE, dropout = TRUE, shrink.method = 'cosine', ...){
+get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2, smoother = 'smooth.spline', shrink.method = 'cosine', ...){
   # CHECKS
   shrink <- as.numeric(shrink)
   if(shrink < 0 | shrink > 1){
@@ -451,7 +446,7 @@ new_get_curves <- function(X, clus.labels, lineages, thresh = 0.001, maxit = 15,
       W[W > 1] <- 1
       W[W.orig==0] <- 0
     }
-    if(dropout){
+    if(drop.multi){
       Z <- D; Z[,] <- NA
       for(l in seq_len(L)){
         idx <- W[,l] > 0
@@ -560,7 +555,7 @@ new_get_curves <- function(X, clus.labels, lineages, thresh = 0.001, maxit = 15,
     W[W > 1] <- 1
     W[W.orig==0] <- 0
   }
-  if(dropout){
+  if(drop.multi){
     Z <- D; Z[,] <- NA
     for(l in seq_len(L)){
       idx <- W[,l] > 0

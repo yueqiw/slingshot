@@ -375,7 +375,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
   D <- W; D[,] <- NA
   
   # determine curve hierarchy
-  C <- sapply(lineages[1:L], function(lin) {
+  C <- sapply(lineages[seq_len(L)], function(lin) {
     sapply(clusters, function(clID) {
       as.numeric(clID %in% lin)
     })
@@ -384,7 +384,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
   segmnts <- unique(C[rowSums(C)>1,,drop = FALSE])
   segmnts <- segmnts[order(rowSums(segmnts),decreasing = FALSE),,drop = FALSE]
   avg.order <- list()
-  for(i in 1:nrow(segmnts)){
+  for(i in seq_len(nrow(segmnts))){
     idx <- segmnts[i,] == 1
     avg.order[[i]] <- colnames(segmnts)[idx]
     new.col <- rowMeans(segmnts[,idx, drop = FALSE])
@@ -468,11 +468,11 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
     }
     
     # predict each dimension as a function of lambda (pseudotime)
-    for(l in 1:L){
+    for(l in seq_len(L)){
       pcurve <- pcurves[[l]]
       s <- pcurve$s
       ord <- order(pcurve$lambda)
-      for(jj in 1:p){
+      for(jj in seq_len(p)){
         s[, jj] <- smootherFcn(pcurve$lambda, X[,jj], w = pcurve$w, ...)[ord]
       }
       new.pcurve <- .get_lam(X, s = s, stretch = stretch)

@@ -64,6 +64,7 @@
 #' 
 
 get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = Inf, distout = FALSE){
+  clus.labels <- as.character(clus.labels)
   # set up, remove unclustered cells (-1's)
   X.original <- X
   X <- X[clus.labels != -1,]
@@ -340,6 +341,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' 
 
 get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2, smoother = 'smooth.spline', shrink.method = 'cosine', ...){
+  clus.labels <- as.character(clus.labels)
   # CHECKS
   shrink <- as.numeric(shrink)
   if(shrink < 0 | shrink > 1){

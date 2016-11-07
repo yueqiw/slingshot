@@ -198,7 +198,7 @@ plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA,
           }else{
             plot(x,y,col=clus.col,pch=16,asp=1,ylab=colnames(X)[ii],xlab=colnames(X)[jj])
           }
-          for(i in 1:length(curves)){lines(curves[[i]]$s[,c(jj,ii)],lwd=2, col = lin.col[i])}
+          for(i in 1:length(curves)){lines(curves[[i]]$s[curves[[i]]$tag,c(jj,ii)],lwd=2, col = lin.col[i])}
         }else{
           plot.new()
         }

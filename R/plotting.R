@@ -183,7 +183,7 @@ plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA,
   clus.col <- sapply(clus.labels,function(clID){center.col[which(clusters==clID)]})
   if(threeD){
     plot3d(X[,1:3],col=clus.col,size=5,box=FALSE,aspect='iso')
-    for(i in 1:length(curves)){lines3d(curves[[i]]$s,lwd=3, col=lin.col[i])}
+    for(i in 1:length(curves)){lines3d(curves[[i]]$s[curves[[i]]$tag,],lwd=3, col=lin.col[i])}
   }else{
     if(is.na(dim)){
       dim <- ncol(X)

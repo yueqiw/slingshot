@@ -336,7 +336,6 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' crv <- get_curves(X, clus.labels, lin)
 #' plot_curves(X, clus.labels, crv)
 #' 
-#' @useDynLib slingshot
 #' @export
 #' 
 

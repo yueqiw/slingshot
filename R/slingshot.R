@@ -64,12 +64,20 @@
 #' 
 
 get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = Inf, distout = FALSE){
+  clus.labels <- as.character(clus.labels)
   # set up, remove unclustered cells (-1's)
   X.original <- X
   X <- X[clus.labels != -1,]
   clus.labels <- clus.labels[clus.labels != -1]
   clusters <- unique(clus.labels)
   nclus <- length(clusters)
+  if(!is.null(start.clus)){
+    start.clus <- as.character(start.clus)
+  }
+  if(!is.null(end.clus)){
+    end.clus <- as.character(end.clus)
+  }
+
   
   ### get the connectivity matrix
   # get cluster centers
@@ -91,13 +99,13 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   }
   
   ### get pairwise cluster distance matrix
-  D <- sapply(clusters,function(clID1){
+  D <- as.matrix(sapply(clusters,function(clID1){
     sapply(clusters,function(clID2){
       clus1 <- X[clus.labels == clID1, ,drop = FALSE]
       clus2 <- X[clus.labels == clID2, ,drop = FALSE]
       return(dist.fun(clus1, clus2))
     })
-  })
+  }))
   rownames(D) <- clusters
   colnames(D) <- clusters
   
@@ -137,7 +145,7 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   }else{
     forest <- mstree
   }
-  forest <- forest[1:nclus, 1:nclus] # remove OMEGA
+  forest <- forest[1:nclus, 1:nclus, drop = FALSE] # remove OMEGA
   rownames(forest) <- clusters
   colnames(forest) <- clusters
   
@@ -161,10 +169,11 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   # identify lineages (paths through trees)
   for(tree in trees){
     if(length(tree) == 1){
-      next # don't draw a lineage for a single-cluster tree
+      lineages[[length(lineages)+1]] <- tree
+      next
     }
     tree.ind <- rownames(forest) %in% tree
-    tree.graph <- forest[tree.ind, tree.ind]
+    tree.graph <- forest[tree.ind, tree.ind, drop = FALSE]
     degree <- rowSums(tree.graph)
     g <- graph.adjacency(tree.graph, mode="undirected")
     
@@ -228,11 +237,11 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
   
   # include "forest" and clusters x lineages (C) matrices
   out$forest <- forest
-  C <- sapply(lineages,function(lin){
+  C <- as.matrix(sapply(lineages,function(lin){
     sapply(clusters,function(clID){
       as.numeric(clID %in% lin)
     })
-  })
+  }))
   rownames(C) <- clusters
   # should probably come up with a better name than C
   out$C <- C
@@ -327,11 +336,11 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' crv <- get_curves(X, clus.labels, lin)
 #' plot_curves(X, clus.labels, crv)
 #' 
-#' @useDynLib slingshot
 #' @export
 #' 
 
 get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2, smoother = 'smooth.spline', shrink.method = 'cosine', ...){
+  clus.labels <- as.character(clus.labels)
   # CHECKS
   shrink <- as.numeric(shrink)
   if(shrink < 0 | shrink > 1){
@@ -375,11 +384,11 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
   D <- W; D[,] <- NA
   
   # determine curve hierarchy
-  C <- sapply(lineages[seq_len(L)], function(lin) {
+  C <- as.matrix(sapply(lineages[seq_len(L)], function(lin) {
     sapply(clusters, function(clID) {
       as.numeric(clID %in% lin)
     })
-  })
+  }))
   rownames(C) <- clusters
   segmnts <- unique(C[rowSums(C)>1,,drop = FALSE])
   segmnts <- segmnts[order(rowSums(segmnts),decreasing = FALSE),,drop = FALSE]
@@ -398,8 +407,23 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
     idx <- W[,l] > 0
     clus.sub <- clus.labels[idx]
     line.initial <- centers[clusters %in% lineages[[l]], , drop = FALSE]
-    line.initial <- line.initial[match(lineages[[l]],rownames(line.initial)),]
+    line.initial <- line.initial[match(lineages[[l]],rownames(line.initial)),  ,drop = FALSE]
     K <- nrow(line.initial)
+    # special case: single-cluster lineage
+    if(K == 1){
+      pca <- prcomp(X[idx, ,drop = FALSE])
+      ctr <- line.initial
+      line.initial <- rbind(ctr - 10*pca$sdev[1]*pca$rotation[,1], ctr, ctr + 10*pca$sdev[1]*pca$rotation[,1])
+      curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial, stretch = 9999)
+      # do this twice because all points should have projections on all 
+      # lineages, but only those points on the lineage should extend it.
+      pcurve <- .get_lam(X, s = curve$s[curve$tag,], stretch=0)
+      pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, na.rm=TRUE) # force pseudotime to start at 0
+      pcurve$w <- W[,l]
+      pcurves[[l]] <- pcurve
+      D[,l] <- pcurve$dist
+      next
+    }
     
     if(extend == 'y'){
       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial, stretch = 9999)

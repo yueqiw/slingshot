@@ -123,9 +123,10 @@
   p <- np[2]
   tt <- .Fortran("getlam", n, p, x, s = x, lambda = double(n), 
                  tag = integer(n), dist = double(n), as.integer(nrow(s)), 
-                 s, stretch, double(p), double(p), PACKAGE = "slingshot")[c("s", 
+                 s, stretch, double(p), double(p), PACKAGE = "princurve")[c("s", 
                                                                             "tag", "lambda", "dist")]
   #tt$dist <- sum(tt$dist)
   class(tt) <- "principal.curve"
   tt
 }
+

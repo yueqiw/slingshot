@@ -73,7 +73,8 @@
   if(method %in% eval(formals(density.default)$kernel)){
     dens <- density(0, bw=1, kernel = method)
     surv <- list(x = dens$x, y = (sum(dens$y) - cumsum(dens$y))/sum(dens$y))
-    surv$x <- .scaleAB(surv$x, a = min(pst,na.rm=TRUE), b = max(pst[share.idx],na.rm=TRUE))
+    box.vals <- boxplot(pst, plot = FALSE)$stats
+    surv$x <- .scaleAB(surv$x, a = box.vals[1], b = box.vals[5])
     pct.l <- approx(surv$x, surv$y, pst, rule = 2)$y
   }
   if(method == 'tricube'){
@@ -81,7 +82,8 @@
     dens <- list(x = seq(-3,3,length.out = 512))
     dens$y <- tc(dens$x)
     surv <- list(x = dens$x, y = (sum(dens$y) - cumsum(dens$y))/sum(dens$y))
-    surv$x <- .scaleAB(surv$x, a = min(pst,na.rm=TRUE), b = max(pst[share.idx],na.rm=TRUE))
+    box.vals <- boxplot(pst, plot = FALSE)$stats
+    surv$x <- .scaleAB(surv$x, a = box.vals[1], b = box.vals[5])
     pct.l <- approx(surv$x, surv$y, pst, rule = 2)$y
   }
   if(method == 'density'){

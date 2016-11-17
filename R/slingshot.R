@@ -510,7 +510,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
     if(shrink > 0){
       if(max(rowSums(C)) > 1){
         
-        segmnts <- unique(C[rowSums(C)>1,])
+        segmnts <- unique(C[rowSums(C)>1,,drop = FALSE])
         segmnts <- segmnts[order(rowSums(segmnts),decreasing = FALSE),,drop = FALSE]
         seg.mix <- segmnts
         avg.lines <- list()

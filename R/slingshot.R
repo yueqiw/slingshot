@@ -64,7 +64,19 @@
 #' 
 
 get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = Inf, distout = FALSE){
+  # CHECKS
   clus.labels <- as.character(clus.labels)
+  X <- as.matrix(X)
+  if(nrow(X) != length(clus.labels)){
+    stop('nrow(X) must equal length(clus.labels)')
+  }
+  if(is.null(rownames(X))){
+    rownames(X) <- paste('cell',seq_len(nrow(X)),sep='-')
+  }
+  if(is.null(colnames(X))){
+    colnames(X) <- paste('dim',seq_len(ncol(X)),sep='-')
+  }
+  
   # set up, remove unclustered cells (-1's)
   X.original <- X
   X <- X[clus.labels != -1,]
@@ -340,8 +352,9 @@ get_lineages <- function(X, clus.labels, start.clus = NULL, end.clus = NULL, dis
 #' 
 
 get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2, smoother = 'smooth.spline', shrink.method = 'cosine', ...){
-  clus.labels <- as.character(clus.labels)
   # CHECKS
+  X <- as.matrix(X)
+  clus.labels <- as.character(clus.labels)
   shrink <- as.numeric(shrink)
   if(shrink < 0 | shrink > 1){
     stop("shrink must be logical or numeric between 0 and 1")
@@ -510,7 +523,7 @@ get_curves <- function(X, clus.labels, lineages, shrink = TRUE, extend = 'y', re
     if(shrink > 0){
       if(max(rowSums(C)) > 1){
         
-        segmnts <- unique(C[rowSums(C)>1,,drop = FALSE])
+        segmnts <- unique(C[rowSums(C)>1,])
         segmnts <- segmnts[order(rowSums(segmnts),decreasing = FALSE),,drop = FALSE]
         seg.mix <- segmnts
         avg.lines <- list()

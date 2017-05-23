@@ -25,7 +25,6 @@ Suggests:
     stats,
     testthat
 VignetteBuilder: knitr
-RdMacros: Rdpack
 LazyData: false
 RoxygenNote: 6.0.1
 biocViews:

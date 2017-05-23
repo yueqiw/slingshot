@@ -1,4 +1,5 @@
 #' @title Perform lineage inference with Slingshot
+#' @aliases slingshot
 #' 
 #' @description Given a reduced-dimensional data matrix \code{n} by \code{p} and a vector of
 #' cluster labels (potentially including \code{-1}'s for "unclustered"), this function

@@ -1,4 +1,5 @@
 #' @title Infer Lineage Structure from Clustered Samples
+#' @aliases getLineages
 #' 
 #' @description Given a reduced-dimension data matrix \code{n} by \code{p} and a vector of
 #' cluster identities (potentially including -1's for "unclustered"), this function

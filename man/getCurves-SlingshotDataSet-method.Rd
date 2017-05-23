@@ -102,12 +102,12 @@ The \code{extend} argument determines how to construct the piece-wise
   cluster center. These options typically have little to no impact on the final
   curve, but can occasionally help with stability issues.
 
-When \code{shink == TRUE}, we compute a shrinkage curve, $w_l(t)$, for 
+When \code{shink == TRUE}, we compute a shrinkage curve, \eqn{w_l(t)}, for 
 each lineage, a non-increasing function of pseudotime that determines how much
-that lineage should be shrunk toward a shared average curve. We set $w_l(0) = 1$, 
-so that the curves will perfectly overlap the average curve at pseudotime $0$. The 
-weighting curve decreases from $1$ to $0$ over the non-outlying pseudotime values 
-of shared cells (where outliers are defined by the $1.5*{IQR}$ rule). The 
+that lineage should be shrunk toward a shared average curve. We set \eqn{w_l(0) = 1}, 
+so that the curves will perfectly overlap the average curve at pseudotime \code{0}. The 
+weighting curve decreases from \code{1} to \code{0} over the non-outlying pseudotime values 
+of shared cells (where outliers are defined by the \code{1.5*IQR} rule). The 
 exact shape of the curve in this region is controlled by \code{shrink.method}, and
 can follow the shape of any standard kernel function's cumulative density curve (or
 more precisely, survival curve, since we require a decreasing function). Different
@@ -124,7 +124,7 @@ lines(sds, type = 'c', lwd = 3)
 
 }
 \references{
-\insertRef{HastieStuetzle89}{slingshot}
+Hastie, T., and Stuetzle, W. (1989). "Principal Curves." \emph{Journal of the American Statistical Association}, 84:502–516.
 }
 \seealso{
 \code{\link{slingshot}}

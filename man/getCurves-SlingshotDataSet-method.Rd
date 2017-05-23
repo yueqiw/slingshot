@@ -123,7 +123,7 @@ lines(sds, type = 'c', lwd = 3)
 
 }
 \references{
-\insertRef{HastieStuetzle89}{slingshotS4}
+\insertRef{HastieStuetzle89}{slingshot}
 }
 \seealso{
 \code{\link{slingshot}}

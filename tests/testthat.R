@@ -1,4 +1,4 @@
 library(testthat)
-library(slingshotS4)
+library(slingshot)
 
-test_check("slingshotS4")
+test_check("slingshot")

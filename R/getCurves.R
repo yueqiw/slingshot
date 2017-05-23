@@ -89,7 +89,7 @@
 #'   \item{\code{pseudotime}}{ a vector of pseudotime values of length \code{n},
 #'   containing \code{NA} values for cells not represented by this lineage} }
 #'
-#' @references \insertRef{HastieStuetzle89}{slingshotS4}
+#' @references \insertRef{HastieStuetzle89}{slingshot}
 #'
 #' @seealso \code{\link{slingshot}}
 #'

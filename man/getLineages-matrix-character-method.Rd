@@ -3,6 +3,7 @@
 \docType{methods}
 \name{getLineages,matrix,character-method}
 \alias{getLineages,matrix,character-method}
+\alias{getLineages}
 \title{Infer Lineage Structure from Clustered Samples}
 \usage{
 \S4method{getLineages}{matrix,character}(reducedDim, clus.labels,

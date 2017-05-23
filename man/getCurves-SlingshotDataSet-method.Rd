@@ -3,6 +3,7 @@
 \docType{methods}
 \name{getCurves,SlingshotDataSet-method}
 \alias{getCurves,SlingshotDataSet-method}
+\alias{getCurves}
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
 \S4method{getCurves}{SlingshotDataSet}(sds, clus.labels = sds@clus.labels,

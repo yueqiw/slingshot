@@ -3,6 +3,7 @@
 \docType{methods}
 \name{slingshot,matrix,character-method}
 \alias{slingshot,matrix,character-method}
+\alias{slingshot}
 \title{Perform lineage inference with Slingshot}
 \usage{
 \S4method{slingshot}{matrix,character}(reducedDim, clus.labels,

@@ -165,7 +165,7 @@ setMethod(f = "getLineages",
               forest[-end.idx, -end.idx] <- mstree
               for(clID in end.clus){
                 cl.idx <- which(clusters == clID)
-                dists <- D[! rownames(D) %in% end.clus, cl.idx, drop = FALSE]
+                dists <- D[! rownames(D) %in% end.clus, cl.idx]
                 closest <- names(dists)[which.min(dists)] # get closest non-endpoint cluster
                 closest.idx <- which.max(clusters == closest)
                 forest[cl.idx, closest.idx] <- 1

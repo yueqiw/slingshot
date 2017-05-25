@@ -1,5 +1,5 @@
-#' @rdname SlingshotDataSet-methods
 #' @title Methods for the \code{SlingshotDataSet} class
+#' @name SlingshotDataSet-methods
 #' 
 #' @description Helper functions for manipulating objects of the \code{SlingshotDataSet}
 #' class.
@@ -43,6 +43,13 @@ setMethod(
   f = "connectivity",
   signature = "SlingshotDataSet",
   definition = function(x) x@connectivity
+)
+#' @rdname SlingshotDataSet-methods
+#' @export
+setMethod(
+  f = "lineages",
+  signature = "SlingshotDataSet",
+  definition = function(x) x@lineages
 )
 #' @rdname SlingshotDataSet-methods
 #' @export

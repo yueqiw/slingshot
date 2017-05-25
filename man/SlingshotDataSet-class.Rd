@@ -3,7 +3,9 @@
 \docType{class}
 \name{SlingshotDataSet-class}
 \alias{SlingshotDataSet-class}
+\alias{SlingshotDataSet}
 \alias{slingshotDataSet}
+\alias{slingshotDataSet-class}
 \alias{SlingshotDataSet}
 \alias{SlingshotDataSet,data.frame,ANY-method}
 \alias{SlingshotDataSet,matrix,numeric-method}
@@ -72,7 +74,7 @@ each terminal state was pre-specified}
 }}
 
 \item{\code{curves}}{list. A list of \code{principal.curve} objects produced by
-\link{\code{getCurves}}.}
+\code{\link{getCurves}}.}
 
 \item{\code{pseudotime}}{matrix. A matrix of size \code{n} by \code{L} (where 
 \code{L} is the number of lineages) specifying each cell's pseudotime along

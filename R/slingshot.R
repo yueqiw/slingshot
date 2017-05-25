@@ -1,10 +1,11 @@
 #' @title Perform lineage inference with Slingshot
 #' @aliases slingshot
 #' 
-#' @description Given a reduced-dimensional data matrix \code{n} by \code{p} and a vector of
-#' cluster labels (potentially including \code{-1}'s for "unclustered"), this function
-#' performs lineage inference using a cluster-based minimum spanning tree and 
-#' constructing simulatenous principal curves for branching paths through the tree.
+#' @description Given a reduced-dimensional data matrix \code{n} by \code{p} and
+#'   a vector of cluster labels (potentially including \code{-1}'s for
+#'   "unclustered"), this function performs lineage inference using a
+#'   cluster-based minimum spanning tree and constructing simulatenous principal
+#'   curves for branching paths through the tree.
 #' 
 #' @description This wrapper function performs lineage inference in two steps: (1) 
 #' identify lineage structure with a cluster-based minimum spanning tree with the
@@ -113,9 +114,9 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(reducedDim, clusLabels, start.clus = '5')
+#' sds <- slingshot(rd, cl, start.clus = '5')
 #' 
-#' plot(reducedDim, col = clusLabels, asp = 1)
+#' plot(rd, col = cl, asp = 1)
 #' lines(sds, lwd = 3)
 #' 
 #' @export

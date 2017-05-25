@@ -24,11 +24,11 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(reducedDim, clusLabels, start.clus = "5")
+#' sds <- slingshot(rd, cl, start.clus = "5")
 #' plot(sds, type = 'b')
 #' 
 #' # add to existing plot
-#' plot(reducedDim, col = 'grey50')
+#' plot(rd, col = 'grey50')
 #' lines(sds, lwd = 3)
 #' 
 #' @export
@@ -162,12 +162,12 @@ setMethod(
 #'
 #' @examples
 #' data("slingshotExample")
-#' reducedDim <- cbind(reducedDim, rnorm(nrow(reducedDim)))
-#' sds <- slingshot(reducedDim, clusLabels, start.clus = "5")
+#' rd <- cbind(rd, rnorm(nrow(rd)))
+#' sds <- slingshot(rd, cl, start.clus = "5")
 #' plot3d(sds, type = 'b')
 #' 
 #' # add to existing plot
-#' plot3d(reducedDim, col = 'grey50', aspect = 'iso')
+#' plot3d(rd, col = 'grey50', aspect = 'iso')
 #' lines3d(sds, lwd = 3)
 #' 
 #' @importFrom rgl plot3d

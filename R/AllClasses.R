@@ -1,5 +1,5 @@
 #' @title Class \code{SlingshotDataSet}
-#' @aliases slingshotDataSet
+#' @aliases SlingshotDataSet SlingshotDataSet-class slingshotDataSet slingshotDataSet-class
 #'
 #' @description The \code{SlingshotDataSet} class holds data relevant 
 #' for performing lineage inference with the \code{slingshot} package, 
@@ -7,7 +7,6 @@
 #' of cluster labels.
 #'
 #' @docType class
-#' @aliases SlingshotDataSet SlingshotDataSet-class SlingshotDataSet SlingshotDataSet-class
 #'
 #' @description All \code{slingshot} methods can take an object of the class
 #' \code{SlingshotDataSet} as input and will output the same. Additionally,
@@ -35,7 +34,7 @@
 #' \item{\code{dist}}{matrix. A numeric matrix of pairwise cluster distances.}
 #' }
 #' @slot curves list. A list of \code{principal.curve} objects produced by
-#' \link{\code{getCurves}}.
+#' \code{\link{getCurves}}.
 #' @slot pseudotime matrix. A matrix of size \code{n} by \code{L} (where 
 #' \code{L} is the number of lineages) specifying each cell's pseudotime along
 #' each lineage.
@@ -82,8 +81,8 @@ setClass(
     connectivity = "matrix",
     lineage.control = "list",
     curves = "list",
-    pseudotime = "matrix",
-    curveWeights = "matrix",
+    pseudotime = "matrix", # make a function that pulls this from curves
+    curveWeights = "matrix", #
     curve.control = "list"
   )
 )

@@ -24,7 +24,7 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(reducedDim, clus.labels, start.clus = "5")
+#' sds <- slingshot(reducedDim, clusLabels, start.clus = "5")
 #' plot(sds, type = 'b')
 #' 
 #' # add to existing plot
@@ -74,17 +74,17 @@ setMethod(
     
     if(lineages){
       X <- x@reducedDim
-      clus.labels <- x@clus.labels
+      clusLabels <- x@clusLabels
       connectivity <- x@connectivity
       clusters <- rownames(connectivity)
       nclus <- nrow(connectivity)
       centers <- t(sapply(clusters,function(clID){
-        x.sub <- X[clus.labels == clID,]
+        x.sub <- X[clusLabels == clID,]
         return(colMeans(x.sub))
       }))
       rownames(centers) <- clusters
-      X <- X[clus.labels %in% clusters,]
-      clus.labels <- clus.labels[clus.labels %in% clusters]
+      X <- X[clusLabels %in% clusters,]
+      clusLabels <- clusLabels[clusLabels %in% clusters]
     }
     
     if(!add){
@@ -163,7 +163,7 @@ setMethod(
 #' @examples
 #' data("slingshotExample")
 #' reducedDim <- cbind(reducedDim, rnorm(nrow(reducedDim)))
-#' sds <- slingshot(reducedDim, clus.labels, start.clus = "5")
+#' sds <- slingshot(reducedDim, clusLabels, start.clus = "5")
 #' plot3d(sds, type = 'b')
 #' 
 #' # add to existing plot
@@ -213,17 +213,17 @@ setMethod(
 #   
 #   if(lineages){
 #     X <- x@reducedDim
-#     clus.labels <- x@clus.labels
+#     clusLabels <- x@clusLabels
 #     connectivity <- x@connectivity
 #     clusters <- rownames(connectivity)
 #     nclus <- nrow(connectivity)
 #     centers <- t(sapply(clusters,function(clID){
-#       x.sub <- X[clus.labels == clID,]
+#       x.sub <- X[clusLabels == clID,]
 #       return(colMeans(x.sub))
 #     }))
 #     rownames(centers) <- clusters
-#     X <- X[clus.labels %in% clusters,]
-#     clus.labels <- clus.labels[clus.labels %in% clusters]
+#     X <- X[clusLabels %in% clusters,]
+#     clusLabels <- clusLabels[clusLabels %in% clusters]
 #   }
 #   
 #   if(!add){
@@ -323,17 +323,17 @@ setMethod(
 #     
 #     if(lineages){
 #       X <- x@reducedDim
-#       clus.labels <- x@clus.labels
+#       clusLabels <- x@clusLabels
 #       connectivity <- x@connectivity
 #       clusters <- rownames(connectivity)
 #       nclus <- nrow(connectivity)
 #       centers <- t(sapply(clusters,function(clID){
-#         x.sub <- X[clus.labels == clID,]
+#         x.sub <- X[clusLabels == clID,]
 #         return(colMeans(x.sub))
 #       }))
 #       rownames(centers) <- clusters
-#       X <- X[clus.labels %in% clusters,]
-#       clus.labels <- clus.labels[clus.labels %in% clusters]
+#       X <- X[clusLabels %in% clusters,]
+#       clusLabels <- clusLabels[clusLabels %in% clusters]
 #     }
 #     
 #     if(!add){

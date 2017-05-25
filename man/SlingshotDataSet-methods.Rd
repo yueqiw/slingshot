@@ -4,15 +4,15 @@
 \name{show,SlingshotDataSet-method}
 \alias{show,SlingshotDataSet-method}
 \alias{reducedDim,SlingshotDataSet-method}
-\alias{clus.labels,SlingshotDataSet-method}
+\alias{clusLabels,SlingshotDataSet-method}
 \alias{connectivity,SlingshotDataSet-method}
 \alias{lineage.control,SlingshotDataSet-method}
 \alias{curves,SlingshotDataSet-method}
 \alias{pseudotime,SlingshotDataSet-method}
-\alias{weights,SlingshotDataSet-method}
+\alias{curveWeights,SlingshotDataSet-method}
 \alias{curve.control,SlingshotDataSet-method}
 \alias{reducedDim<-,SlingshotDataSet-method}
-\alias{clus.labels<-,SlingshotDataSet-method}
+\alias{clusLabels<-,SlingshotDataSet-method}
 \alias{lines,SlingshotDataSet-method}
 \title{Methods for the \code{SlingshotDataSet} class}
 \usage{
@@ -20,7 +20,7 @@
 
 \S4method{reducedDim}{SlingshotDataSet}(x)
 
-\S4method{clus.labels}{SlingshotDataSet}(x)
+\S4method{clusLabels}{SlingshotDataSet}(x)
 
 \S4method{connectivity}{SlingshotDataSet}(x)
 
@@ -30,13 +30,13 @@
 
 \S4method{pseudotime}{SlingshotDataSet}(x)
 
-\S4method{weights}{SlingshotDataSet}(x)
+\S4method{curveWeights}{SlingshotDataSet}(x)
 
 \S4method{curve.control}{SlingshotDataSet}(x)
 
 \S4method{reducedDim}{SlingshotDataSet}(x) <- value
 
-\S4method{clus.labels}{SlingshotDataSet}(x) <- value
+\S4method{clusLabels}{SlingshotDataSet}(x) <- value
 
 \S4method{lines}{SlingshotDataSet}(x, type = NULL, dims = 1:2, ...)
 }

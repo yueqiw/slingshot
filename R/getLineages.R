@@ -8,7 +8,7 @@
 #' 
 #' @param reducedDim numeric, the \code{n} by \code{p} matrix of samples in a reduced 
 #' dimensionality space.
-#' @param clus.labels character, a vector of length \code{n} denoting cluster labels,
+#' @param clusLabels character, a vector of length \code{n} denoting cluster labels,
 #'   optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 #'   \code{SlingshotDataSet}, cluster labels will be taken from it.
 #' @param start.clus (optional) character, indicates the cluster(s) *from* which
@@ -57,9 +57,9 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- getLineages(reducedDim, clus.labels, start.clus = '5')
+#' sds <- getLineages(reducedDim, clusLabels, start.clus = '5')
 #' 
-#' plot(reducedDim, col = clus.labels, asp = 1)
+#' plot(reducedDim, col = clusLabels, asp = 1)
 #' lines(sds, type = 'l', lwd = 3)
 #' 
 #' @export
@@ -69,17 +69,17 @@
 #' @importFrom ape mst
 #' 
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clus.labels = "character"),
-          definition = function(reducedDim, clus.labels,
+          signature = signature(reducedDim = "matrix", clusLabels = "character"),
+          definition = function(reducedDim, clusLabels,
                    start.clus = NULL, end.clus = NULL,
                    dist.fun = NULL, omega = NULL){
             
             X <- reducedDim
             # CHECKS
-            clus.labels <- as.character(clus.labels)
+            clusLabels <- as.character(clusLabels)
             X <- as.matrix(X)
-            if(nrow(X) != length(clus.labels)){
-              stop('nrow(reducedDim) must equal length(clus.labels).')
+            if(nrow(X) != length(clusLabels)){
+              stop('nrow(reducedDim) must equal length(clusLabels).')
             }
             if(any(is.na(X))){
               stop('reducedDim cannot contain missing values.')
@@ -96,9 +96,9 @@ setMethod(f = "getLineages",
             
             # set up, remove unclustered cells (-1's)
             X.original <- X
-            X <- X[clus.labels != -1, ,drop = FALSE]
-            clus.labels <- clus.labels[clus.labels != -1]
-            clusters <- unique(clus.labels)
+            X <- X[clusLabels != -1, ,drop = FALSE]
+            clusLabels <- clusLabels[clusLabels != -1]
+            clusters <- unique(clusLabels)
             nclus <- length(clusters)
             if(!is.null(start.clus)){
               start.clus <- as.character(start.clus)
@@ -111,13 +111,13 @@ setMethod(f = "getLineages",
             ### get the connectivity matrix
             # get cluster centers
             centers <- t(sapply(clusters,function(clID){
-              x.sub <- X[clus.labels == clID, ,drop = FALSE]
+              x.sub <- X[clusLabels == clID, ,drop = FALSE]
               return(colMeans(x.sub))
             }))
             
             # determine the distance function
             if(is.null(dist.fun)){
-              min.clus.size <- min(table(clus.labels))
+              min.clus.size <- min(table(clusLabels))
               if(min.clus.size <= ncol(X)){
                 message('Using diagonal covariance matrix')
                 dist.fun <- function(c1,c2) .dist_clusters_diag(c1,c2)
@@ -130,8 +130,8 @@ setMethod(f = "getLineages",
             ### get pairwise cluster distance matrix
             D <- as.matrix(sapply(clusters,function(clID1){
               sapply(clusters,function(clID2){
-                clus1 <- X[clus.labels == clID1, ,drop = FALSE]
-                clus2 <- X[clus.labels == clID2, ,drop = FALSE]
+                clus1 <- X[clusLabels == clID1, ,drop = FALSE]
+                clus2 <- X[clusLabels == clID2, ,drop = FALSE]
                 return(dist.fun(clus1, clus2))
               })
             }))
@@ -269,7 +269,7 @@ setMethod(f = "getLineages",
             lineage.control$dist <- D[1:nclus,1:nclus, drop = FALSE]
             connectivity <- forest
             
-            out <- SlingshotDataSet(reducedDim = X, clus.labels = clus.labels, lineages = lineages, connectivity = connectivity, lineage.control = lineage.control)
+            out <- SlingshotDataSet(reducedDim = X, clusLabels = clusLabels, lineages = lineages, connectivity = connectivity, lineage.control = lineage.control)
             
             validObject(out)
             return(out)
@@ -279,48 +279,48 @@ setMethod(f = "getLineages",
 
 
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "SlingshotDataSet", clus.labels = "ANY"),
+          signature = signature(reducedDim = "SlingshotDataSet", clusLabels = "ANY"),
           definition = function(reducedDim,
-                                clus.labels = reducedDim@clus.labels,
+                                clusLabels = reducedDim@clusLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
             return(getLineages(reducedDim = reducedDim@reducedDim, 
-                               clus.labels = reducedDim@clus.labels, 
+                               clusLabels = reducedDim@clusLabels, 
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega))
           })
 
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "data.frame", clus.labels = "ANY"),
-          definition = function(reducedDim, clus.labels, 
+          signature = signature(reducedDim = "data.frame", clusLabels = "ANY"),
+          definition = function(reducedDim, clusLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
             RD <- as.matrix(reducedDim)
             rownames(RD) <- rownames(reducedDim)
             return(getLineages(reducedDim = RD, 
-                               clus.labels = clus.labels, 
+                               clusLabels = clusLabels, 
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega))
           })
 
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clus.labels = "numeric"),
-          definition = function(reducedDim, clus.labels, 
+          signature = signature(reducedDim = "matrix", clusLabels = "numeric"),
+          definition = function(reducedDim, clusLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
             return(getLineages(reducedDim = reducedDim, 
-                               clus.labels = as.character(clus.labels), 
+                               clusLabels = as.character(clusLabels), 
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega))
           })
 
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clus.labels = "factor"),
-          definition = function(reducedDim, clus.labels, 
+          signature = signature(reducedDim = "matrix", clusLabels = "factor"),
+          definition = function(reducedDim, clusLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
             return(getLineages(reducedDim = reducedDim, 
-                               clus.labels = as.character(clus.labels), 
+                               clusLabels = as.character(clusLabels), 
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega))
           })

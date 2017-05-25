@@ -77,7 +77,7 @@
 #' \itemize{
 #' \item{curves}{}
 #' \item{pseudotime}{}
-#' \item{weights}{}
+#' \item{curveWeights}{}
 #' \item{curve.controls}{}}
 #' A list of length \code{L}, equal to the number of lineages. Each element
 #'   is an object of class \code{principal.curve} containing the following objects: 
@@ -96,10 +96,10 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- getLineages(reducedDim, clus.labels, start.clus = '5')
+#' sds <- getLineages(reducedDim, clusLabels, start.clus = '5')
 #' sds <- getCurves(sds)
 #' 
-#' plot(reducedDim, col = clus.labels, asp = 1)
+#' plot(reducedDim, col = clusLabels, asp = 1)
 #' lines(sds, type = 'c', lwd = 3)
 #' 
 #' @export
@@ -108,7 +108,7 @@
 setMethod(f = "getCurves",
           signature = signature(sds = "SlingshotDataSet"),
           definition = function(sds,
-                                clus.labels = sds@clus.labels,
+                                clusLabels = sds@clusLabels,
                                 lineages = sds@lineages,
                                 shrink = TRUE, 
                                 extend = 'y', 
@@ -126,13 +126,13 @@ setMethod(f = "getCurves",
             
             # CHECKS
             X <- sds@reducedDim
-            clus.labels <- sds@clus.labels
+            clusLabels <- sds@clusLabels
             shrink <- as.numeric(shrink)
             if(shrink < 0 | shrink > 1){
               stop("shrink must be logical or numeric between 0 and 1")
             }
-            if(nrow(X) != length(clus.labels)){
-              stop('nrow(X) must equal length(clus.labels)')
+            if(nrow(X) != length(clusLabels)){
+              stop('nrow(X) must equal length(clusLabels)')
             }
             if(any(is.na(X))){
               stop('reducedDim cannot contain missing values.')
@@ -156,23 +156,23 @@ setMethod(f = "getCurves",
             
             # remove unclustered cells
             X.original <- X
-            clus.labels.original <- clus.labels
-            X <- X[clus.labels != -1, ,drop = FALSE]
-            clus.labels <- clus.labels[clus.labels != -1]
+            clusLabels.original <- clusLabels
+            X <- X[clusLabels != -1, ,drop = FALSE]
+            clusLabels <- clusLabels[clusLabels != -1]
             # SETUP
             L <- length(grep("Lineage",names(lineages))) # number of lineages
-            clusters <- unique(clus.labels)
+            clusters <- unique(clusLabels)
             d <- dim(X); n <- d[1]; p <- d[2]
             nclus <- length(clusters)
             centers <- t(sapply(clusters,function(clID){
-              x.sub <- X[clus.labels == clID, ,drop = FALSE]
+              x.sub <- X[clusLabels == clID, ,drop = FALSE]
               return(colMeans(x.sub))
             }))
             if(p == 1){
               centers <- t(centers)
             }
             rownames(centers) <- clusters
-            W <- sapply(seq_len(L),function(l){as.numeric(clus.labels %in% lineages[[l]])}) # weighting matrix
+            W <- sapply(seq_len(L),function(l){as.numeric(clusLabels %in% lineages[[l]])}) # weighting matrix
             rownames(W) <- rownames(X); colnames(W) <- names(lineages)[seq_len(L)]
             W.orig <- W
             D <- W; D[,] <- NA
@@ -199,7 +199,7 @@ setMethod(f = "getCurves",
             pcurves <- list()
             for(l in seq_len(L)){
               idx <- W[,l] > 0
-              clus.sub <- clus.labels[idx]
+              clus.sub <- clusLabels[idx]
               line.initial <- centers[clusters %in% lineages[[l]], , drop = FALSE]
               line.initial <- line.initial[match(lineages[[l]],rownames(line.initial)),  ,drop = FALSE]
               K <- nrow(line.initial)
@@ -226,14 +226,14 @@ setMethod(f = "getCurves",
                 curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial, stretch = 0)
               }
               if(extend == 'pc1'){
-                pc1.1 <- prcomp(X[clus.labels == lineages[[l]][1],])
+                pc1.1 <- prcomp(X[clusLabels == lineages[[l]][1],])
                 pc1.1 <- pc1.1$rotation[,1] * pc1.1$sdev[1]^2
                 leg1 <- line.initial[2,] - line.initial[1,]
                 # pick the direction most "in line with" the first branch
                 if(sum(pc1.1*leg1) > 0){ # dot prod < 0 => cos(theta) < 0 => larger angle
                   pc1.1 <- -pc1.1 
                 }
-                pc1.2 <- prcomp(X[clus.labels == lineages[[l]][K],])
+                pc1.2 <- prcomp(X[clusLabels == lineages[[l]][K],])
                 pc1.2 <- pc1.2$rotation[,1] * pc1.2$sdev[1]^2
                 leg2 <- line.initial[K-1,] - line.initial[K,]
                 if(sum(pc1.2*leg2) > 0){ # dot prod < 0 => cos(theta) < 0 => larger angle
@@ -416,7 +416,7 @@ setMethod(f = "getCurves",
             
             sds@curves <- pcurves
             sds@pseudotime <- pseudotime
-            sds@weights <- weights
+            sds@curveWeights <- weights
             
             validObject(sds)
             return(sds)

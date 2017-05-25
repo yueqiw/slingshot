@@ -1,7 +1,7 @@
 setGeneric(
   name = "getLineages",
-  signature = c('reducedDim','clus.labels'),
-  def = function(reducedDim, clus.labels,
+  signature = c('reducedDim','clusLabels'),
+  def = function(reducedDim, clusLabels,
                  start.clus = NULL, end.clus = NULL,
                  dist.fun = NULL, omega = NULL, ...) {
     standardGeneric("getLineages")
@@ -12,7 +12,7 @@ setGeneric(
   name = "getCurves",
   signature = 'sds',
   def = function(sds, 
-                 clus.labels = sds@clus.labels,
+                 clusLabels = sds@clusLabels,
                  lineages = sds@lineages,
                  shrink = TRUE, 
                  extend = 'y', 
@@ -27,8 +27,8 @@ setGeneric(
 
 setGeneric(
   name = "slingshot",
-  signature = c('reducedDim','clus.labels'),
-  def = function(reducedDim, clus.labels,
+  signature = c('reducedDim','clusLabels'),
+  def = function(reducedDim, clusLabels,
                  start.clus = NULL, end.clus = NULL,
                  dist.fun = NULL, omega = NULL,
                  lineages = list(),
@@ -47,9 +47,9 @@ setGeneric(name = "reducedDim",
            signature = "x",
            def = function(x) standardGeneric("reducedDim"))
 
-setGeneric(name = "clus.labels",
+setGeneric(name = "clusLabels",
            signature = "x",
-           def = function(x) standardGeneric("clus.labels"))
+           def = function(x) standardGeneric("clusLabels"))
 
 setGeneric(name = "lineages",
            signature = "x",
@@ -71,9 +71,9 @@ setGeneric(name = "pseudotime",
            signature = "x",
            def = function(x) standardGeneric("pseudotime"))
 
-setGeneric(name = "weights",
+setGeneric(name = "curveWeights",
            signature = "x",
-           def = function(x) standardGeneric("weights"))
+           def = function(x) standardGeneric("curveWeights"))
 
 setGeneric(name = "curve.control",
            signature = "x",
@@ -84,7 +84,7 @@ setGeneric(name = "reducedDim<-",
            signature = "x",
            def = function(x, value) standardGeneric("reducedDim<-"))
 
-setGeneric(name = "clus.labels<-", 
+setGeneric(name = "clusLabels<-", 
            signature = "x",
-           def = function(x, value) standardGeneric("clus.labels<-"))
+           def = function(x, value) standardGeneric("clusLabels<-"))
 

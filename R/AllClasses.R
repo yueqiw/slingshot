@@ -16,7 +16,7 @@
 #'
 #' @slot reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
 #' coordinates of the cells in a reduced dimensionality space.
-#' @slot clus.labels character. A character vector of length \code{n} denoting each
+#' @slot clusLabels character. A character vector of length \code{n} denoting each
 #' cell's cluster label.
 #' @slot lineages list. A list with each element a character vector of cluster names
 #' representing a lineage as an ordered set of clusters.
@@ -39,7 +39,7 @@
 #' @slot pseudotime matrix. A matrix of size \code{n} by \code{L} (where 
 #' \code{L} is the number of lineages) specifying each cell's pseudotime along
 #' each lineage.
-#' @slot weights matrix. An \code{n} by \code{L} matrix specifying the weight
+#' @slot curveWeights matrix. An \code{n} by \code{L} matrix specifying the weight
 #' of each cell's contribution to each lineage.
 #' @slot curve.control list. Additional parameters specifying how the
 #' simultaneous principal curves were constructed.
@@ -77,13 +77,13 @@ setClass(
   Class = "SlingshotDataSet",
   slots = list(
     reducedDim = "matrix",
-    clus.labels = "character",
+    clusLabels = "character",
     lineages = "list",
     connectivity = "matrix",
     lineage.control = "list",
     curves = "list",
     pseudotime = "matrix",
-    weights = "matrix",
+    curveWeights = "matrix",
     curve.control = "list"
   )
 )
@@ -95,8 +95,8 @@ setValidity("SlingshotDataSet", function(object) {
   if(!is.numeric(X)) {
     return("Reduced dimensional coordinates must be numeric.")
   }
-  if(length(object@clus.labels) != n){
-    return('nrow(reducedDim) must equal length(clus.labels).')
+  if(length(object@clusLabels) != n){
+    return('nrow(reducedDim) must equal length(clusLabels).')
   }
   # something requires row and column names. Princurve?
   if(is.null(rownames(object@reducedDim))){
@@ -109,7 +109,7 @@ setValidity("SlingshotDataSet", function(object) {
   # if lineages present
   if(length(object@lineages) > 0){
     L <- length(object@lineages)
-    clus.names <- unique(object@clus.labels)
+    clus.names <- unique(object@clusLabels)
     K <- length(clus.names)
     if(any(sapply(object@lineages,class) != 'character')){
       return("lineages must be a list of character vectors.")
@@ -162,9 +162,9 @@ setValidity("SlingshotDataSet", function(object) {
         return("Dimensions for pseudotime matrix are incorrect. Should be n (number of cells) by L (number of lineages).")
       }
     }
-    if(dim(object@weights)[1] > 0){
-      if(any(dim(object@weights) != c(n,L))){
-        return("Dimensions for weights matrix are incorrect. Should be n (number of cells) by L (number of lineages).")
+    if(dim(object@curveWeights)[1] > 0){
+      if(any(dim(object@curveWeights) != c(n,L))){
+        return("Dimensions for curveWeights matrix are incorrect. Should be n (number of cells) by L (number of lineages).")
       }
     }
     if(!is.null(object@curve.control$shrink)){
@@ -197,7 +197,7 @@ setValidity("SlingshotDataSet", function(object) {
 #'
 #' @param reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
 #' coordinates of the cells in a reduced dimensionality space.
-#' @param clus.labels character. A character vector of length \code{n} denoting each
+#' @param clusLabels character. A character vector of length \code{n} denoting each
 #' cell's cluster label.
 #'
 #'@return A \code{SlingshotDataSet} object.
@@ -205,15 +205,15 @@ setValidity("SlingshotDataSet", function(object) {
 #'@examples
 #'
 #'reducedDim <- matrix(data=rnorm(200), ncol=2)
-#'clus.labels <- sample(letters[1:5], 100, replace = TRUE)
+#'clusLabels <- sample(letters[1:5], 100, replace = TRUE)
 #'
-#'sds <- SlingshotDataSet(reducedDim, clus.labels)
+#'sds <- SlingshotDataSet(reducedDim, clusLabels)
 #'
 #' @rdname SlingshotDataSet-class
 #' @export
 setGeneric(
   name = "SlingshotDataSet",
-  def = function(reducedDim,  clus.labels, ...) {
+  def = function(reducedDim,  clusLabels, ...) {
     standardGeneric("SlingshotDataSet")
   }
 )
@@ -222,40 +222,40 @@ setGeneric(
 setMethod(
   f = "SlingshotDataSet",
   signature = signature("data.frame","ANY"),
-  definition = function(reducedDim, clus.labels, ...){
+  definition = function(reducedDim, clusLabels, ...){
     RD <- as.matrix(reducedDim)
     rownames(RD) <- rownames(reducedDim)
-    SlingshotDataSet(RD, clus.labels, ...)
+    SlingshotDataSet(RD, clusLabels, ...)
   })
 #' @rdname SlingshotDataSet-class
 setMethod(
   f = "SlingshotDataSet",
   signature = signature("matrix", "numeric"),
-  definition = function(reducedDim, clus.labels, ...){
-    SlingshotDataSet(reducedDim, as.character(clus.labels), ...)
+  definition = function(reducedDim, clusLabels, ...){
+    SlingshotDataSet(reducedDim, as.character(clusLabels), ...)
   })
 #' @rdname SlingshotDataSet-class
 setMethod(
   f = "SlingshotDataSet",
   signature = signature("matrix","factor"),
-  definition = function(reducedDim, clus.labels, ...){
-    SlingshotDataSet(reducedDim, as.character(clus.labels), ...)
+  definition = function(reducedDim, clusLabels, ...){
+    SlingshotDataSet(reducedDim, as.character(clusLabels), ...)
   })
 
 setMethod(
   f = "SlingshotDataSet",
   signature = signature("matrix","character"),
-  definition = function(reducedDim, clus.labels,
+  definition = function(reducedDim, clusLabels,
                         lineages=list(),
                         connectivity=matrix(NA,0,0),
                         lineage.control=list(),
                         curves=list(),
                         pseudotime=matrix(NA,0,0),
-                        weights=matrix(NA,0,0),
+                        curveWeights=matrix(NA,0,0),
                         curve.control=list()
   ){
-    if(nrow(reducedDim) != length(clus.labels)) {
-      stop('nrow(reducedDim) must equal length(clus.labels).')
+    if(nrow(reducedDim) != length(clusLabels)) {
+      stop('nrow(reducedDim) must equal length(clusLabels).')
     }
     # something requires row and column names. Princurve?
     if(is.null(rownames(reducedDim))){
@@ -264,18 +264,18 @@ setMethod(
     if(is.null(colnames(reducedDim))){
       colnames(reducedDim) <- paste('Dim',seq_len(ncol(reducedDim)),sep='-')
     }
-    if(is.null(names(clus.labels))){
-      names(clus.labels) <- rownames(reducedDim)
+    if(is.null(names(clusLabels))){
+      names(clusLabels) <- rownames(reducedDim)
     }
     out <- new("SlingshotDataSet",
                reducedDim=reducedDim,
-               clus.labels=clus.labels,
+               clusLabels=clusLabels,
                lineages=lineages,
                connectivity=connectivity,
                lineage.control=lineage.control,
                curves=curves,
                pseudotime=pseudotime,
-               weights=weights,
+               curveWeights=curveWeights,
                curve.control=curve.control
     )
     validObject(out)

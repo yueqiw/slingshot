@@ -6,14 +6,14 @@
 \alias{getLineages}
 \title{Infer Lineage Structure from Clustered Samples}
 \usage{
-\S4method{getLineages}{matrix,character}(reducedDim, clus.labels,
+\S4method{getLineages}{matrix,character}(reducedDim, clusLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 }
 \arguments{
 \item{reducedDim}{numeric, the \code{n} by \code{p} matrix of samples in a reduced 
 dimensionality space.}
 
-\item{clus.labels}{character, a vector of length \code{n} denoting cluster labels,
+\item{clusLabels}{character, a vector of length \code{n} denoting cluster labels,
 optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 \code{SlingshotDataSet}, cluster labels will be taken from it.}
 
@@ -74,9 +74,9 @@ Once the \code{connectivity} is known, lineages are identified in any tree
 }
 \examples{
 data("slingshotExample")
-sds <- getLineages(reducedDim, clus.labels, start.clus = '5')
+sds <- getLineages(reducedDim, clusLabels, start.clus = '5')
 
-plot(reducedDim, col = clus.labels, asp = 1)
+plot(reducedDim, col = clusLabels, asp = 1)
 lines(sds, type = 'l', lwd = 3)
 
 }

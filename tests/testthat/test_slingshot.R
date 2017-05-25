@@ -4,40 +4,40 @@ set.seed(1234)
 
 test_that("getLineages works for different input types", {
   reducedDim <- matrix(rnorm(100), ncol = 2)
-  clus.labels <- rep(1:5, each = 10)
+  clusLabels <- rep(1:5, each = 10)
   
   # matrix / integer
-  mi <- getLineages(reducedDim, clus.labels)
+  mi <- getLineages(reducedDim, clusLabels)
   expect_is(mi, "SlingshotDataSet")
   expect_equal(dim(connectivity(mi)), c(5,5))
   # 1-column matrix / integer
-  m1i <- getLineages(reducedDim[,1,drop = FALSE], clus.labels)
+  m1i <- getLineages(reducedDim[,1,drop = FALSE], clusLabels)
   expect_is(mi, "SlingshotDataSet")
   expect_equal(dim(connectivity(mi)), c(5,5))
   # matrix / character
-  mc <- getLineages(reducedDim, as.character(clus.labels))
+  mc <- getLineages(reducedDim, as.character(clusLabels))
   expect_is(mc, "SlingshotDataSet")
   expect_equal(dim(connectivity(mc)), c(5,5))
   # matrix / factor
-  mf <- getLineages(reducedDim, as.factor(clus.labels))
+  mf <- getLineages(reducedDim, as.factor(clusLabels))
   expect_is(mf, "SlingshotDataSet")
   expect_equal(dim(connectivity(mf)), c(5,5))
   
   rd <- data.frame(reducedDim)
   # data frame / integer
-  dfi <- getLineages(rd, clus.labels)
+  dfi <- getLineages(rd, clusLabels)
   expect_is(dfi, "SlingshotDataSet")
   expect_equal(dim(connectivity(dfi)), c(5,5))
   # data frame / character
-  dfc <- getLineages(rd, as.character(clus.labels))
+  dfc <- getLineages(rd, as.character(clusLabels))
   expect_is(dfc, "SlingshotDataSet")
   expect_equal(dim(connectivity(dfc)), c(5,5))
   # data frame / factor
-  dff <- getLineages(rd, as.factor(clus.labels))
+  dff <- getLineages(rd, as.factor(clusLabels))
   expect_is(dff, "SlingshotDataSet")
   expect_equal(dim(connectivity(dff)), c(5,5))
   
-  sds <- SlingshotDataSet(reducedDim, clus.labels)
+  sds <- SlingshotDataSet(reducedDim, clusLabels)
   # SlingshotDataSet
   s <- getLineages(sds)
   expect_is(s, "SlingshotDataSet")
@@ -50,19 +50,21 @@ test_that("getLineages works for different input types", {
   expect_equal(dim(connectivity(c1)), c(1,1))
   
   # invalid inputs
-  expect_error(getLineages(reducedDim, clus.labels[1:10]), 'must equal length')
+  expect_error(getLineages(reducedDim, clusLabels[1:10]), 'must equal length')
   rdna <- reducedDim; rdna[1,1] <- NA
-  expect_error(getLineages(rdna, clus.labels), 'cannot contain missing values')
+  expect_error(getLineages(rdna, clusLabels), 'cannot contain missing values')
   rdc <- reducedDim; rdc[1,1] <- 'a'
-  expect_error(getLineages(rdc, clus.labels), 'must only contain numeric values')
+  expect_error(getLineages(rdc, clusLabels), 'must only contain numeric values')
 })
 
-test_that("getCurves can handle various problematic cases", {
+test_that("getCurves behaves as expected", {
   reducedDim <- matrix(rnorm(100), ncol = 2)
-  clus.labels <- rep(1:5, each = 10)
+  clusLabels <- rep(1:5, each = 10)
+  
+  # 2 dim, 5 clus
   
   # one dimension
-  m1i <- getLineages(reducedDim[,1,drop = FALSE], clus.labels)
+  m1i <- getLineages(reducedDim[,1,drop = FALSE], clusLabels)
   m1i <- getCurves(m1i)
   expect_true(abs(abs(cor(reducedDim(m1i)[,1], pseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
   m1i <- getCurves(m1i, extend = 'n')

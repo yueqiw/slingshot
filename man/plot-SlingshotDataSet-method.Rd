@@ -40,7 +40,7 @@ will be plotted, if present.
 }
 \examples{
 data("slingshotExample")
-sds <- slingshot(reducedDim, clus.labels, start.clus = "5")
+sds <- slingshot(reducedDim, clusLabels, start.clus = "5")
 plot(sds, type = 'b')
 
 # add to existing plot

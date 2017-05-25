@@ -6,7 +6,7 @@
 \alias{getCurves}
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
-\S4method{getCurves}{SlingshotDataSet}(sds, clus.labels = sds@clus.labels,
+\S4method{getCurves}{SlingshotDataSet}(sds, clusLabels = sds@clusLabels,
   lineages = sds@lineages, shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine", ...)
@@ -62,7 +62,7 @@ following new elements:
 \itemize{
 \item{curves}{}
 \item{pseudotime}{}
-\item{weights}{}
+\item{curveWeights}{}
 \item{curve.controls}{}}
 A list of length \code{L}, equal to the number of lineages. Each element
   is an object of class \code{principal.curve} containing the following objects: 
@@ -116,10 +116,10 @@ most cases.
 }
 \examples{
 data("slingshotExample")
-sds <- getLineages(reducedDim, clus.labels, start.clus = '5')
+sds <- getLineages(reducedDim, clusLabels, start.clus = '5')
 sds <- getCurves(sds)
 
-plot(reducedDim, col = clus.labels, asp = 1)
+plot(reducedDim, col = clusLabels, asp = 1)
 lines(sds, type = 'c', lwd = 3)
 
 }

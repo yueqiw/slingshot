@@ -14,7 +14,7 @@
 #' 
 #' @param reducedDim numeric matrix or \code{SlingshotDataSet} object containing low-
 #' dimensional representation of single cells.
-#' @param clus.labels character, a vector of length \code{n} denoting cluster labels,
+#' @param clusLabels character, a vector of length \code{n} denoting cluster labels,
 #' optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 #' \code{SlingshotDataSet}, cluster labels will be taken from it.
 #' @param start.clus (optional) character, indicates the cluster(s) of origin. Lineages
@@ -113,16 +113,16 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(reducedDim, clus.labels, start.clus = '5')
+#' sds <- slingshot(reducedDim, clusLabels, start.clus = '5')
 #' 
-#' plot(reducedDim, col = clus.labels, asp = 1)
+#' plot(reducedDim, col = clusLabels, asp = 1)
 #' lines(sds, lwd = 3)
 #' 
 #' @export
 #' 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clus.labels = "character"),
-          definition = function(reducedDim, clus.labels,
+          signature = signature(reducedDim = "matrix", clusLabels = "character"),
+          definition = function(reducedDim, clusLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -133,7 +133,7 @@ setMethod(f = "slingshot",
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
-            sds <- getLineages(reducedDim, clus.labels,
+            sds <- getLineages(reducedDim, clusLabels,
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega)
             sds <- getCurves(sds,
@@ -148,9 +148,9 @@ setMethod(f = "slingshot",
 
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "SlingshotDataSet", clus.labels = "ANY"),
+          signature = signature(reducedDim = "SlingshotDataSet", clusLabels = "ANY"),
           definition = function(reducedDim,
-                                clus.labels = reducedDim@clus.labels,
+                                clusLabels = reducedDim@clusLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -162,7 +162,7 @@ setMethod(f = "slingshot",
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
             return(slingshot(reducedDim = reducedDim@reducedDim, 
-                             clus.labels = reducedDim@clus.labels, 
+                             clusLabels = reducedDim@clusLabels, 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,
@@ -173,8 +173,8 @@ setMethod(f = "slingshot",
           })
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "data.frame", clus.labels = "ANY"),
-          definition = function(reducedDim, clus.labels, 
+          signature = signature(reducedDim = "data.frame", clusLabels = "ANY"),
+          definition = function(reducedDim, clusLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -188,7 +188,7 @@ setMethod(f = "slingshot",
             RD <- as.matrix(reducedDim)
             rownames(RD) <- rownames(reducedDim)
             return(slingshot(reducedDim = RD, 
-                             clus.labels = clus.labels, 
+                             clusLabels = clusLabels, 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,
@@ -199,8 +199,8 @@ setMethod(f = "slingshot",
           })
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clus.labels = "numeric"),
-          definition = function(reducedDim, clus.labels, 
+          signature = signature(reducedDim = "matrix", clusLabels = "numeric"),
+          definition = function(reducedDim, clusLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -212,7 +212,7 @@ setMethod(f = "slingshot",
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
             return(slingshot(reducedDim = reducedDim, 
-                             clus.labels = as.character(clus.labels), 
+                             clusLabels = as.character(clusLabels), 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,
@@ -223,8 +223,8 @@ setMethod(f = "slingshot",
           })
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clus.labels = "factor"),
-          definition = function(reducedDim, clus.labels, 
+          signature = signature(reducedDim = "matrix", clusLabels = "factor"),
+          definition = function(reducedDim, clusLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -236,7 +236,7 @@ setMethod(f = "slingshot",
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
             return(slingshot(reducedDim = reducedDim, 
-                             clus.labels = as.character(clus.labels), 
+                             clusLabels = as.character(clusLabels), 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,

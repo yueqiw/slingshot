@@ -33,9 +33,9 @@ setMethod(
 #' @rdname SlingshotDataSet-methods
 #' @export
 setMethod(
-  f = "clus.labels",
+  f = "clusLabels",
   signature = "SlingshotDataSet",
-  definition = function(x) x@clus.labels
+  definition = function(x) x@clusLabels
 )
 #' @rdname SlingshotDataSet-methods
 #' @export
@@ -68,9 +68,9 @@ setMethod(
 #' @rdname SlingshotDataSet-methods
 #' @export
 setMethod(
-  f = "weights",
+  f = "curveWeights",
   signature = "SlingshotDataSet",
-  definition = function(x) x@weights
+  definition = function(x) x@curveWeights
 )
 #' @rdname SlingshotDataSet-methods
 #' @export
@@ -89,24 +89,24 @@ setReplaceMethod(
 #' @rdname SlingshotDataSet-methods
 #' @export
 setReplaceMethod(
-  f = "clus.labels", 
+  f = "clusLabels", 
   signature = "SlingshotDataSet",
-  definition = function(x, value) initialize(x, clus.labels = value))
+  definition = function(x, value) initialize(x, clusLabels = value))
 
 setMethod(f = "[", 
           signature = c("SlingshotDataSet", "ANY", "ANY", "ANY"),
           function(x, i, j, ..., drop=FALSE)
           {
             rd <- x@reducedDim[i,j]
-            cl <- x@clus.labels[i]
+            cl <- x@clusLabels[i]
             initialize(x, reducedDim = rd,
-                       clus.labels  = cl,
+                       clusLabels  = cl,
                        lineages = list(),
                        connectivity = matrix(NA,0,0),
                        lineage.control = x@lineage.control,
                        curves = list(),
                        pseudotime = matrix(NA,0,0),
-                       weights = matrix(NA,0,0),
+                       curveWeights = matrix(NA,0,0),
                        curve.control = x@curve.control)
           })
 

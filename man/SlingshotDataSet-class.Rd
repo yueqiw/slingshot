@@ -10,19 +10,19 @@
 \alias{SlingshotDataSet,matrix,factor-method}
 \title{Class \code{SlingshotDataSet}}
 \usage{
-SlingshotDataSet(reducedDim, clus.labels, ...)
+SlingshotDataSet(reducedDim, clusLabels, ...)
 
-\S4method{SlingshotDataSet}{data.frame,ANY}(reducedDim, clus.labels, ...)
+\S4method{SlingshotDataSet}{data.frame,ANY}(reducedDim, clusLabels, ...)
 
-\S4method{SlingshotDataSet}{matrix,numeric}(reducedDim, clus.labels, ...)
+\S4method{SlingshotDataSet}{matrix,numeric}(reducedDim, clusLabels, ...)
 
-\S4method{SlingshotDataSet}{matrix,factor}(reducedDim, clus.labels, ...)
+\S4method{SlingshotDataSet}{matrix,factor}(reducedDim, clusLabels, ...)
 }
 \arguments{
 \item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
 coordinates of the cells in a reduced dimensionality space.}
 
-\item{clus.labels}{character. A character vector of length \code{n} denoting each
+\item{clusLabels}{character. A character vector of length \code{n} denoting each
 cell's cluster label.}
 }
 \value{
@@ -49,7 +49,7 @@ returned by \code{\link{getLineages}} and \code{\link{getCurves}}.
 \item{\code{reducedDim}}{matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
 coordinates of the cells in a reduced dimensionality space.}
 
-\item{\code{clus.labels}}{character. A character vector of length \code{n} denoting each
+\item{\code{clusLabels}}{character. A character vector of length \code{n} denoting each
 cell's cluster label.}
 
 \item{\code{lineages}}{list. A list with each element a character vector of cluster names
@@ -78,7 +78,7 @@ each terminal state was pre-specified}
 \code{L} is the number of lineages) specifying each cell's pseudotime along
 each lineage.}
 
-\item{\code{weights}}{matrix. An \code{n} by \code{L} matrix specifying the weight
+\item{\code{curveWeights}}{matrix. An \code{n} by \code{L} matrix specifying the weight
 of each cell's contribution to each lineage.}
 
 \item{\code{curve.control}}{list. Additional parameters specifying how the
@@ -110,8 +110,8 @@ for \code{kernel} in  the \code{density} function (default is
 \examples{
 
 reducedDim <- matrix(data=rnorm(200), ncol=2)
-clus.labels <- sample(letters[1:5], 100, replace = TRUE)
+clusLabels <- sample(letters[1:5], 100, replace = TRUE)
 
-sds <- SlingshotDataSet(reducedDim, clus.labels)
+sds <- SlingshotDataSet(reducedDim, clusLabels)
 
 }

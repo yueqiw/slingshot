@@ -6,7 +6,7 @@
 \alias{slingshot}
 \title{Perform lineage inference with Slingshot}
 \usage{
-\S4method{slingshot}{matrix,character}(reducedDim, clus.labels,
+\S4method{slingshot}{matrix,character}(reducedDim, clusLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
@@ -16,7 +16,7 @@
 \item{reducedDim}{numeric matrix or \code{SlingshotDataSet} object containing low-
 dimensional representation of single cells.}
 
-\item{clus.labels}{character, a vector of length \code{n} denoting cluster labels,
+\item{clusLabels}{character, a vector of length \code{n} denoting cluster labels,
 optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 \code{SlingshotDataSet}, cluster labels will be taken from it.}
 
@@ -144,9 +144,9 @@ The \code{extend} argument determines how to construct the piece-wise
 }
 \examples{
 data("slingshotExample")
-sds <- slingshot(reducedDim, clus.labels, start.clus = '5')
+sds <- slingshot(reducedDim, clusLabels, start.clus = '5')
 
-plot(reducedDim, col = clus.labels, asp = 1)
+plot(reducedDim, col = clusLabels, asp = 1)
 lines(sds, lwd = 3)
 
 }

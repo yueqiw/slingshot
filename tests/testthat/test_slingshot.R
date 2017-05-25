@@ -1,6 +1,6 @@
 context("Test slingshot methods and SlingshotDataSet class.")
-load("../../data/slingshotExample.RData")
-#data("slingshotExample")
+#load("../../data/slingshotExample.RData")
+data("slingshotExample")
 set.seed(1234)
 
 # 0 column matrix, reordering

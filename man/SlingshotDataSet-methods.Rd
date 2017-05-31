@@ -9,12 +9,10 @@
 \alias{lineages,SlingshotDataSet-method}
 \alias{lineageControl,SlingshotDataSet-method}
 \alias{curves,SlingshotDataSet-method}
-\alias{pseudotime,SlingshotDataSet-method}
-\alias{curveWeights,SlingshotDataSet-method}
 \alias{curveControl,SlingshotDataSet-method}
 \alias{reducedDim<-,SlingshotDataSet-method}
 \alias{clusterLabels<-,SlingshotDataSet-method}
-\alias{[,SlingshotDataSet-method}
+\alias{[,SlingshotDataSet,ANY,ANY,ANY-method}
 \title{Methods for the \code{SlingshotDataSet} class}
 \usage{
 \S4method{show}{SlingshotDataSet}(object)
@@ -31,24 +29,21 @@
 
 \S4method{curves}{SlingshotDataSet}(x)
 
-\S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
-
-\S4method{curveWeights}{SlingshotDataSet}(x)
-
 \S4method{curveControl}{SlingshotDataSet}(x)
 
 \S4method{reducedDim}{SlingshotDataSet}(x) <- value
 
 \S4method{clusterLabels}{SlingshotDataSet}(x) <- value
 
-\S4method{[}{SlingshotDataSet}(x, i, j, ..., drop = FALSE)
+\S4method{[}{SlingshotDataSet,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
-\item{na}{logical. If \code{TRUE}, cells that are not assigned to a lineage
-will have a pseudotime value of \code{NA}. Otherwise, their arclength along
-the curve will be returned.}
+\item{x}{a \code{SlingshotDataSet} object.}
 }
 \description{
 Helper functions for accessing and changing elements of a
   \code{SlingshotDataSet} object.
+}
+\seealso{
+\code{\link{SlingshotDataSet}}
 }

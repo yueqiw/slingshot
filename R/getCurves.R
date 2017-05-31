@@ -1,5 +1,5 @@
 #' @title Construct Smooth Curves for Each Lineage
-#' @aliases getCurves
+#' @name getCurves
 #' 
 #' @description This function takes a reduced data matrix \code{n} by \code{p},
 #'  a vector of cluster identities (optionally including \code{-1}'s for 
@@ -92,7 +92,6 @@
 #' 
 #' @export
 #' 
-
 setMethod(f = "getCurves",
           signature = signature(sds = "SlingshotDataSet"),
           definition = function(sds,

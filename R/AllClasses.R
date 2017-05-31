@@ -1,9 +1,9 @@
 #' @title Class \code{SlingshotDataSet}
-#' @aliases SlingshotDataSet-class slingshotDataSet-class
-#' @name SlingshotDataSet-class
+#' @name SlingshotDataSet
+#' @aliases SlingshotDataSet-class
 #' @docType class
 #'   
-#' @description The \code{SlingshotDataSet} class holds data relevant for
+#' @description The \code{SlingshotDataSet} class holds data relevant for 
 #'   performing lineage inference with the \code{slingshot} package, primarily a
 #'   reduced dimensional representation of the data and a set of cluster labels.
 #'   
@@ -12,57 +12,56 @@
 #'   simple helper methods for creating and manipulating objects of the class 
 #'   \code{SlingshotDataSet} are described below.
 #'   
-#' @slot reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
-#' coordinates of the cells in a reduced dimensionality space.
-#' @slot clusterLabels character. A character vector of length \code{n} denoting each
-#' cell's cluster label.
-#' @slot lineages list. A list with each element a character vector of cluster names
-#' representing a lineage as an ordered set of clusters.
-#' @slot connectivity matrix. A binary matrix describing the connectivity between
-#' clusters induced by the minimum spanning tree.
-#' @slot lineageControl list. Additional parameters specifying how the minimum
-#' spanning tree on clusters was constructed.
-#' \itemize{
-#' \item{\code{start.clus}}{character. The label of the root cluster.}
-#' \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
-#' terminal clusters.}
-#' \item{\code{start.given}}{logical. A logical value indicating whether the initial
-#' state was pre-specified.}
-#' \item{\code{end.given}}{logical. A vector of logical values indicating whether
-#' each terminal state was pre-specified}
-#' \item{\code{dist}}{matrix. A numeric matrix of pairwise cluster distances.}
-#' }
-#' @slot curves list. A list of \code{principal.curve} objects produced by
-#' \code{\link{getCurves}}.
-#' @slot curveControl list. Additional parameters specifying how the
-#' simultaneous principal curves were constructed.
-#' \itemize{
-#' \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
-#' and how much to shrink branching lineages toward their shared average curve.}
-#' \item{\code{extend}}{character. Specifies the method for handling root and
-#' leaf clusters of lineages when constructing the initial, piece-wise linear
-#' curve. Accepted values are 'y' (default), 'n', and 'pc1'. See
-#' \code{\link{getCurves}} for details.}
-#' \item{\code{reweight}}{logical. Indicates whether to reweight cells shared
-#' by multiple lineages during curve-fitting. If \code{TRUE}, cells shared
-#' between lineages will have lineage-specific weights determined by the ratio:
-#' (distance to nearest curve) / (distance to specific curve).}
-#' \item{\code{drop.multi}}{logical. Indicates whether to drop shared cells
-#' from lineages which do not fit them well. If \code{TRUE}, shared cells 
-#' with a distance to one lineage above the 90th percentile and another 
-#' lineage below the 50th percentile will be dropped from the farther lineage.}
-#' \item{\code{shrink.method}}{character. Denotes how to determine the
-#' amount of shrinkage for a branching lineage. Accepted values are the same as 
-#' for \code{kernel} in  the \code{density} function (default is 
-#' \code{"cosine"}), as well as \code{"tricube"} and \code{"density"}. See 
-#' \code{\link{getCurves}} for details.}
-#' \item{Other parameters specified by \code{\link{principal.curve}}}.
-#' }
-#'
+#' @slot reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame
+#'   giving the coordinates of the cells in a reduced dimensionality space.
+#' @slot clusterLabels character. A character vector of length \code{n} denoting
+#'   each cell's cluster label.
+#' @slot lineages list. A list with each element a character vector of cluster
+#'   names representing a lineage as an ordered set of clusters.
+#' @slot connectivity matrix. A binary matrix describing the connectivity
+#'   between clusters induced by the minimum spanning tree.
+#' @slot lineageControl list. Additional parameters specifying how the minimum 
+#'   spanning tree on clusters was constructed. \itemize{ 
+#'   \item{\code{start.clus}}{character. The label of the root cluster.} 
+#'   \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
+#'   terminal clusters.} \item{\code{start.given}}{logical. A logical value
+#'   indicating whether the initial state was pre-specified.} 
+#'   \item{\code{end.given}}{logical. A vector of logical values indicating
+#'   whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
+#'   numeric matrix of pairwise cluster distances.} }
+#' @slot curves list. A list of \code{principal.curve} objects produced by 
+#'   \code{\link{getCurves}}.
+#' @slot curveControl list. Additional parameters specifying how the 
+#'   simultaneous principal curves were constructed. \itemize{ 
+#'   \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
+#'   and how much to shrink branching lineages toward their shared average
+#'   curve.} \item{\code{extend}}{character. Specifies the method for handling
+#'   root and leaf clusters of lineages when constructing the initial,
+#'   piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
+#'   See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical.
+#'   Indicates whether to reweight cells shared by multiple lineages during
+#'   curve-fitting. If \code{TRUE}, cells shared between lineages will have
+#'   lineage-specific weights determined by the ratio: (distance to nearest
+#'   curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical.
+#'   Indicates whether to drop shared cells from lineages which do not fit them
+#'   well. If \code{TRUE}, shared cells with a distance to one lineage above the
+#'   90th percentile and another lineage below the 50th percentile will be
+#'   dropped from the farther lineage.} \item{\code{shrink.method}}{character.
+#'   Denotes how to determine the amount of shrinkage for a branching lineage.
+#'   Accepted values are the same as for \code{kernel} in  the \code{density}
+#'   function (default is \code{"cosine"}), as well as \code{"tricube"} and
+#'   \code{"density"}. See \code{\link{getCurves}} for details.} \item{Other
+#'   parameters specified by \code{\link{principal.curve}}}. }
+#'   
+#' @examples
+#' rd <- matrix(data=rnorm(200), ncol=2)
+#' cl <- sample(letters[1:5], 100, replace = TRUE)
+#' sds <- SlingshotDataSet(rd, cl)
+#' 
 #' @import princurve
 #' @import methods
 #' @export
-#'
+#' 
 setClass(
   Class = "SlingshotDataSet",
   slots = list(
@@ -72,8 +71,8 @@ setClass(
     connectivity = "matrix",
     lineageControl = "list",
     curves = "list",
-    pseudotime = "matrix", # make a function that pulls this from curves
-    curveWeights = "matrix", #
+    pseudotime = "matrix",
+    curveWeights = "matrix",
     curveControl = "list"
   )
 )
@@ -187,41 +186,16 @@ setValidity("SlingshotDataSet", function(object) {
   return(TRUE)
   })
 
-#'@title Constructor function for the \code{SlingshotDataSet} class
-#'@rdname SlingshotDataSet
-#'  
-#'@description The \code{SlingshotDataSet} constructor creates an object of the
-#'  class \code{SlingshotDataSet}. Objects of this type will also be returned by
-#'  \code{\link{getLineages}} and \code{\link{getCurves}}.
-#'  
-#'@description Additional functions extract or replace elements of a
-#'  \code{SlingshotDataSet}.
-#'  
-#'@param reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame
-#'  giving the coordinates of the cells in a reduced dimensionality space.
-#'@param clusterLabels character. A character vector of length \code{n} denoting
-#'  each cell's cluster label.
-#'@param ... Additional elements to specify, see
-#'  \code{\link{SlingshotDataSet-class}}.
-#'  
-#'@return A \code{SlingshotDataSet} object.
-#'  
-#'@seealso \code{\link{SlingshotDataSet-class}}
-#'  
-#'@examples
-#'
-#'rd <- matrix(data=rnorm(200), ncol=2)
-#'cl <- sample(letters[1:5], 100, replace = TRUE)
-#'sds <- SlingshotDataSet(rd, cl)
-#'
-#' @export
 setGeneric(
   name = "SlingshotDataSet",
+  signature = c('reducedDim','clusterLabels'),
   def = function(reducedDim,  clusterLabels, ...) {
     standardGeneric("SlingshotDataSet")
   }
 )
-#' @rdname SlingshotDataSet
+
+#' @describeIn SlingshotDataSet Constructor function for the
+#'   \code{SlingshotDataSet} class.
 #' @export
 setMethod(
   f = "SlingshotDataSet",

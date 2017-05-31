@@ -1,5 +1,5 @@
 #' @title Perform lineage inference with Slingshot
-#' @aliases slingshot
+#' @name slingshot
 #' 
 #' @description Given a reduced-dimensional data matrix \code{n} by \code{p} and
 #'   a vector of cluster labels (potentially including \code{-1}'s for
@@ -147,7 +147,8 @@ setMethod(f = "slingshot",
           }
 )
 
-
+#' @rdname slingshot
+#' @export
 setMethod(f = "slingshot",
           signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
           definition = function(reducedDim,
@@ -173,6 +174,8 @@ setMethod(f = "slingshot",
                              shrink.method = shrink.method, ...))
           })
 
+#' @rdname slingshot
+#' @export
 setMethod(f = "slingshot",
           signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels, 
@@ -199,6 +202,8 @@ setMethod(f = "slingshot",
                              shrink.method = shrink.method, ...))
           })
 
+#' @rdname slingshot
+#' @export
 setMethod(f = "slingshot",
           signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
           definition = function(reducedDim, clusterLabels, 
@@ -223,6 +228,8 @@ setMethod(f = "slingshot",
                              shrink.method = shrink.method, ...))
           })
 
+#' @rdname slingshot
+#' @export
 setMethod(f = "slingshot",
           signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
           definition = function(reducedDim, clusterLabels, 

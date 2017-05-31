@@ -1,5 +1,5 @@
 #' @title Infer Lineage Structure from Clustered Samples
-#' @aliases getLineages
+#' @name getLineages
 #' 
 #' @description Given a reduced-dimension data matrix \code{n} by \code{p} and a vector of
 #' cluster identities (potentially including -1's for "unclustered"), this function
@@ -283,7 +283,8 @@ setMethod(f = "getLineages",
 )
 
 
-
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
           definition = function(reducedDim,
@@ -296,6 +297,8 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels, 
@@ -309,6 +312,8 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
           definition = function(reducedDim, clusterLabels, 
@@ -320,6 +325,8 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
           definition = function(reducedDim, clusterLabels, 

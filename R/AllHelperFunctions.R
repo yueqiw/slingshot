@@ -4,6 +4,10 @@
 #' @description Helper functions for accessing and changing elements of a
 #'   \code{SlingshotDataSet} object.
 #'   
+#' @param x a \code{SlingshotDataSet} object.
+#' 
+#' @seealso \code{\link{SlingshotDataSet}}
+#'   
 #' @export
 setMethod(
   f = "show",
@@ -65,15 +69,24 @@ setMethod(
   signature = "SlingshotDataSet",
   definition = function(x) x@curves
 )
-#' @rdname SlingshotDataSet-methods
-#' @param na logical. If \code{TRUE}, cells that are not assigned to a lineage
-#'   will have a pseudotime value of \code{NA}. Otherwise, their arclength along
-#'   the curve will be returned.
+#' @title Get Slingshot pseudotime values
+#' @name pseudotime
+#' 
+#' @description Extract the matrix of pseudotime values or cells' weights along
+#'   each lineage.
+#' 
+#' @param x a \code{SlingshotDataSet} object.
+#' @param na logical. If \code{TRUE} (default), cells that are not assigned to a
+#'   lineage will have a pseudotime value of \code{NA}. Otherwise, their
+#'   arclength along the curve will be returned.
 #' @export
 setMethod(
   f = "pseudotime",
   signature = "SlingshotDataSet",
   definition = function(x, na = TRUE){
+    if(length(curves(x))==0){
+      stop('No curves detected.')
+    }
     pst <- sapply(curves(x), function(pc) {
       t <- pc$lambda
       if(na){
@@ -86,12 +99,15 @@ setMethod(
     return(pst)
   }
 )
-#' @rdname SlingshotDataSet-methods
+#' @rdname pseudotime
 #' @export
 setMethod(
   f = "curveWeights",
   signature = "SlingshotDataSet",
   definition = function(x){
+    if(length(curves(x))==0){
+      stop('No curves detected.')
+    }
     weights <- sapply(curves(x), function(pc) { pc$w })
     rownames(weights) <- rownames(reducedDim(x)); colnames(weights) <- names(curves(x))
     return(weights)
@@ -129,11 +145,11 @@ setMethod(f = "[",
                        clusterLabels  = cl,
                        lineages = list(),
                        connectivity = matrix(NA,0,0),
-                       lineageControl = x@lineageControl,
+                       lineageControl = lineageControl(x),
                        curves = list(),
                        pseudotime = matrix(NA,0,0),
                        curveWeights = matrix(NA,0,0),
-                       curveControl = x@curveControl)
+                       curveControl = curveControl(x))
           })
 
 

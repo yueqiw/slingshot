@@ -1,9 +1,8 @@
 setGeneric(
   name = "getLineages",
   signature = c('reducedDim','clusterLabels'),
-  def = function(reducedDim, clusterLabels,
-                 start.clus = NULL, end.clus = NULL,
-                 dist.fun = NULL, omega = NULL, ...) {
+  def = function(reducedDim,
+                 clusterLabels, ...) {
     standardGeneric("getLineages")
   }
 )
@@ -11,16 +10,7 @@ setGeneric(
 setGeneric(
   name = "getCurves",
   signature = 'sds',
-  def = function(sds, 
-                 clusterLabels = sds@clusterLabels,
-                 lineages = sds@lineages,
-                 shrink = TRUE, 
-                 extend = 'y', 
-                 reweight = TRUE,
-                 drop.multi = TRUE, 
-                 thresh = 0.001, maxit = 15, stretch = 2, 
-                 smoother = 'smooth.spline', 
-                 shrink.method = 'cosine', ...) {
+  def = function(sds, ...) {
     standardGeneric("getCurves")
   }
 )
@@ -28,17 +18,8 @@ setGeneric(
 setGeneric(
   name = "slingshot",
   signature = c('reducedDim','clusterLabels'),
-  def = function(reducedDim, clusterLabels,
-                 start.clus = NULL, end.clus = NULL,
-                 dist.fun = NULL, omega = NULL,
-                 lineages = list(),
-                 shrink = TRUE,
-                 extend = 'y',
-                 reweight = TRUE,
-                 drop.multi = TRUE,
-                 thresh = 0.001, maxit = 15, stretch = 2,
-                 smoother = 'smooth.spline',
-                 shrink.method = 'cosine', ...) {
+  def = function(reducedDim,
+                 clusterLabels, ...) {
     standardGeneric("slingshot")
   }
 )

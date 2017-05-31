@@ -6,7 +6,7 @@
 \alias{getCurves}
 \title{Construct Smooth Curves for Each Lineage}
 \usage{
-\S4method{getCurves}{SlingshotDataSet}(sds, clusLabels = sds@clusLabels,
+\S4method{getCurves}{SlingshotDataSet}(sds, clusterLabels = sds@clusterLabels,
   lineages = sds@lineages, shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine", ...)
@@ -60,20 +60,8 @@ An updated \code{\link{SlingshotDataSet}} object containing the
 oringinal input, arguments provided to \code{getCurves} as well as the
 following new elements:
 \itemize{
-\item{curves}{}
-\item{pseudotime}{}
-\item{curveWeights}{}
-\item{curve.controls}{}}
-A list of length \code{L}, equal to the number of lineages. Each element
-  is an object of class \code{principal.curve} containing the following objects: 
-  \itemize{ \item{\code{s}}{ a matrix of points along the curve corresponding to
-  the projections of points in \code{X} onto the curve, ordered by pseudotime.}
-  \item{\code{lambda}}{ a vector of pseudotime values in the same order as 
-  \code{s}, representing each point's arclength along the curve.}
-  \item{\code{dist}}{ the total squared distance between points used in the 
-  construction of the curve and their projections onto the curve.}
-  \item{\code{pseudotime}}{ a vector of pseudotime values of length \code{n},
-  containing \code{NA} values for cells not represented by this lineage} }
+\item{curves}{A list of \code{\link{principal.curve}} objects.}
+\item{curveControls}{Additional parameters used for fitting simultaneous principal curves.}}
 }
 \description{
 This function takes a reduced data matrix \code{n} by \code{p},

@@ -1,5 +1,6 @@
 ## plot
 #' @title Plot Slingshot output
+#' @name SlingshotDataSet-plot
 #' 
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #' 
@@ -74,17 +75,17 @@ setMethod(
     
     if(lineages){
       X <- x@reducedDim
-      clusLabels <- x@clusLabels
+      clusterLabels <- x@clusterLabels
       connectivity <- x@connectivity
       clusters <- rownames(connectivity)
       nclus <- nrow(connectivity)
       centers <- t(sapply(clusters,function(clID){
-        x.sub <- X[clusLabels == clID,]
+        x.sub <- X[clusterLabels == clID,]
         return(colMeans(x.sub))
       }))
       rownames(centers) <- clusters
-      X <- X[clusLabels %in% clusters,]
-      clusLabels <- clusLabels[clusLabels %in% clusters]
+      X <- X[clusterLabels %in% clusters,]
+      clusterLabels <- clusterLabels[clusterLabels %in% clusters]
     }
     
     if(!add){
@@ -120,8 +121,7 @@ setMethod(
   }
 )
 
-## lines --- HOW DO I COMBINE THE DOC FILES FOR THIS AND PLOT?
-#' @rdname SlingshotDataSet-methods
+#' @rdname SlingshotDataSet-plot
 #' @export
 setMethod(
   f = "lines",
@@ -137,6 +137,7 @@ setMethod(
 
 ## plot3d
 #' @title Plot Slingshot output in 3D
+#' @name SlingshotDataSet-plot3d
 #' 
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #' 
@@ -173,223 +174,129 @@ setMethod(
 #' @importFrom rgl plot3d
 #' 
 #' @export
-# plot3d.SlingshotDataSet <- function(x,
-#                                     type = NULL,
-#                                     add = FALSE,
-#                                     dims = 1:3,
-#                                     aspect = 'iso',
-#                                     ...){
-#   require(rgl)
-#   curves <- FALSE
-#   lineages <- FALSE
-#   if(is.null(type)){
-#     if(length(x@curves) > 0){
-#       type <- 'curves'
-#     }else if(length(x@lineages) > 0){
-#       type <- 'lineages'
-#     }else{
-#       stop('No lineages or curves detected.')
-#     }
-#   }else{
-#     type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages','both'))]
-#     if(is.na(type)){
-#       stop('Unrecognized type argument.')
-#     }
-#   }
-#   
-#   if(type %in% c('lineages','both')){
-#     lineages <- TRUE
-#   }
-#   if(type %in% c('curves','both')){
-#     curves <- TRUE
-#   }
-#   
-#   if(lineages & (length(x@lineages)==0)){
-#     stop('No lineages detected.')
-#   }
-#   if(curves & (length(x@curves)==0)){
-#     stop('No curves detected.')
-#   }
-#   
-#   if(lineages){
-#     X <- x@reducedDim
-#     clusLabels <- x@clusLabels
-#     connectivity <- x@connectivity
-#     clusters <- rownames(connectivity)
-#     nclus <- nrow(connectivity)
-#     centers <- t(sapply(clusters,function(clID){
-#       x.sub <- X[clusLabels == clID,]
-#       return(colMeans(x.sub))
-#     }))
-#     rownames(centers) <- clusters
-#     X <- X[clusLabels %in% clusters,]
-#     clusLabels <- clusLabels[clusLabels %in% clusters]
-#   }
-#   
-#   if(!add){
-#     xs <- NULL
-#     ys <- NULL
-#     zs <- NULL
-#     if(lineages){
-#       xs <- c(xs, centers[,dims[1]])
-#       ys <- c(ys, centers[,dims[2]])
-#       zs <- c(zs, centers[,dims[3]])
-#     }
-#     if(curves){
-#       xs <- c(xs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[1]] })))
-#       ys <- c(ys, as.numeric(sapply(x@curves, function(c){ c$s[,dims[2]] })))        
-#       zs <- c(zs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[3]] })))        
-#     }
-#     plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
-#            xlim = range(xs), ylim = range(ys), zlim = range(zs), 
-#            xlab = colnames(x@reducedDim)[dims[1]],
-#            ylab = colnames(x@reducedDim)[dims[2]],
-#            zlab = colnames(x@reducedDim)[dims[3]])
-#   }
-#   
-#   if(lineages){
-#     for(i in 1:(nclus-1)){
-#       for(j in (i+1):nclus){
-#         if(connectivity[i,j]==1){
-#           lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
-#         }
-#       }
-#     }
-#   }
-#   if(curves){
-#     for(c in x@curves){ lines3d(c$s[c$tag,dims], ...) }
-#   }
-#   invisible(NULL)
-#   
-# }
-
+plot3d.SlingshotDataSet <- function(x,
+                                    type = NULL,
+                                    add = FALSE,
+                                    dims = 1:3,
+                                    aspect = 'iso',
+                                    ...){
+  require(rgl)
+  curves <- FALSE
+  lineages <- FALSE
+  if(is.null(type)){
+    if(length(x@curves) > 0){
+      type <- 'curves'
+    }else if(length(x@lineages) > 0){
+      type <- 'lineages'
+    }else{
+      stop('No lineages or curves detected.')
+    }
+  }else{
+    type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages','both'))]
+    if(is.na(type)){
+      stop('Unrecognized type argument.')
+    }
+  }
+  
+  if(type %in% c('lineages','both')){
+    lineages <- TRUE
+  }
+  if(type %in% c('curves','both')){
+    curves <- TRUE
+  }
+  
+  if(lineages & (length(x@lineages)==0)){
+    stop('No lineages detected.')
+  }
+  if(curves & (length(x@curves)==0)){
+    stop('No curves detected.')
+  }
+  
+  if(lineages){
+    X <- x@reducedDim
+    clusterLabels <- x@clusterLabels
+    connectivity <- x@connectivity
+    clusters <- rownames(connectivity)
+    nclus <- nrow(connectivity)
+    centers <- t(sapply(clusters,function(clID){
+      x.sub <- X[clusterLabels == clID,]
+      return(colMeans(x.sub))
+    }))
+    rownames(centers) <- clusters
+    X <- X[clusterLabels %in% clusters,]
+    clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+  }
+  
+  if(!add){
+    xs <- NULL
+    ys <- NULL
+    zs <- NULL
+    if(lineages){
+      xs <- c(xs, centers[,dims[1]])
+      ys <- c(ys, centers[,dims[2]])
+      zs <- c(zs, centers[,dims[3]])
+    }
+    if(curves){
+      xs <- c(xs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[1]] })))
+      ys <- c(ys, as.numeric(sapply(x@curves, function(c){ c$s[,dims[2]] })))
+      zs <- c(zs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[3]] })))
+    }
+    plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
+           xlim = range(xs), ylim = range(ys), zlim = range(zs),
+           xlab = colnames(x@reducedDim)[dims[1]],
+           ylab = colnames(x@reducedDim)[dims[2]],
+           zlab = colnames(x@reducedDim)[dims[3]])
+  }
+  
+  if(lineages){
+    for(i in 1:(nclus-1)){
+      for(j in (i+1):nclus){
+        if(connectivity[i,j]==1){
+          lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
+        }
+      }
+    }
+  }
+  if(curves){
+    for(c in x@curves){ lines3d(c$s[c$tag,dims], ...) }
+  }
+  invisible(NULL)
+}
+#' @rdname SlingshotDataSet-plot3d
+#' @export
+setMethod(
+  f = "plot3d",
+  signature = "SlingshotDataSet",
+  definition = function(x,
+                        type = NULL,
+                        add = FALSE,
+                        dims = 1:3,
+                        aspect = 'iso',
+                        ...) {
+    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, aspect = aspect, ...)
+  }
+)
 
 ## lines3d
-#' @rdname SlingshotDataSet-methods
+#' @rdname SlingshotDataSet-plot3d
+#' @importFrom rgl lines3d
 #' @export
-# lines3d.SlingshotDataSet <- function(x,
-#                                      type = NULL,
-#                                      dims = 1:3,
-#                                      ...) {
-#   plot3d(x, type = type, add = TRUE, dims = dims, ...)
-#   invisible(NULL)
-# }
-
-
-
-
-
-
-# setMethod(
-#   f = "plot3d",
-#   signature = "SlingshotDataSet",
-#   definition = function(x,
-#                         type = NULL,
-#                         add = FALSE,
-#                         dims = 1:3,
-#                         aspect = 'iso',
-#                         ...) {
-#     require(rgl)
-#     curves <- FALSE
-#     lineages <- FALSE
-#     if(is.null(type)){
-#       if(length(x@curves) > 0){
-#         type <- 'curves'
-#       }else if(length(x@lineages) > 0){
-#         type <- 'lineages'
-#       }else{
-#         stop('No lineages or curves detected.')
-#       }
-#     }else{
-#       type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages','both'))]
-#       if(is.na(type)){
-#         stop('Unrecognized type argument.')
-#       }
-#     }
-#     
-#     if(type %in% c('lineages','both')){
-#       lineages <- TRUE
-#     }
-#     if(type %in% c('curves','both')){
-#       curves <- TRUE
-#     }
-#     
-#     if(lineages & (length(x@lineages)==0)){
-#       stop('No lineages detected.')
-#     }
-#     if(curves & (length(x@curves)==0)){
-#       stop('No curves detected.')
-#     }
-#     
-#     if(lineages){
-#       X <- x@reducedDim
-#       clusLabels <- x@clusLabels
-#       connectivity <- x@connectivity
-#       clusters <- rownames(connectivity)
-#       nclus <- nrow(connectivity)
-#       centers <- t(sapply(clusters,function(clID){
-#         x.sub <- X[clusLabels == clID,]
-#         return(colMeans(x.sub))
-#       }))
-#       rownames(centers) <- clusters
-#       X <- X[clusLabels %in% clusters,]
-#       clusLabels <- clusLabels[clusLabels %in% clusters]
-#     }
-#     
-#     if(!add){
-#       xs <- NULL
-#       ys <- NULL
-#       zs <- NULL
-#       if(lineages){
-#         xs <- c(xs, centers[,dims[1]])
-#         ys <- c(ys, centers[,dims[2]])
-#         zs <- c(zs, centers[,dims[3]])
-#       }
-#       if(curves){
-#         xs <- c(xs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[1]] })))
-#         ys <- c(ys, as.numeric(sapply(x@curves, function(c){ c$s[,dims[2]] })))        
-#         zs <- c(zs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[3]] })))        
-#       }
-#       plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
-#              xlim = range(xs), ylim = range(ys), zlim = range(zs), 
-#              xlab = colnames(x@reducedDim)[dims[1]],
-#              ylab = colnames(x@reducedDim)[dims[2]],
-#              zlab = colnames(x@reducedDim)[dims[3]])
-#     }
-#     
-#     if(lineages){
-#       for(i in 1:(nclus-1)){
-#         for(j in (i+1):nclus){
-#           if(connectivity[i,j]==1){
-#             lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
-#           }
-#         }
-#       }
-#     }
-#     if(curves){
-#       for(c in x@curves){ lines3d(c$s[c$tag,dims], ...) }
-#     }
-#     invisible(NULL)
-#   }
-# )
-
-
-
-
-
-
-
-
-
-
-# setMethod(
-#   f = "lines3d",
-#   signature = "SlingshotDataSet",
-#   definition = function(x,
-#                         type = NULL,
-#                         dims = 1:3,
-#                         ...) {
-#     plot3d(x, type = type, add = TRUE, dims = dims, ...)
-#     invisible(NULL)
-#   }
-# )
+lines3d.SlingshotDataSet <- function(x,
+                                     type = NULL,
+                                     dims = 1:3,
+                                     ...) {
+  plot3d(x, type = type, add = TRUE, dims = dims, ...)
+  invisible(NULL)
+}
+#' @rdname SlingshotDataSet-plot3d
+#' @export
+setMethod(
+  f = "lines3d",
+  signature = "SlingshotDataSet",
+  definition = function(x,
+                        type = NULL,
+                        dims = 1:3,
+                        ...) {
+    lines3d.SlingshotDataSet(x, type = type, add = TRUE, dims = dims, ...)
+  }
+)

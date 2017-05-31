@@ -3,47 +3,17 @@
 \docType{class}
 \name{SlingshotDataSet-class}
 \alias{SlingshotDataSet-class}
-\alias{SlingshotDataSet}
-\alias{slingshotDataSet}
 \alias{slingshotDataSet-class}
-\alias{SlingshotDataSet}
-\alias{SlingshotDataSet,data.frame,ANY-method}
-\alias{SlingshotDataSet,matrix,numeric-method}
-\alias{SlingshotDataSet,matrix,factor-method}
 \title{Class \code{SlingshotDataSet}}
-\usage{
-SlingshotDataSet(reducedDim, clusLabels, ...)
-
-\S4method{SlingshotDataSet}{data.frame,ANY}(reducedDim, clusLabels, ...)
-
-\S4method{SlingshotDataSet}{matrix,numeric}(reducedDim, clusLabels, ...)
-
-\S4method{SlingshotDataSet}{matrix,factor}(reducedDim, clusLabels, ...)
-}
-\arguments{
-\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
-coordinates of the cells in a reduced dimensionality space.}
-
-\item{clusLabels}{character. A character vector of length \code{n} denoting each
-cell's cluster label.}
-}
-\value{
-A \code{SlingshotDataSet} object.
-}
 \description{
-The \code{SlingshotDataSet} class holds data relevant 
-for performing lineage inference with the \code{slingshot} package, 
-primarily a reduced dimensional representation of the data and a set
-of cluster labels.
+The \code{SlingshotDataSet} class holds data relevant for
+  performing lineage inference with the \code{slingshot} package, primarily a
+  reduced dimensional representation of the data and a set of cluster labels.
 
-All \code{slingshot} methods can take an object of the class
-\code{SlingshotDataSet} as input and will output the same. Additionally,
-simple helper methods for creating and manipulating objects of the class
-\code{SlingshotDataSet} are described below.
-
-The \code{SlingshotDataSet} constructor creates an object of
-the class \code{SlingshotDataSet}. Objects of this type will also be 
-returned by \code{\link{getLineages}} and \code{\link{getCurves}}.
+All \code{slingshot} methods can take an object of the class 
+  \code{SlingshotDataSet} as input and will output the same. Additionally, 
+  simple helper methods for creating and manipulating objects of the class 
+  \code{SlingshotDataSet} are described below.
 }
 \section{Slots}{
 
@@ -51,7 +21,7 @@ returned by \code{\link{getLineages}} and \code{\link{getCurves}}.
 \item{\code{reducedDim}}{matrix. An \code{n} by \code{p} numeric matrix or data frame giving the
 coordinates of the cells in a reduced dimensionality space.}
 
-\item{\code{clusLabels}}{character. A character vector of length \code{n} denoting each
+\item{\code{clusterLabels}}{character. A character vector of length \code{n} denoting each
 cell's cluster label.}
 
 \item{\code{lineages}}{list. A list with each element a character vector of cluster names
@@ -60,7 +30,7 @@ representing a lineage as an ordered set of clusters.}
 \item{\code{connectivity}}{matrix. A binary matrix describing the connectivity between
 clusters induced by the minimum spanning tree.}
 
-\item{\code{lineage.control}}{list. Additional parameters specifying how the minimum
+\item{\code{lineageControl}}{list. Additional parameters specifying how the minimum
 spanning tree on clusters was constructed.
 \itemize{
 \item{\code{start.clus}}{character. The label of the root cluster.}
@@ -76,14 +46,7 @@ each terminal state was pre-specified}
 \item{\code{curves}}{list. A list of \code{principal.curve} objects produced by
 \code{\link{getCurves}}.}
 
-\item{\code{pseudotime}}{matrix. A matrix of size \code{n} by \code{L} (where 
-\code{L} is the number of lineages) specifying each cell's pseudotime along
-each lineage.}
-
-\item{\code{curveWeights}}{matrix. An \code{n} by \code{L} matrix specifying the weight
-of each cell's contribution to each lineage.}
-
-\item{\code{curve.control}}{list. Additional parameters specifying how the
+\item{\code{curveControl}}{list. Additional parameters specifying how the
 simultaneous principal curves were constructed.
 \itemize{
 \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
@@ -109,11 +72,3 @@ for \code{kernel} in  the \code{density} function (default is
 }}
 }}
 
-\examples{
-
-reducedDim <- matrix(data=rnorm(200), ncol=2)
-clusLabels <- sample(letters[1:5], 100, replace = TRUE)
-
-sds <- SlingshotDataSet(reducedDim, clusLabels)
-
-}

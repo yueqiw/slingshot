@@ -1,45 +1,46 @@
 context("Test slingshot methods and SlingshotDataSet class.")
-#load("../../data/slingshotExample.RData")
+load("../../data/slingshotExample.RData")
 data("slingshotExample")
 set.seed(1234)
 
-# 0 column matrix, reordering
+# check for reordering
+
 test_that("getLineages works for different input types", {
   reducedDim <- matrix(rnorm(100), ncol = 2)
-  clusLabels <- rep(1:5, each = 10)
+  clusterLabels <- rep(1:5, each = 10)
   
   # matrix / integer
-  mi <- getLineages(reducedDim, clusLabels)
+  mi <- getLineages(reducedDim, clusterLabels)
   expect_is(mi, "SlingshotDataSet")
   expect_equal(dim(connectivity(mi)), c(5,5))
   # 1-column matrix / integer
-  m1i <- getLineages(reducedDim[,1,drop = FALSE], clusLabels)
+  m1i <- getLineages(reducedDim[,1,drop = FALSE], clusterLabels)
   expect_is(mi, "SlingshotDataSet")
   expect_equal(dim(connectivity(mi)), c(5,5))
   # matrix / character
-  mc <- getLineages(reducedDim, as.character(clusLabels))
+  mc <- getLineages(reducedDim, as.character(clusterLabels))
   expect_is(mc, "SlingshotDataSet")
   expect_equal(dim(connectivity(mc)), c(5,5))
   # matrix / factor
-  mf <- getLineages(reducedDim, as.factor(clusLabels))
+  mf <- getLineages(reducedDim, as.factor(clusterLabels))
   expect_is(mf, "SlingshotDataSet")
   expect_equal(dim(connectivity(mf)), c(5,5))
   
-  rd <- data.frame(reducedDim)
+  df <- data.frame(reducedDim)
   # data frame / integer
-  dfi <- getLineages(rd, clusLabels)
+  dfi <- getLineages(df, clusterLabels)
   expect_is(dfi, "SlingshotDataSet")
   expect_equal(dim(connectivity(dfi)), c(5,5))
   # data frame / character
-  dfc <- getLineages(rd, as.character(clusLabels))
+  dfc <- getLineages(df, as.character(clusterLabels))
   expect_is(dfc, "SlingshotDataSet")
   expect_equal(dim(connectivity(dfc)), c(5,5))
   # data frame / factor
-  dff <- getLineages(rd, as.factor(clusLabels))
+  dff <- getLineages(df, as.factor(clusterLabels))
   expect_is(dff, "SlingshotDataSet")
   expect_equal(dim(connectivity(dff)), c(5,5))
   
-  sds <- SlingshotDataSet(reducedDim, clusLabels)
+  sds <- SlingshotDataSet(reducedDim, clusterLabels)
   # SlingshotDataSet
   s <- getLineages(sds)
   expect_is(s, "SlingshotDataSet")
@@ -52,11 +53,13 @@ test_that("getLineages works for different input types", {
   expect_equal(dim(connectivity(c1)), c(1,1))
   
   # invalid inputs
-  expect_error(getLineages(reducedDim, clusLabels[1:10]), 'must equal length')
+  expect_error(getLineages(reducedDim[,-(seq_len(ncol(reducedDim)))], clusterLabels), 'has zero columns')
+  expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels), 'has zero rows')
+  expect_error(getLineages(reducedDim, clusterLabels[1:10]), 'must equal length')
   rdna <- reducedDim; rdna[1,1] <- NA
-  expect_error(getLineages(rdna, clusLabels), 'cannot contain missing values')
+  expect_error(getLineages(rdna, clusterLabels), 'cannot contain missing values')
   rdc <- reducedDim; rdc[1,1] <- 'a'
-  expect_error(getLineages(rdc, clusLabels), 'must only contain numeric values')
+  expect_error(getLineages(rdc, clusterLabels), 'must only contain numeric values')
 })
 
 test_that("getLineages works as expected", {
@@ -73,25 +76,26 @@ test_that("getLineages works as expected", {
 })
 
 test_that("getCurves works as expected", {
-  reducedDim <- matrix(rnorm(100), ncol = 2)
-  clusLabels <- rep(1:5, each = 10)
+  load("../../data/slingshotExample.RData")
+  data("slingshotExample")
   
   # 2 dim, 5 clus
-  mi <- getLineages(reducedDim, clusLabels)
+  mi <- getLineages(rd, cl)
   mi <- getCurves(mi)
+  expect_equal(length(curves(mi)),2)
   
   # one dimension
-  m1i <- getLineages(reducedDim[,1,drop = FALSE], clusLabels)
+  m1i <- getLineages(rd[,1,drop = FALSE], cl)
   m1i <- getCurves(m1i)
   expect_true(abs(abs(cor(reducedDim(m1i)[,1], pseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
   m1i <- getCurves(m1i, extend = 'n')
-  expect_equal(abs(cor(reducedDim(m1i)[,1], pseudotime(m1i)[,1], use='complete.obs')), 1)
+  expect_true(abs(abs(cor(reducedDim(m1i)[,1], pseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
   m1i <- getCurves(m1i, extend = 'pc1')
   expect_true(abs(abs(cor(reducedDim(m1i)[,1], pseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
   
   # one cluster
-  clus1 <- rep(1,50)
-  c1 <- getLineages(reducedDim, clus1)
+  clus1 <- cl; clus1[] <- 1
+  c1 <- getLineages(rd, clus1)
   c1 <- getCurves(c1)
   expect_equal(length(curves(c1)), 1)
   c1 <- getCurves(c1, extend = 'n')

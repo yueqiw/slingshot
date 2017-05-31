@@ -75,20 +75,8 @@
 #' oringinal input, arguments provided to \code{getCurves} as well as the
 #' following new elements:
 #' \itemize{
-#' \item{curves}{}
-#' \item{pseudotime}{}
-#' \item{curveWeights}{}
-#' \item{curve.controls}{}}
-#' A list of length \code{L}, equal to the number of lineages. Each element
-#'   is an object of class \code{principal.curve} containing the following objects: 
-#'   \itemize{ \item{\code{s}}{ a matrix of points along the curve corresponding to
-#'   the projections of points in \code{X} onto the curve, ordered by pseudotime.}
-#'   \item{\code{lambda}}{ a vector of pseudotime values in the same order as 
-#'   \code{s}, representing each point's arclength along the curve.}
-#'   \item{\code{dist}}{ the total squared distance between points used in the 
-#'   construction of the curve and their projections onto the curve.}
-#'   \item{\code{pseudotime}}{ a vector of pseudotime values of length \code{n},
-#'   containing \code{NA} values for cells not represented by this lineage} }
+#' \item{curves}{A list of \code{\link{principal.curve}} objects.}
+#' \item{curveControls}{Additional parameters used for fitting simultaneous principal curves.}}
 #'
 #' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves." \emph{Journal of the American Statistical Association}, 84:502–516.
 #'
@@ -108,7 +96,7 @@
 setMethod(f = "getCurves",
           signature = signature(sds = "SlingshotDataSet"),
           definition = function(sds,
-                                clusLabels = sds@clusLabels,
+                                clusterLabels = sds@clusterLabels,
                                 lineages = sds@lineages,
                                 shrink = TRUE, 
                                 extend = 'y', 
@@ -118,21 +106,21 @@ setMethod(f = "getCurves",
                                 smoother = 'smooth.spline', 
                                 shrink.method = 'cosine', ...){
             
-            sds@curve.control$shrink <- shrink
-            sds@curve.control$extend <- extend
-            sds@curve.control$reweight <- reweight
-            sds@curve.control$drop.multi <- drop.multi
-            sds@curve.control$shrink.method <- shrink.method
+            sds@curveControl$shrink <- shrink
+            sds@curveControl$extend <- extend
+            sds@curveControl$reweight <- reweight
+            sds@curveControl$drop.multi <- drop.multi
+            sds@curveControl$shrink.method <- shrink.method
             
             # CHECKS
             X <- sds@reducedDim
-            clusLabels <- sds@clusLabels
+            clusterLabels <- sds@clusterLabels
             shrink <- as.numeric(shrink)
             if(shrink < 0 | shrink > 1){
               stop("shrink must be logical or numeric between 0 and 1")
             }
-            if(nrow(X) != length(clusLabels)){
-              stop('nrow(X) must equal length(clusLabels)')
+            if(nrow(X) != length(clusterLabels)){
+              stop('nrow(X) must equal length(clusterLabels)')
             }
             if(any(is.na(X))){
               stop('reducedDim cannot contain missing values.')
@@ -156,23 +144,23 @@ setMethod(f = "getCurves",
             
             # remove unclustered cells
             X.original <- X
-            clusLabels.original <- clusLabels
-            X <- X[clusLabels != -1, ,drop = FALSE]
-            clusLabels <- clusLabels[clusLabels != -1]
+            clusterLabels.original <- clusterLabels
+            X <- X[clusterLabels != -1, ,drop = FALSE]
+            clusterLabels <- clusterLabels[clusterLabels != -1]
             # SETUP
             L <- length(grep("Lineage",names(lineages))) # number of lineages
-            clusters <- unique(clusLabels)
+            clusters <- unique(clusterLabels)
             d <- dim(X); n <- d[1]; p <- d[2]
             nclus <- length(clusters)
             centers <- t(sapply(clusters,function(clID){
-              x.sub <- X[clusLabels == clID, ,drop = FALSE]
+              x.sub <- X[clusterLabels == clID, ,drop = FALSE]
               return(colMeans(x.sub))
             }))
             if(p == 1){
               centers <- t(centers)
             }
             rownames(centers) <- clusters
-            W <- sapply(seq_len(L),function(l){as.numeric(clusLabels %in% lineages[[l]])}) # weighting matrix
+            W <- sapply(seq_len(L),function(l){as.numeric(clusterLabels %in% lineages[[l]])}) # weighting matrix
             rownames(W) <- rownames(X); colnames(W) <- names(lineages)[seq_len(L)]
             W.orig <- W
             D <- W; D[,] <- NA
@@ -199,7 +187,7 @@ setMethod(f = "getCurves",
             pcurves <- list()
             for(l in seq_len(L)){
               idx <- W[,l] > 0
-              clus.sub <- clusLabels[idx]
+              clus.sub <- clusterLabels[idx]
               line.initial <- centers[clusters %in% lineages[[l]], , drop = FALSE]
               line.initial <- line.initial[match(lineages[[l]],rownames(line.initial)),  ,drop = FALSE]
               K <- nrow(line.initial)
@@ -226,14 +214,14 @@ setMethod(f = "getCurves",
                 curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial, stretch = 0)
               }
               if(extend == 'pc1'){
-                pc1.1 <- prcomp(X[clusLabels == lineages[[l]][1],])
+                pc1.1 <- prcomp(X[clusterLabels == lineages[[l]][1],])
                 pc1.1 <- pc1.1$rotation[,1] * pc1.1$sdev[1]^2
                 leg1 <- line.initial[2,] - line.initial[1,]
                 # pick the direction most "in line with" the first branch
                 if(sum(pc1.1*leg1) > 0){ # dot prod < 0 => cos(theta) < 0 => larger angle
                   pc1.1 <- -pc1.1 
                 }
-                pc1.2 <- prcomp(X[clusLabels == lineages[[l]][K],])
+                pc1.2 <- prcomp(X[clusterLabels == lineages[[l]][K],])
                 pc1.2 <- pc1.2$rotation[,1] * pc1.2$sdev[1]^2
                 leg2 <- line.initial[K-1,] - line.initial[K,]
                 if(sum(pc1.2*leg2) > 0){ # dot prod < 0 => cos(theta) < 0 => larger angle
@@ -402,21 +390,20 @@ setMethod(f = "getCurves",
             names(pcurves) <- paste('curve',1:length(pcurves),sep='')
             
             for(l in seq_len(L)){
-              #pcurve$pseudotime <- pcurve$lambda
-              #pcurve$w <- W[,l]
-              #pcurve$pseudotime[pcurve$w==0] <- NA
-              
+              pcurve$pseudotime <- pcurve$lambda
+              pcurve$w <- W[,l]
+              pcurve$pseudotime[pcurve$w==0] <- NA
             }
             
-            pseudotime <- sapply(pcurves, function(pc) { pc$lambda })
-            weights <- sapply(seq_len(L), function(l) { W[,l] })
-            rownames(weights) <- rownames(X); colnames(weights) <- names(pcurves)
-            pseudotime[weights == 0] <- NA
-            rownames(pseudotime) <- rownames(X); colnames(pseudotime) <- names(pcurves)
+            #pseudotime <- sapply(pcurves, function(pc) { pc$lambda })
+            #weights <- sapply(seq_len(L), function(l) { W[,l] })
+            #rownames(weights) <- rownames(X); colnames(weights) <- names(pcurves)
+            #pseudotime[weights == 0] <- NA
+            #rownames(pseudotime) <- rownames(X); colnames(pseudotime) <- names(pcurves)
             
             sds@curves <- pcurves
-            sds@pseudotime <- pseudotime
-            sds@curveWeights <- weights
+            #sds@pseudotime <- pseudotime
+            #sds@curveWeights <- weights
             
             validObject(sds)
             return(sds)

@@ -15,7 +15,7 @@
 #' 
 #' @param reducedDim numeric matrix or \code{SlingshotDataSet} object containing low-
 #' dimensional representation of single cells.
-#' @param clusLabels character, a vector of length \code{n} denoting cluster labels,
+#' @param clusterLabels character, a vector of length \code{n} denoting cluster labels,
 #' optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 #' \code{SlingshotDataSet}, cluster labels will be taken from it.
 #' @param start.clus (optional) character, indicates the cluster(s) of origin. Lineages
@@ -107,10 +107,10 @@
 #'   of lineages identified. Each lineage is represented by a character vector 
 #'   with the names of the clusters included in that lineage, in order.}
 #' \item{\code{connectivity}}{ the inferred cluster connectivity matrix.}
-#' \item{\code{lineage.control$start.given},\code{lineage.control$end.given}}
+#' \item{\code{lineageControl$start.given},\code{lineageControl$end.given}}
 #'   { logical values indicating whether the starting and ending clusters were 
 #'   specified a priori.} 
-#' \item{\code{lineage.control$dist}}{ the pairwise cluster distance matrix.}}
+#' \item{\code{lineageControl$dist}}{ the pairwise cluster distance matrix.}}
 #'
 #' @examples
 #' data("slingshotExample")
@@ -122,8 +122,8 @@
 #' @export
 #' 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clusLabels = "character"),
-          definition = function(reducedDim, clusLabels,
+          signature = signature(reducedDim = "matrix", clusterLabels = "character"),
+          definition = function(reducedDim, clusterLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -134,7 +134,7 @@ setMethod(f = "slingshot",
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
-            sds <- getLineages(reducedDim, clusLabels,
+            sds <- getLineages(reducedDim, clusterLabels,
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega)
             sds <- getCurves(sds,
@@ -149,9 +149,9 @@ setMethod(f = "slingshot",
 
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "SlingshotDataSet", clusLabels = "ANY"),
+          signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
           definition = function(reducedDim,
-                                clusLabels = reducedDim@clusLabels,
+                                clusterLabels = reducedDim@clusterLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -163,7 +163,7 @@ setMethod(f = "slingshot",
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
             return(slingshot(reducedDim = reducedDim@reducedDim, 
-                             clusLabels = reducedDim@clusLabels, 
+                             clusterLabels = reducedDim@clusterLabels, 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,
@@ -174,8 +174,8 @@ setMethod(f = "slingshot",
           })
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "data.frame", clusLabels = "ANY"),
-          definition = function(reducedDim, clusLabels, 
+          signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
+          definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -189,7 +189,7 @@ setMethod(f = "slingshot",
             RD <- as.matrix(reducedDim)
             rownames(RD) <- rownames(reducedDim)
             return(slingshot(reducedDim = RD, 
-                             clusLabels = clusLabels, 
+                             clusterLabels = clusterLabels, 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,
@@ -200,8 +200,8 @@ setMethod(f = "slingshot",
           })
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clusLabels = "numeric"),
-          definition = function(reducedDim, clusLabels, 
+          signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
+          definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -213,7 +213,7 @@ setMethod(f = "slingshot",
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
             return(slingshot(reducedDim = reducedDim, 
-                             clusLabels = as.character(clusLabels), 
+                             clusterLabels = as.character(clusterLabels), 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,
@@ -224,8 +224,8 @@ setMethod(f = "slingshot",
           })
 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clusLabels = "factor"),
-          definition = function(reducedDim, clusLabels, 
+          signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
+          definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -237,7 +237,7 @@ setMethod(f = "slingshot",
                                 smoother = 'smooth.spline',
                                 shrink.method = 'cosine', ...){
             return(slingshot(reducedDim = reducedDim, 
-                             clusLabels = as.character(clusLabels), 
+                             clusterLabels = as.character(clusterLabels), 
                              start.clus = start.clus, end.clus = end.clus,
                              dist.fun = dist.fun, omega = omega,
                              shrink = shrink, extend = extend,

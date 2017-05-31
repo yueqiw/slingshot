@@ -1,9 +1,9 @@
 #' @title Methods for the \code{SlingshotDataSet} class
 #' @name SlingshotDataSet-methods
-#' 
-#' @description Helper functions for manipulating objects of the \code{SlingshotDataSet}
-#' class.
-#' 
+#'   
+#' @description Helper functions for accessing and changing elements of a
+#'   \code{SlingshotDataSet} object.
+#'   
 #' @export
 setMethod(
   f = "show",
@@ -33,9 +33,9 @@ setMethod(
 #' @rdname SlingshotDataSet-methods
 #' @export
 setMethod(
-  f = "clusLabels",
+  f = "clusterLabels",
   signature = "SlingshotDataSet",
-  definition = function(x) x@clusLabels
+  definition = function(x) x@clusterLabels
 )
 #' @rdname SlingshotDataSet-methods
 #' @export
@@ -54,9 +54,9 @@ setMethod(
 #' @rdname SlingshotDataSet-methods
 #' @export
 setMethod(
-  f = "lineage.control",
+  f = "lineageControl",
   signature = "SlingshotDataSet",
-  definition = function(x) x@lineage.control
+  definition = function(x) x@lineageControl
 )
 #' @rdname SlingshotDataSet-methods
 #' @export
@@ -66,25 +66,43 @@ setMethod(
   definition = function(x) x@curves
 )
 #' @rdname SlingshotDataSet-methods
+#' @param na logical. If \code{TRUE}, cells that are not assigned to a lineage
+#'   will have a pseudotime value of \code{NA}. Otherwise, their arclength along
+#'   the curve will be returned.
 #' @export
 setMethod(
   f = "pseudotime",
   signature = "SlingshotDataSet",
-  definition = function(x) x@pseudotime
+  definition = function(x, na = TRUE){
+    pst <- sapply(curves(x), function(pc) {
+      t <- pc$lambda
+      if(na){
+        t[pc$w == 0] <- NA
+      }
+      return(t)
+    })
+    rownames(pst) <- rownames(reducedDim(x))
+    colnames(pst) <- names(curves(x))
+    return(pst)
+  }
 )
 #' @rdname SlingshotDataSet-methods
 #' @export
 setMethod(
   f = "curveWeights",
   signature = "SlingshotDataSet",
-  definition = function(x) x@curveWeights
+  definition = function(x){
+    weights <- sapply(curves(x), function(pc) { pc$w })
+    rownames(weights) <- rownames(reducedDim(x)); colnames(weights) <- names(curves(x))
+    return(weights)
+  }
 )
 #' @rdname SlingshotDataSet-methods
 #' @export
 setMethod(
-  f = "curve.control",
+  f = "curveControl",
   signature = "SlingshotDataSet",
-  definition = function(x) x@curve.control
+  definition = function(x) x@curveControl
 )
 # replacement methods
 #' @rdname SlingshotDataSet-methods
@@ -96,25 +114,26 @@ setReplaceMethod(
 #' @rdname SlingshotDataSet-methods
 #' @export
 setReplaceMethod(
-  f = "clusLabels", 
+  f = "clusterLabels", 
   signature = "SlingshotDataSet",
-  definition = function(x, value) initialize(x, clusLabels = value))
-
+  definition = function(x, value) initialize(x, clusterLabels = value))
+#' @rdname SlingshotDataSet-methods
+#' @export
 setMethod(f = "[", 
           signature = c("SlingshotDataSet", "ANY", "ANY", "ANY"),
           function(x, i, j, ..., drop=FALSE)
           {
             rd <- x@reducedDim[i,j]
-            cl <- x@clusLabels[i]
+            cl <- x@clusterLabels[i]
             initialize(x, reducedDim = rd,
-                       clusLabels  = cl,
+                       clusterLabels  = cl,
                        lineages = list(),
                        connectivity = matrix(NA,0,0),
-                       lineage.control = x@lineage.control,
+                       lineageControl = x@lineageControl,
                        curves = list(),
                        pseudotime = matrix(NA,0,0),
                        curveWeights = matrix(NA,0,0),
-                       curve.control = x@curve.control)
+                       curveControl = x@curveControl)
           })
 
 

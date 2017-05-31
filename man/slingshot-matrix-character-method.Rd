@@ -6,7 +6,7 @@
 \alias{slingshot}
 \title{Perform lineage inference with Slingshot}
 \usage{
-\S4method{slingshot}{matrix,character}(reducedDim, clusLabels,
+\S4method{slingshot}{matrix,character}(reducedDim, clusterLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
@@ -16,7 +16,7 @@
 \item{reducedDim}{numeric matrix or \code{SlingshotDataSet} object containing low-
 dimensional representation of single cells.}
 
-\item{clusLabels}{character, a vector of length \code{n} denoting cluster labels,
+\item{clusterLabels}{character, a vector of length \code{n} denoting cluster labels,
 optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 \code{SlingshotDataSet}, cluster labels will be taken from it.}
 
@@ -91,10 +91,10 @@ arguments provided to \code{getLineages} as well as the following output:
   of lineages identified. Each lineage is represented by a character vector 
   with the names of the clusters included in that lineage, in order.}
 \item{\code{connectivity}}{ the inferred cluster connectivity matrix.}
-\item{\code{lineage.control$start.given},\code{lineage.control$end.given}}
+\item{\code{lineageControl$start.given},\code{lineageControl$end.given}}
   { logical values indicating whether the starting and ending clusters were 
   specified a priori.} 
-\item{\code{lineage.control$dist}}{ the pairwise cluster distance matrix.}}
+\item{\code{lineageControl$dist}}{ the pairwise cluster distance matrix.}}
 }
 \description{
 Given a reduced-dimensional data matrix \code{n} by \code{p} and

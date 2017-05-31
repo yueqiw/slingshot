@@ -6,14 +6,14 @@
 \alias{getLineages}
 \title{Infer Lineage Structure from Clustered Samples}
 \usage{
-\S4method{getLineages}{matrix,character}(reducedDim, clusLabels,
+\S4method{getLineages}{matrix,character}(reducedDim, clusterLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 }
 \arguments{
 \item{reducedDim}{numeric, the \code{n} by \code{p} matrix of samples in a reduced 
 dimensionality space.}
 
-\item{clusLabels}{character, a vector of length \code{n} denoting cluster labels,
+\item{clusterLabels}{character, a vector of length \code{n} denoting cluster labels,
 optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
 \code{SlingshotDataSet}, cluster labels will be taken from it.}
 
@@ -46,10 +46,10 @@ elements:
   of lineages identified. Each lineage is represented by a character vector 
   with the names of the clusters included in that lineage, in order.}
 \item{\code{connectivity}}{ the inferred cluster connectivity matrix.}
-\item{\code{lineage.control$start.given},\code{lineage.control$end.given}}
+\item{\code{lineageControl$start.given},\code{lineageControl$end.given}}
   { logical values indicating whether the starting and ending clusters were 
   specified a priori.} 
-\item{\code{lineage.control$dist}}{ the pairwise cluster distance matrix.}}
+\item{\code{lineageControl$dist}}{ the pairwise cluster distance matrix.}}
 }
 \description{
 Given a reduced-dimension data matrix \code{n} by \code{p} and a vector of

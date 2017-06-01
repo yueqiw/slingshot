@@ -1,5 +1,4 @@
-#' @title Construct Smooth Curves for Each Lineage
-#' @name getCurves
+#' @rdname getCurves
 #' 
 #' @description This function takes a reduced data matrix \code{n} by \code{p},
 #'  a vector of cluster identities (optionally including \code{-1}'s for 

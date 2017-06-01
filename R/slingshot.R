@@ -1,5 +1,4 @@
-#' @title Perform lineage inference with Slingshot
-#' @name slingshot
+#' @rdname slingshot
 #' 
 #' @description Given a reduced-dimensional data matrix \code{n} by \code{p} and
 #'   a vector of cluster labels (potentially including \code{-1}'s for
@@ -122,7 +121,7 @@
 #' @export
 #' 
 setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clusterLabels = "character"),
+          signature = signature(reducedDim = "ANY", clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
@@ -147,109 +146,109 @@ setMethod(f = "slingshot",
           }
 )
 
-#' @rdname slingshot
-#' @export
-setMethod(f = "slingshot",
-          signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
-          definition = function(reducedDim,
-                                clusterLabels = reducedDim@clusterLabels,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL,
-                                lineages = list(),
-                                shrink = TRUE,
-                                extend = 'y',
-                                reweight = TRUE,
-                                drop.multi = TRUE,
-                                thresh = 0.001, maxit = 15, stretch = 2,
-                                smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
-            return(slingshot(reducedDim = reducedDim@reducedDim, 
-                             clusterLabels = reducedDim@clusterLabels, 
-                             start.clus = start.clus, end.clus = end.clus,
-                             dist.fun = dist.fun, omega = omega,
-                             shrink = shrink, extend = extend,
-                             reweight = reweight, drop.multi = drop.multi,
-                             thresh = thresh, maxit = maxit,
-                             stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
-          })
-
-#' @rdname slingshot
-#' @export
-setMethod(f = "slingshot",
-          signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
-          definition = function(reducedDim, clusterLabels, 
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL,
-                                lineages = list(),
-                                shrink = TRUE,
-                                extend = 'y',
-                                reweight = TRUE,
-                                drop.multi = TRUE,
-                                thresh = 0.001, maxit = 15, stretch = 2,
-                                smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
-            RD <- as.matrix(reducedDim)
-            rownames(RD) <- rownames(reducedDim)
-            return(slingshot(reducedDim = RD, 
-                             clusterLabels = clusterLabels, 
-                             start.clus = start.clus, end.clus = end.clus,
-                             dist.fun = dist.fun, omega = omega,
-                             shrink = shrink, extend = extend,
-                             reweight = reweight, drop.multi = drop.multi,
-                             thresh = thresh, maxit = maxit,
-                             stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
-          })
-
-#' @rdname slingshot
-#' @export
-setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
-          definition = function(reducedDim, clusterLabels, 
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL,
-                                lineages = list(),
-                                shrink = TRUE,
-                                extend = 'y',
-                                reweight = TRUE,
-                                drop.multi = TRUE,
-                                thresh = 0.001, maxit = 15, stretch = 2,
-                                smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
-            return(slingshot(reducedDim = reducedDim, 
-                             clusterLabels = as.character(clusterLabels), 
-                             start.clus = start.clus, end.clus = end.clus,
-                             dist.fun = dist.fun, omega = omega,
-                             shrink = shrink, extend = extend,
-                             reweight = reweight, drop.multi = drop.multi,
-                             thresh = thresh, maxit = maxit,
-                             stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
-          })
-
-#' @rdname slingshot
-#' @export
-setMethod(f = "slingshot",
-          signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
-          definition = function(reducedDim, clusterLabels, 
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL,
-                                lineages = list(),
-                                shrink = TRUE,
-                                extend = 'y',
-                                reweight = TRUE,
-                                drop.multi = TRUE,
-                                thresh = 0.001, maxit = 15, stretch = 2,
-                                smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
-            return(slingshot(reducedDim = reducedDim, 
-                             clusterLabels = as.character(clusterLabels), 
-                             start.clus = start.clus, end.clus = end.clus,
-                             dist.fun = dist.fun, omega = omega,
-                             shrink = shrink, extend = extend,
-                             reweight = reweight, drop.multi = drop.multi,
-                             thresh = thresh, maxit = maxit,
-                             stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
-          })
+#' #' @rdname slingshot
+#' #' @export
+#' setMethod(f = "slingshot",
+#'           signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
+#'           definition = function(reducedDim,
+#'                                 clusterLabels = reducedDim@clusterLabels,
+#'                                 start.clus = NULL, end.clus = NULL,
+#'                                 dist.fun = NULL, omega = NULL,
+#'                                 lineages = list(),
+#'                                 shrink = TRUE,
+#'                                 extend = 'y',
+#'                                 reweight = TRUE,
+#'                                 drop.multi = TRUE,
+#'                                 thresh = 0.001, maxit = 15, stretch = 2,
+#'                                 smoother = 'smooth.spline',
+#'                                 shrink.method = 'cosine', ...){
+#'             return(slingshot(reducedDim = reducedDim@reducedDim, 
+#'                              clusterLabels = reducedDim@clusterLabels, 
+#'                              start.clus = start.clus, end.clus = end.clus,
+#'                              dist.fun = dist.fun, omega = omega,
+#'                              shrink = shrink, extend = extend,
+#'                              reweight = reweight, drop.multi = drop.multi,
+#'                              thresh = thresh, maxit = maxit,
+#'                              stretch = stretch, smoother = smoother,
+#'                              shrink.method = shrink.method, ...))
+#'           })
+#' 
+#' #' @rdname slingshot
+#' #' @export
+#' setMethod(f = "slingshot",
+#'           signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
+#'           definition = function(reducedDim, clusterLabels, 
+#'                                 start.clus = NULL, end.clus = NULL,
+#'                                 dist.fun = NULL, omega = NULL,
+#'                                 lineages = list(),
+#'                                 shrink = TRUE,
+#'                                 extend = 'y',
+#'                                 reweight = TRUE,
+#'                                 drop.multi = TRUE,
+#'                                 thresh = 0.001, maxit = 15, stretch = 2,
+#'                                 smoother = 'smooth.spline',
+#'                                 shrink.method = 'cosine', ...){
+#'             RD <- as.matrix(reducedDim)
+#'             rownames(RD) <- rownames(reducedDim)
+#'             return(slingshot(reducedDim = RD, 
+#'                              clusterLabels = clusterLabels, 
+#'                              start.clus = start.clus, end.clus = end.clus,
+#'                              dist.fun = dist.fun, omega = omega,
+#'                              shrink = shrink, extend = extend,
+#'                              reweight = reweight, drop.multi = drop.multi,
+#'                              thresh = thresh, maxit = maxit,
+#'                              stretch = stretch, smoother = smoother,
+#'                              shrink.method = shrink.method, ...))
+#'           })
+#' 
+#' #' @rdname slingshot
+#' #' @export
+#' setMethod(f = "slingshot",
+#'           signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
+#'           definition = function(reducedDim, clusterLabels, 
+#'                                 start.clus = NULL, end.clus = NULL,
+#'                                 dist.fun = NULL, omega = NULL,
+#'                                 lineages = list(),
+#'                                 shrink = TRUE,
+#'                                 extend = 'y',
+#'                                 reweight = TRUE,
+#'                                 drop.multi = TRUE,
+#'                                 thresh = 0.001, maxit = 15, stretch = 2,
+#'                                 smoother = 'smooth.spline',
+#'                                 shrink.method = 'cosine', ...){
+#'             return(slingshot(reducedDim = reducedDim, 
+#'                              clusterLabels = as.character(clusterLabels), 
+#'                              start.clus = start.clus, end.clus = end.clus,
+#'                              dist.fun = dist.fun, omega = omega,
+#'                              shrink = shrink, extend = extend,
+#'                              reweight = reweight, drop.multi = drop.multi,
+#'                              thresh = thresh, maxit = maxit,
+#'                              stretch = stretch, smoother = smoother,
+#'                              shrink.method = shrink.method, ...))
+#'           })
+#' 
+#' #' @rdname slingshot
+#' #' @export
+#' setMethod(f = "slingshot",
+#'           signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
+#'           definition = function(reducedDim, clusterLabels, 
+#'                                 start.clus = NULL, end.clus = NULL,
+#'                                 dist.fun = NULL, omega = NULL,
+#'                                 lineages = list(),
+#'                                 shrink = TRUE,
+#'                                 extend = 'y',
+#'                                 reweight = TRUE,
+#'                                 drop.multi = TRUE,
+#'                                 thresh = 0.001, maxit = 15, stretch = 2,
+#'                                 smoother = 'smooth.spline',
+#'                                 shrink.method = 'cosine', ...){
+#'             return(slingshot(reducedDim = reducedDim, 
+#'                              clusterLabels = as.character(clusterLabels), 
+#'                              start.clus = start.clus, end.clus = end.clus,
+#'                              dist.fun = dist.fun, omega = omega,
+#'                              shrink = shrink, extend = extend,
+#'                              reweight = reweight, drop.multi = drop.multi,
+#'                              thresh = thresh, maxit = maxit,
+#'                              stretch = stretch, smoother = smoother,
+#'                              shrink.method = shrink.method, ...))
+#'           })

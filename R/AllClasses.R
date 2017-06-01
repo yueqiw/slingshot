@@ -1,16 +1,11 @@
 #' @title Class \code{SlingshotDataSet}
-#' @name SlingshotDataSet
-#' @aliases SlingshotDataSet-class
-#' @docType class
+#' @aliases SlingshotDataSet SlingshotDataSet-class
 #'   
 #' @description The \code{SlingshotDataSet} class holds data relevant for 
 #'   performing lineage inference with the \code{slingshot} package, primarily a
 #'   reduced dimensional representation of the data and a set of cluster labels.
-#'   
-#' @description All \code{slingshot} methods can take an object of the class 
-#'   \code{SlingshotDataSet} as input and will output the same. Additionally, 
-#'   simple helper methods for creating and manipulating objects of the class 
-#'   \code{SlingshotDataSet} are described below.
+#'   All \code{slingshot} methods can take an object of the class 
+#'   \code{SlingshotDataSet} as input and will output the same.
 #'   
 #' @slot reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame
 #'   giving the coordinates of the cells in a reduced dimensionality space.
@@ -53,11 +48,6 @@
 #'   \code{"density"}. See \code{\link{getCurves}} for details.} \item{Other
 #'   parameters specified by \code{\link{principal.curve}}}. }
 #'   
-#' @examples
-#' rd <- matrix(data=rnorm(200), ncol=2)
-#' cl <- sample(letters[1:5], 100, replace = TRUE)
-#' sds <- SlingshotDataSet(rd, cl)
-#' 
 #' @import princurve
 #' @import methods
 #' @export
@@ -185,81 +175,4 @@ setValidity("SlingshotDataSet", function(object) {
   }
   return(TRUE)
   })
-
-setGeneric(
-  name = "SlingshotDataSet",
-  signature = c('reducedDim','clusterLabels'),
-  def = function(reducedDim,  clusterLabels, ...) {
-    standardGeneric("SlingshotDataSet")
-  }
-)
-
-#' @describeIn SlingshotDataSet Constructor function for the
-#'   \code{SlingshotDataSet} class.
-#' @export
-setMethod(
-  f = "SlingshotDataSet",
-  signature = signature("data.frame","ANY"),
-  definition = function(reducedDim, clusterLabels, ...){
-    RD <- as.matrix(reducedDim)
-    rownames(RD) <- rownames(reducedDim)
-    SlingshotDataSet(RD, clusterLabels, ...)
-  })
-#' @rdname SlingshotDataSet
-#' @export
-setMethod(
-  f = "SlingshotDataSet",
-  signature = signature("matrix", "numeric"),
-  definition = function(reducedDim, clusterLabels, ...){
-    SlingshotDataSet(reducedDim, as.character(clusterLabels), ...)
-  })
-#' @rdname SlingshotDataSet
-#' @export
-setMethod(
-  f = "SlingshotDataSet",
-  signature = signature("matrix","factor"),
-  definition = function(reducedDim, clusterLabels, ...){
-    SlingshotDataSet(reducedDim, as.character(clusterLabels), ...)
-  })
-#' @rdname SlingshotDataSet
-#' @export
-setMethod(
-  f = "SlingshotDataSet",
-  signature = signature("matrix","character"),
-  definition = function(reducedDim, clusterLabels,
-                        lineages=list(),
-                        connectivity=matrix(NA,0,0),
-                        lineageControl=list(),
-                        curves=list(),
-                        pseudotime=matrix(NA,0,0),
-                        curveWeights=matrix(NA,0,0),
-                        curveControl=list()
-  ){
-    if(nrow(reducedDim) != length(clusterLabels)) {
-      stop('nrow(reducedDim) must equal length(clusterLabels).')
-    }
-    # something requires row and column names. Princurve?
-    if(is.null(rownames(reducedDim))){
-      rownames(reducedDim) <- paste('Cell',seq_len(nrow(reducedDim)),sep='-')
-    }
-    if(is.null(colnames(reducedDim))){
-      colnames(reducedDim) <- paste('Dim',seq_len(ncol(reducedDim)),sep='-')
-    }
-    if(is.null(names(clusterLabels))){
-      names(clusterLabels) <- rownames(reducedDim)
-    }
-    out <- new("SlingshotDataSet",
-               reducedDim=reducedDim,
-               clusterLabels=clusterLabels,
-               lineages=lineages,
-               connectivity=connectivity,
-               lineageControl=lineageControl,
-               curves=curves,
-               pseudotime=pseudotime,
-               curveWeights=curveWeights,
-               curveControl=curveControl
-    )
-    validObject(out)
-    return(out)
-    })
 

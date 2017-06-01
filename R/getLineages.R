@@ -1,5 +1,4 @@
-#' @title Infer Lineage Structure from Clustered Samples
-#' @name getLineages
+#' @rdname getLineages
 #' 
 #' @description Given a reduced-dimension data matrix \code{n} by \code{p} and a vector of
 #' cluster identities (potentially including -1's for "unclustered"), this function
@@ -68,6 +67,7 @@
 #' @importFrom igraph shortest_paths
 #' @importFrom ape mst
 #' 
+
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "character"),
           definition = function(reducedDim, clusterLabels,
@@ -282,9 +282,22 @@ setMethod(f = "getLineages",
           }
 )
 
+setMethod(f = "getLineages",
+          signature = signature(reducedDim = "matrix", clusterLabels = "ANY"),
+          definition = function(reducedDim,
+                                clusterLabels = reducedDim@clusterLabels,
+                                start.clus = NULL, end.clus = NULL,
+                                dist.fun = NULL, omega = NULL){
+            if(missing(clusterLabels)){
+              message('Unclustered data detected.')
+              clusterLabels <- rep('1', nrow(reducedDim))
+            }
+            return(getLineages(reducedDim = reducedDim, 
+                               clusterLabels = clusterLabels, 
+                               start.clus = start.clus, end.clus = end.clus,
+                               dist.fun = dist.fun, omega = omega))
+          })
 
-#' @rdname getLineages
-#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
           definition = function(reducedDim,
@@ -297,8 +310,6 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
-#' @rdname getLineages
-#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels, 
@@ -312,8 +323,6 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
-#' @rdname getLineages
-#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
           definition = function(reducedDim, clusterLabels, 
@@ -325,8 +334,6 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
-#' @rdname getLineages
-#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
           definition = function(reducedDim, clusterLabels, 

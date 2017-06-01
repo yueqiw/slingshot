@@ -1,13 +1,75 @@
-#' @title Methods for the \code{SlingshotDataSet} class
-#' @name SlingshotDataSet-methods
+#' @describeIn newSlingshotDataSet returns a \code{SlingshotDataSet} object.
+#' @export
+setMethod(
+  f = "newSlingshotDataSet",
+  signature = signature("data.frame","ANY"),
+  definition = function(reducedDim, clusterLabels, ...){
+    RD <- as.matrix(reducedDim)
+    rownames(RD) <- rownames(reducedDim)
+    newSlingshotDataSet(RD, clusterLabels, ...)
+  })
+#' @describeIn newSlingshotDataSet returns a \code{SlingshotDataSet} object.
+#' @export
+setMethod(
+  f = "newSlingshotDataSet",
+  signature = signature("matrix", "numeric"),
+  definition = function(reducedDim, clusterLabels, ...){
+    newSlingshotDataSet(reducedDim, as.character(clusterLabels), ...)
+  })
+#' @describeIn newSlingshotDataSet returns a \code{SlingshotDataSet} object.
+#' @export
+setMethod(
+  f = "newSlingshotDataSet",
+  signature = signature("matrix","factor"),
+  definition = function(reducedDim, clusterLabels, ...){
+    newSlingshotDataSet(reducedDim, as.character(clusterLabels), ...)
+  })
+#' @describeIn newSlingshotDataSet returns a \code{SlingshotDataSet} object.
+#' @export
+setMethod(
+  f = "newSlingshotDataSet",
+  signature = signature("matrix","character"),
+  definition = function(reducedDim, clusterLabels,
+                        lineages=list(),
+                        connectivity=matrix(NA,0,0),
+                        lineageControl=list(),
+                        curves=list(),
+                        pseudotime=matrix(NA,0,0),
+                        curveWeights=matrix(NA,0,0),
+                        curveControl=list()
+  ){
+    if(nrow(reducedDim) != length(clusterLabels)) {
+      stop('nrow(reducedDim) must equal length(clusterLabels).')
+    }
+    # something requires row and column names. Princurve?
+    if(is.null(rownames(reducedDim))){
+      rownames(reducedDim) <- paste('Cell',seq_len(nrow(reducedDim)),sep='-')
+    }
+    if(is.null(colnames(reducedDim))){
+      colnames(reducedDim) <- paste('Dim',seq_len(ncol(reducedDim)),sep='-')
+    }
+    if(is.null(names(clusterLabels))){
+      names(clusterLabels) <- rownames(reducedDim)
+    }
+    out <- new("SlingshotDataSet",
+               reducedDim=reducedDim,
+               clusterLabels=clusterLabels,
+               lineages=lineages,
+               connectivity=connectivity,
+               lineageControl=lineageControl,
+               curves=curves,
+               pseudotime=pseudotime,
+               curveWeights=curveWeights,
+               curveControl=curveControl
+    )
+    validObject(out)
+    return(out)
+  })
+
+#' @describeIn SlingshotDataSet a short summary of \code{SlingshotDataSet}
+#'   object.
 #'   
-#' @description Helper functions for accessing and changing elements of a
-#'   \code{SlingshotDataSet} object.
-#'   
-#' @param x a \code{SlingshotDataSet} object.
-#' 
-#' @seealso \code{\link{SlingshotDataSet}}
-#'   
+#' @param object a \code{SlingshotDataSet} object.
 #' @export
 setMethod(
   f = "show",
@@ -27,58 +89,95 @@ setMethod(
   }
 )
 # accessor methods
-#' @rdname SlingshotDataSet-methods
+#' @describeIn SlingshotDataSet returns the matrix representing the reduced
+#'   dimensional dataset.
+#' @param x a \code{SlingshotDataSet} object.
 #' @export
 setMethod(
   f = "reducedDim",
   signature = "SlingshotDataSet",
   definition = function(x) x@reducedDim
 )
-#' @rdname SlingshotDataSet-methods
+#' @describeIn SlingshotDataSet returns the vector of cluster labels.
 #' @export
 setMethod(
   f = "clusterLabels",
   signature = "SlingshotDataSet",
   definition = function(x) x@clusterLabels
 )
-#' @rdname SlingshotDataSet-methods
+#' @describeIn SlingshotDataSet returns the connectivity matrix between
+#'   clusters.
 #' @export
 setMethod(
   f = "connectivity",
   signature = "SlingshotDataSet",
   definition = function(x) x@connectivity
 )
-#' @rdname SlingshotDataSet-methods
+#' @describeIn SlingshotDataSet returns the list of lineages, represented by
+#'   ordered sets of clusters.
 #' @export
 setMethod(
   f = "lineages",
   signature = "SlingshotDataSet",
   definition = function(x) x@lineages
 )
-#' @rdname SlingshotDataSet-methods
+#' @describeIn SlingshotDataSet returns the list of additional lineage inference
+#'   parameters.
 #' @export
 setMethod(
   f = "lineageControl",
   signature = "SlingshotDataSet",
   definition = function(x) x@lineageControl
 )
-#' @rdname SlingshotDataSet-methods
+#' @describeIn SlingshotDataSet returns the list of smooth lineage curves.
 #' @export
 setMethod(
   f = "curves",
   signature = "SlingshotDataSet",
   definition = function(x) x@curves
 )
-#' @title Get Slingshot pseudotime values
-#' @name pseudotime
-#' 
-#' @description Extract the matrix of pseudotime values or cells' weights along
-#'   each lineage.
-#' 
-#' @param x a \code{SlingshotDataSet} object.
-#' @param na logical. If \code{TRUE} (default), cells that are not assigned to a
-#'   lineage will have a pseudotime value of \code{NA}. Otherwise, their
-#'   arclength along the curve will be returned.
+#' @describeIn SlingshotDataSet returns the list of additional curve fitting
+#'   parameters.
+#' @export
+setMethod(
+  f = "curveControl",
+  signature = "SlingshotDataSet",
+  definition = function(x) x@curveControl
+)
+
+# replacement methods
+#' @describeIn SlingshotDataSet Updated object with new reduced dimensional matrix.
+#' @export
+setReplaceMethod(
+  f = "reducedDim", 
+  signature = "SlingshotDataSet",
+  definition = function(x, value) initialize(x, reducedDim = value))
+
+#' @describeIn SlingshotDataSet Updated object with new vector of cluster labels.
+#' @export
+setReplaceMethod(
+  f = "clusterLabels", 
+  signature = "SlingshotDataSet",
+  definition = function(x, value) initialize(x, clusterLabels = value))
+setMethod(f = "[", 
+          signature = c("SlingshotDataSet", "ANY", "ANY", "ANY"),
+          function(x, i, j, ..., drop=FALSE)
+          {
+            rd <- x@reducedDim[i,j]
+            cl <- x@clusterLabels[i]
+            initialize(x, reducedDim = rd,
+                       clusterLabels  = cl,
+                       lineages = list(),
+                       connectivity = matrix(NA,0,0),
+                       lineageControl = lineageControl(x),
+                       curves = list(),
+                       pseudotime = matrix(NA,0,0),
+                       curveWeights = matrix(NA,0,0),
+                       curveControl = curveControl(x))
+          })
+
+
+#' @describeIn SlingshotDataSet returns the matrix of pseudotime values.
 #' @export
 setMethod(
   f = "pseudotime",
@@ -99,7 +198,8 @@ setMethod(
     return(pst)
   }
 )
-#' @rdname pseudotime
+
+#' @describeIn SlingshotDataSet returns the matrix of cell weights along each lineage.
 #' @export
 setMethod(
   f = "curveWeights",
@@ -113,46 +213,6 @@ setMethod(
     return(weights)
   }
 )
-#' @rdname SlingshotDataSet-methods
-#' @export
-setMethod(
-  f = "curveControl",
-  signature = "SlingshotDataSet",
-  definition = function(x) x@curveControl
-)
-# replacement methods
-#' @rdname SlingshotDataSet-methods
-#' @export
-setReplaceMethod(
-  f = "reducedDim", 
-  signature = "SlingshotDataSet",
-  definition = function(x, value) initialize(x, reducedDim = value))
-#' @rdname SlingshotDataSet-methods
-#' @export
-setReplaceMethod(
-  f = "clusterLabels", 
-  signature = "SlingshotDataSet",
-  definition = function(x, value) initialize(x, clusterLabels = value))
-#' @rdname SlingshotDataSet-methods
-#' @export
-setMethod(f = "[", 
-          signature = c("SlingshotDataSet", "ANY", "ANY", "ANY"),
-          function(x, i, j, ..., drop=FALSE)
-          {
-            rd <- x@reducedDim[i,j]
-            cl <- x@clusterLabels[i]
-            initialize(x, reducedDim = rd,
-                       clusterLabels  = cl,
-                       lineages = list(),
-                       connectivity = matrix(NA,0,0),
-                       lineageControl = lineageControl(x),
-                       curves = list(),
-                       pseudotime = matrix(NA,0,0),
-                       curveWeights = matrix(NA,0,0),
-                       curveControl = curveControl(x))
-          })
-
-
 
 
 # internal functions

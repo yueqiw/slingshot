@@ -47,6 +47,15 @@
 
 \item{x}{a \code{SlingshotDataSet} object.}
 }
+\value{
+The accessor functions \code{reducedDim}, \code{clusterLabels}, 
+  \code{lineages}, \code{connectivity}, \code{lineageControl}, \code{curves},
+  and \code{curveControl} return the corresponding elements of a 
+  \code{SlingshotDataSet}. The functions \code{pseudotime} and 
+  \code{curveWeights} extract useful output elements of a 
+  \code{SlingshotDataSet}, provided that curves have already been fit with 
+  either \code{slingshot} or \code{getCurves}.
+}
 \description{
 The \code{SlingshotDataSet} class holds data relevant for 
   performing lineage inference with the \code{slingshot} package, primarily a
@@ -78,13 +87,16 @@ parameters.
 \item \code{curveControl}: returns the list of additional curve fitting
 parameters.
 
-\item \code{reducedDim<-}: Updated object with new reduced dimensional matrix.
+\item \code{reducedDim<-}: Updated object with new reduced dimensional
+matrix.
 
-\item \code{clusterLabels<-}: Updated object with new vector of cluster labels.
+\item \code{clusterLabels<-}: Updated object with new vector of cluster
+labels.
 
 \item \code{pseudotime}: returns the matrix of pseudotime values.
 
-\item \code{curveWeights}: returns the matrix of cell weights along each lineage.
+\item \code{curveWeights}: returns the matrix of cell weights along each
+lineage.
 }}
 
 \section{Slots}{
@@ -96,19 +108,19 @@ giving the coordinates of the cells in a reduced dimensionality space.}
 \item{\code{clusterLabels}}{character. A character vector of length \code{n} denoting
 each cell's cluster label.}
 
-\item{\code{lineages}}{list. A list with each element a character vector of cluster
+\item{\code{lineages}}{list. A list with each element a character vector of cluster 
 names representing a lineage as an ordered set of clusters.}
 
-\item{\code{connectivity}}{matrix. A binary matrix describing the connectivity
+\item{\code{connectivity}}{matrix. A binary matrix describing the connectivity 
 between clusters induced by the minimum spanning tree.}
 
 \item{\code{lineageControl}}{list. Additional parameters specifying how the minimum 
 spanning tree on clusters was constructed. \itemize{ 
 \item{\code{start.clus}}{character. The label of the root cluster.} 
 \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
-terminal clusters.} \item{\code{start.given}}{logical. A logical value
+terminal clusters.} \item{\code{start.given}}{logical. A logical value 
 indicating whether the initial state was pre-specified.} 
-\item{\code{end.given}}{logical. A vector of logical values indicating
+\item{\code{end.given}}{logical. A vector of logical values indicating 
 whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
 numeric matrix of pairwise cluster distances.} }}
 
@@ -118,23 +130,23 @@ numeric matrix of pairwise cluster distances.} }}
 \item{\code{curveControl}}{list. Additional parameters specifying how the 
 simultaneous principal curves were constructed. \itemize{ 
 \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
-and how much to shrink branching lineages toward their shared average
-curve.} \item{\code{extend}}{character. Specifies the method for handling
-root and leaf clusters of lineages when constructing the initial,
+and how much to shrink branching lineages toward their shared average 
+curve.} \item{\code{extend}}{character. Specifies the method for handling 
+root and leaf clusters of lineages when constructing the initial, 
 piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
-See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical.
-Indicates whether to reweight cells shared by multiple lineages during
-curve-fitting. If \code{TRUE}, cells shared between lineages will have
-lineage-specific weights determined by the ratio: (distance to nearest
-curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical.
-Indicates whether to drop shared cells from lineages which do not fit them
+See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical. 
+Indicates whether to reweight cells shared by multiple lineages during 
+curve-fitting. If \code{TRUE}, cells shared between lineages will have 
+lineage-specific weights determined by the ratio: (distance to nearest 
+curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical. 
+Indicates whether to drop shared cells from lineages which do not fit them 
 well. If \code{TRUE}, shared cells with a distance to one lineage above the
-90th percentile and another lineage below the 50th percentile will be
-dropped from the farther lineage.} \item{\code{shrink.method}}{character.
-Denotes how to determine the amount of shrinkage for a branching lineage.
-Accepted values are the same as for \code{kernel} in  the \code{density}
-function (default is \code{"cosine"}), as well as \code{"tricube"} and
-\code{"density"}. See \code{\link{getCurves}} for details.} \item{Other
+90th percentile and another lineage below the 50th percentile will be 
+dropped from the farther lineage.} \item{\code{shrink.method}}{character. 
+Denotes how to determine the amount of shrinkage for a branching lineage. 
+Accepted values are the same as for \code{kernel} in  the \code{density} 
+function (default is \code{"cosine"}), as well as \code{"tricube"} and 
+\code{"density"}. See \code{\link{getCurves}} for details.} \item{Other 
 parameters specified by \code{\link{principal.curve}}}. }}
 }}
 

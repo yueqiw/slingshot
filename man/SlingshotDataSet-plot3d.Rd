@@ -5,8 +5,6 @@
 \alias{SlingshotDataSet-plot3d}
 \alias{plot3d.SlingshotDataSet}
 \alias{plot3d,SlingshotDataSet-method}
-\alias{lines3d.SlingshotDataSet}
-\alias{lines3d,SlingshotDataSet-method}
 \title{Plot Slingshot output in 3D}
 \usage{
 plot3d.SlingshotDataSet(x, type = NULL, add = FALSE, dims = 1:3,
@@ -14,10 +12,6 @@ plot3d.SlingshotDataSet(x, type = NULL, add = FALSE, dims = 1:3,
 
 \S4method{plot3d}{SlingshotDataSet}(x, type = NULL, add = FALSE,
   dims = 1:3, aspect = "iso", ...)
-
-lines3d.SlingshotDataSet(x, type = NULL, dims = 1:3, ...)
-
-\S4method{lines3d}{SlingshotDataSet}(x, type = NULL, dims = 1:3, ...)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}
@@ -58,6 +52,6 @@ plot3d(sds, type = 'b')
 
 # add to existing plot
 plot3d(rd, col = 'grey50', aspect = 'iso')
-lines3d(sds, lwd = 3)
+plot3d(sds, lwd = 3, add = TRUE)
 
 }

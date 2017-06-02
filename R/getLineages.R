@@ -1,59 +1,60 @@
 #' @rdname getLineages
-#' 
-#' @description Given a reduced-dimension data matrix \code{n} by \code{p} and a vector of
-#' cluster identities (potentially including -1's for "unclustered"), this function
-#' infers a forest structure on the clusters and returns paths through the forest
-#' that can be interpreted as lineages.
-#' 
-#' @param reducedDim numeric, the \code{n} by \code{p} matrix of samples in a reduced 
-#' dimensionality space.
-#' @param clusterLabels character, a vector of length \code{n} denoting cluster labels,
-#'   optionally including \code{-1}'s for "unclustered." If \code{reducedDim} is a
-#'   \code{SlingshotDataSet}, cluster labels will be taken from it.
+#'   
+#' @description Given a reduced-dimension data matrix \code{n} by \code{p} and a
+#'   vector of cluster identities (potentially including -1's for
+#'   "unclustered"), this function infers a forest structure on the clusters and
+#'   returns paths through the forest that can be interpreted as lineages.
+#'   
+#' @param reducedDim numeric, the \code{n} by \code{p} matrix of samples in a
+#'   reduced dimensionality space.
+#' @param clusterLabels character, a vector of length \code{n} denoting cluster
+#'   labels, optionally including \code{-1}'s for "unclustered." If
+#'   \code{reducedDim} is a \code{SlingshotDataSet}, cluster labels will be
+#'   taken from it.
 #' @param start.clus (optional) character, indicates the cluster(s) *from* which
 #'   lineages will be drawn.
-#' @param end.clus (optional) character, indicates the cluster(s) which will be
+#' @param end.clus (optional) character, indicates the cluster(s) which will be 
 #'   forced leaf nodes in their trees.
 #' @param dist.fun (optional) function, method for calculating distances between
-#'   clusters. Must take two matrices as input, corresponding to points in
-#'   reduced-dimensional space. If the minimum cluster size is larger than the
-#'   number dimensions, the default is to use the joint covariance matrix to find
-#'   squared distance between cluster centers. If not, the default is to use the
-#'   diagonal of the joint covariance matrix.
-#' @param omega (optional) numeric between 0 and 1. This granularity
-#'   parameter determines the distance between every real cluster and the artificial
-#'   cluster, OMEGA. It is parameterized as a fraction of the largest distance
-#'   between two real clusters (hence, any value greater than 1 would result in a
-#'   single tree being returned and would be equivalent to setting \code{omega = Inf},
-#'   which is the default behavior).
-#' 
-#' @details The \code{connectivity} matrix is learned by fitting a
-#'   (possibly constrained) minimum-spanning tree on the clusters and the artificial
-#'   cluster, OMEGA, which is a fixed distance away from every real cluster. This 
-#'   effectively limits the maximum branch length in the MST to twice the chosen 
-#'   distance, meaning that the output may contain multiple trees.
-#'
-#' @details Once the \code{connectivity} is known, lineages are identified in any tree
-#'   with at least two clusters. For a given tree, if there is an annotated starting
-#'   cluster, every possible path out of a starting cluster and ending in a leaf
-#'   that isn't another starting cluster will be returned. If no starting cluster is
-#'   annotated, every leaf will be considered as a potential starting cluster and
-#'   whichever configuration produces the longest average lineage length (in terms
-#'   of number of clusters included) will be returned.
-#'
+#'   clusters. Must take two matrices as input, corresponding to points in 
+#'   reduced-dimensional space. If the minimum cluster size is larger than the 
+#'   number dimensions, the default is to use the joint covariance matrix to
+#'   find squared distance between cluster centers. If not, the default is to
+#'   use the diagonal of the joint covariance matrix.
+#' @param omega (optional) numeric between 0 and 1. This granularity parameter
+#'   determines the distance between every real cluster and the artificial 
+#'   cluster, OMEGA. It is parameterized as a fraction of the largest distance 
+#'   between two real clusters (hence, any value greater than 1 would result in
+#'   a single tree being returned and would be equivalent to setting \code{omega
+#'   = Inf}, which is the default behavior).
+#'   
+#' @details The \code{connectivity} matrix is learned by fitting a (possibly
+#'   constrained) minimum-spanning tree on the clusters and the artificial 
+#'   cluster, OMEGA, which is a fixed distance away from every real cluster.
+#'   This effectively limits the maximum branch length in the MST to twice the
+#'   chosen distance, meaning that the output may contain multiple trees.
+#'   
+#' @details Once the \code{connectivity} is known, lineages are identified in
+#'   any tree with at least two clusters. For a given tree, if there is an
+#'   annotated starting cluster, every possible path out of a starting cluster
+#'   and ending in a leaf that isn't another starting cluster will be returned.
+#'   If no starting cluster is annotated, every leaf will be considered as a
+#'   potential starting cluster and whichever configuration produces the longest
+#'   average lineage length (in terms of number of clusters included) will be
+#'   returned.
+#'   
 #' @return An object of class \code{\link{SlingshotDataSet}} containing the 
-#' arguments provided to \code{getLineages} as well as the following new
-#' elements:
-#' \itemize{
-#' \item{\code{lineages}}{ a list of \code{L} items, where \code{L} is the number 
-#'   of lineages identified. Each lineage is represented by a character vector 
-#'   with the names of the clusters included in that lineage, in order.}
-#' \item{\code{connectivity}}{ the inferred cluster connectivity matrix.}
-#' \item{\code{lineageControl$start.given},\code{lineageControl$end.given}}
-#'   { logical values indicating whether the starting and ending clusters were 
-#'   specified a priori.} 
-#' \item{\code{lineageControl$dist}}{ the pairwise cluster distance matrix.}}
-#'
+#'   arguments provided to \code{getLineages} as well as the following new 
+#'   elements: \itemize{ \item{\code{lineages}}{ a list of \code{L} items, where
+#'   \code{L} is the number of lineages identified. Each lineage is represented
+#'   by a character vector with the names of the clusters included in that
+#'   lineage, in order.} \item{\code{connectivity}}{ the inferred cluster
+#'   connectivity matrix.} 
+#'   \item{\code{lineageControl$start.given},\code{lineageControl$end.given}} {
+#'   logical values indicating whether the starting and ending clusters were 
+#'   specified a priori.} \item{\code{lineageControl$dist}}{ the pairwise
+#'   cluster distance matrix.}}
+#'   
 #' @examples
 #' data("slingshotExample")
 #' sds <- getLineages(rd, cl, start.clus = '5')
@@ -62,12 +63,11 @@
 #' lines(sds, type = 'l', lwd = 3)
 #' 
 #' @export
-#'
+#' 
 #' @importFrom igraph graph.adjacency
 #' @importFrom igraph shortest_paths
 #' @importFrom ape mst
-#' 
-
+#'   
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "character"),
           definition = function(reducedDim, clusterLabels,
@@ -94,11 +94,20 @@ setMethod(f = "getLineages",
               stop('reducedDim must only contain numeric values.')
             }
             if(is.null(rownames(X))){
-              rownames(X) <- paste('cell',seq_len(nrow(X)),sep='-')
+              rownames(X) <- paste('Cell',seq_len(nrow(X)),sep='-')
             }
             if(is.null(colnames(X))){
-              colnames(X) <- paste('dim',seq_len(ncol(X)),sep='-')
+              colnames(X) <- paste('Dim',seq_len(ncol(X)),sep='-')
             }
+            if(any(rownames(X)=='')){
+              miss.ind <- which(rownames(X) == '')
+              rownames(X)[miss.ind] <- paste('Cell',miss.ind,sep='-')
+            }
+            if(any(colnames(X)=='')){
+              miss.ind <- which(colnames(X) == '')
+              colnames(X)[miss.ind] <- paste('Dim',miss.ind,sep='-')
+            }
+            
             
             # set up, remove unclustered cells (-1's)
             X.original <- X
@@ -275,17 +284,19 @@ setMethod(f = "getLineages",
             lineageControl$dist <- D[1:nclus,1:nclus, drop = FALSE]
             connectivity <- forest
             
-            out <- SlingshotDataSet(reducedDim = X, clusterLabels = clusterLabels, lineages = lineages, connectivity = connectivity, lineageControl = lineageControl)
+            out <- newSlingshotDataSet(reducedDim = X, clusterLabels = clusterLabels, lineages = lineages, connectivity = connectivity, lineageControl = lineageControl)
             
             validObject(out)
             return(out)
           }
 )
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "ANY"),
           definition = function(reducedDim,
-                                clusterLabels = reducedDim@clusterLabels,
+                                clusterLabels,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
             if(missing(clusterLabels)){
@@ -298,18 +309,22 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
           definition = function(reducedDim,
-                                clusterLabels = reducedDim@clusterLabels,
+                                clusterLabels = clusterLabels(reducedDim),
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
-            return(getLineages(reducedDim = reducedDim@reducedDim, 
+            return(getLineages(reducedDim = reducedDim(reducedDim), 
                                clusterLabels = reducedDim@clusterLabels, 
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels, 
@@ -323,6 +338,8 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
           definition = function(reducedDim, clusterLabels, 
@@ -334,6 +351,8 @@ setMethod(f = "getLineages",
                                dist.fun = dist.fun, omega = omega))
           })
 
+#' @rdname getLineages
+#' @export
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
           definition = function(reducedDim, clusterLabels, 

@@ -28,6 +28,18 @@ setMethod(
 #' @export
 setMethod(
   f = "newSlingshotDataSet",
+  signature = signature("matrix","ANY"),
+  definition = function(reducedDim, clusterLabels, ...){
+    if(missing(clusterLabels)){
+      message('Unclustered data detected.')
+      clusterLabels <- rep('1', nrow(reducedDim))
+    }
+    newSlingshotDataSet(reducedDim, as.character(clusterLabels), ...)
+  })
+#' @describeIn newSlingshotDataSet returns a \code{SlingshotDataSet} object.
+#' @export
+setMethod(
+  f = "newSlingshotDataSet",
   signature = signature("matrix","character"),
   definition = function(reducedDim, clusterLabels,
                         lineages=list(),
@@ -76,15 +88,18 @@ setMethod(
   signature = "SlingshotDataSet",
   definition = function(object) {
     cat("class:", class(object), "\n\n")
-    df <- data.frame(Samples = dim(object@reducedDim)[1], Dimensions = dim(object@reducedDim)[2])
+    df <- data.frame(Samples = dim(reducedDim(object))[1], 
+                     Dimensions = dim(reducedDim(object))[2])
     print(df, row.names = FALSE)
-    cat('\nlineages:', length(object@lineages), "\n")
-    for(i in seq_len(length(object@lineages))){
-      cat('Lineage',i,": ", paste(object@lineages[[i]],' '), "\n", sep='')
+    cat('\nlineages:', length(lineages(object)), "\n")
+    for(i in seq_len(length(lineages(object)))){
+      cat('Lineage',i,": ", paste(lineages(object)[[i]],' '), "\n", sep='')
     }
-    cat('\ncurves:', length(object@curves), "\n")
-    for(i in seq_len(length(object@curves))){
-      cat('Curve',i,": ", "Length: ", signif(max(object@curves[[i]]$lambda), digits = 5), "\tSamples: ", round(sum(object@curves[[i]]$w), digits = 2), "\n", sep='')
+    cat('\ncurves:', length(curves(object)), "\n")
+    for(i in seq_len(length(curves(object)))){
+      cat('Curve',i,": ", "Length: ", signif(max(curves(object)[[i]]$lambda), 
+                                             digits = 5), "\tSamples: ", 
+          round(sum(curves(object)[[i]]$w), digits = 2), "\n", sep='')
     }
   }
 )
@@ -146,14 +161,16 @@ setMethod(
 )
 
 # replacement methods
-#' @describeIn SlingshotDataSet Updated object with new reduced dimensional matrix.
+#' @describeIn SlingshotDataSet Updated object with new reduced dimensional
+#'   matrix.
 #' @export
 setReplaceMethod(
   f = "reducedDim", 
   signature = "SlingshotDataSet",
   definition = function(x, value) initialize(x, reducedDim = value))
 
-#' @describeIn SlingshotDataSet Updated object with new vector of cluster labels.
+#' @describeIn SlingshotDataSet Updated object with new vector of cluster
+#'   labels.
 #' @export
 setReplaceMethod(
   f = "clusterLabels", 
@@ -163,8 +180,8 @@ setMethod(f = "[",
           signature = c("SlingshotDataSet", "ANY", "ANY", "ANY"),
           function(x, i, j, ..., drop=FALSE)
           {
-            rd <- x@reducedDim[i,j]
-            cl <- x@clusterLabels[i]
+            rd <- reducedDim(x)[i,j]
+            cl <- clusterLabels(x)[i]
             initialize(x, reducedDim = rd,
                        clusterLabels  = cl,
                        lineages = list(),
@@ -199,7 +216,8 @@ setMethod(
   }
 )
 
-#' @describeIn SlingshotDataSet returns the matrix of cell weights along each lineage.
+#' @describeIn SlingshotDataSet returns the matrix of cell weights along each
+#'   lineage.
 #' @export
 setMethod(
   f = "curveWeights",
@@ -209,7 +227,8 @@ setMethod(
       stop('No curves detected.')
     }
     weights <- sapply(curves(x), function(pc) { pc$w })
-    rownames(weights) <- rownames(reducedDim(x)); colnames(weights) <- names(curves(x))
+    rownames(weights) <- rownames(reducedDim(x))
+    colnames(weights) <- names(curves(x))
     return(weights)
   }
 )
@@ -249,7 +268,9 @@ setMethod(
     })
   })
   avg <- sapply(seq_len(p),function(jj){
-    dim.all <- sapply(1:length(pcurves.dense),function(i){ pcurves.dense[[i]][,jj] })
+    dim.all <- sapply(1:length(pcurves.dense),function(i){
+      pcurves.dense[[i]][,jj]
+    })
     return(rowMeans(dim.all))
   })
   avg.curve <- .get_lam(X, avg, stretch=stretch)

@@ -40,7 +40,7 @@ test_that("getLineages works for different input types", {
   expect_is(dff, "SlingshotDataSet")
   expect_equal(dim(connectivity(dff)), c(5,5))
   
-  sds <- SlingshotDataSet(reducedDim, clusterLabels)
+  sds <- newSlingshotDataSet(reducedDim, clusterLabels)
   # SlingshotDataSet
   s <- getLineages(sds)
   expect_is(s, "SlingshotDataSet")
@@ -49,6 +49,11 @@ test_that("getLineages works for different input types", {
   # one cluster
   clus1 <- rep(1,50)
   c1 <- getLineages(reducedDim, clus1)
+  expect_is(c1, "SlingshotDataSet")
+  expect_equal(dim(connectivity(c1)), c(1,1))
+  
+  # no clusters (default = make one cluster)
+  c0 <- getLineages(reducedDim)
   expect_is(c1, "SlingshotDataSet")
   expect_equal(dim(connectivity(c1)), c(1,1))
   

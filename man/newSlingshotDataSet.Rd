@@ -6,6 +6,7 @@
 \alias{newSlingshotDataSet,data.frame,ANY-method}
 \alias{newSlingshotDataSet,matrix,numeric-method}
 \alias{newSlingshotDataSet,matrix,factor-method}
+\alias{newSlingshotDataSet,matrix,ANY-method}
 \alias{newSlingshotDataSet,matrix,character-method}
 \title{Initialize an object of class \code{SlingshotDataSet}}
 \usage{
@@ -17,31 +18,34 @@ newSlingshotDataSet(reducedDim, clusterLabels, ...)
 
 \S4method{newSlingshotDataSet}{matrix,factor}(reducedDim, clusterLabels, ...)
 
+\S4method{newSlingshotDataSet}{matrix,ANY}(reducedDim, clusterLabels, ...)
+
 \S4method{newSlingshotDataSet}{matrix,character}(reducedDim, clusterLabels,
   lineages = list(), connectivity = matrix(NA, 0, 0),
   lineageControl = list(), curves = list(), pseudotime = matrix(NA, 0, 0),
   curveWeights = matrix(NA, 0, 0), curveControl = list())
 }
 \arguments{
-\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data frame
-giving the coordinates of the cells in a reduced dimensionality space.}
+\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data
+frame giving the coordinates of the cells in a reduced dimensionality
+space.}
 
-\item{clusterLabels}{character. A character vector of length \code{n} denoting
-each cell's cluster label.}
+\item{clusterLabels}{character. A character vector of length \code{n}
+denoting each cell's cluster label.}
 
-\item{lineages}{list. A list with each element a character vector of cluster
+\item{lineages}{list. A list with each element a character vector of cluster 
 names representing a lineage as an ordered set of clusters.}
 
-\item{connectivity}{matrix. A binary matrix describing the connectivity
+\item{connectivity}{matrix. A binary matrix describing the connectivity 
 between clusters induced by the minimum spanning tree.}
 
 \item{lineageControl}{list. Additional parameters specifying how the minimum 
 spanning tree on clusters was constructed. \itemize{ 
 \item{\code{start.clus}}{character. The label of the root cluster.} 
 \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
-terminal clusters.} \item{\code{start.given}}{logical. A logical value
+terminal clusters.} \item{\code{start.given}}{logical. A logical value 
 indicating whether the initial state was pre-specified.} 
-\item{\code{end.given}}{logical. A vector of logical values indicating
+\item{\code{end.given}}{logical. A vector of logical values indicating 
 whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
 numeric matrix of pairwise cluster distances.} }}
 
@@ -51,28 +55,31 @@ numeric matrix of pairwise cluster distances.} }}
 \item{curveControl}{list. Additional parameters specifying how the 
 simultaneous principal curves were constructed. \itemize{ 
 \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
-and how much to shrink branching lineages toward their shared average
-curve.} \item{\code{extend}}{character. Specifies the method for handling
-root and leaf clusters of lineages when constructing the initial,
+and how much to shrink branching lineages toward their shared average 
+curve.} \item{\code{extend}}{character. Specifies the method for handling 
+root and leaf clusters of lineages when constructing the initial, 
 piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
-See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical.
-Indicates whether to reweight cells shared by multiple lineages during
-curve-fitting. If \code{TRUE}, cells shared between lineages will have
-lineage-specific weights determined by the ratio: (distance to nearest
-curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical.
-Indicates whether to drop shared cells from lineages which do not fit them
+See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical. 
+Indicates whether to reweight cells shared by multiple lineages during 
+curve-fitting. If \code{TRUE}, cells shared between lineages will have 
+lineage-specific weights determined by the ratio: (distance to nearest 
+curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical. 
+Indicates whether to drop shared cells from lineages which do not fit them 
 well. If \code{TRUE}, shared cells with a distance to one lineage above the
-90th percentile and another lineage below the 50th percentile will be
-dropped from the farther lineage.} \item{\code{shrink.method}}{character.
-Denotes how to determine the amount of shrinkage for a branching lineage.
-Accepted values are the same as for \code{kernel} in  the \code{density}
-function (default is \code{"cosine"}), as well as \code{"tricube"} and
-\code{"density"}. See \code{\link{getCurves}} for details.} \item{Other
+90th percentile and another lineage below the 50th percentile will be 
+dropped from the farther lineage.} \item{\code{shrink.method}}{character. 
+Denotes how to determine the amount of shrinkage for a branching lineage. 
+Accepted values are the same as for \code{kernel} in  the \code{density} 
+function (default is \code{"cosine"}), as well as \code{"tricube"} and 
+\code{"density"}. See \code{\link{getCurves}} for details.} \item{Other 
 parameters specified by \code{\link{principal.curve}}}. }}
 }
+\value{
+A \code{SlingshotDataSet} object with all specified values.
+}
 \description{
-Constructs a \code{SlingshotDataSet} object. Additionally, 
-  simple helper methods for manipulating \code{SlingshotDataSet} objects are
+Constructs a \code{SlingshotDataSet} object. Additional helper 
+  methods for manipulating \code{SlingshotDataSet} objects are  also 
   described below.
 }
 \section{Methods (by class)}{
@@ -83,12 +90,14 @@ Constructs a \code{SlingshotDataSet} object. Additionally,
 
 \item \code{reducedDim = matrix,clusterLabels = factor}: returns a \code{SlingshotDataSet} object.
 
+\item \code{reducedDim = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+
 \item \code{reducedDim = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
 }}
 
 \examples{
-rd <- matrix(data=rnorm(200), ncol=2)
-cl <- sample(letters[1:5], 100, replace = TRUE)
-sds <- SlingshotDataSet(rd, cl)
+rd <- matrix(data=rnorm(100), ncol=2)
+cl <- sample(letters[1:5], 50, replace = TRUE)
+sds <- newSlingshotDataSet(rd, cl)
 
 }

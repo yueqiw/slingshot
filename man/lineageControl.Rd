@@ -12,3 +12,8 @@ lineageControl(x)
 \value{
 the list of additional lineage inference parameters.
 }
+\examples{
+data("slingshotExample")
+sds <- getLineages(rd, cl, start.clus = '5')
+lineageControl(sds)
+}

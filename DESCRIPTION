@@ -15,13 +15,13 @@ Depends:
 Imports:
     ape,
     igraph,
-    methods,
-    rgl
+    methods
 Suggests:
     BiocGenerics,
     knitr,
     rmarkdown,
     RColorBrewer,
+    rgl,
     stats,
     testthat
 VignetteBuilder: knitr

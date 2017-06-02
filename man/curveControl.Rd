@@ -13,3 +13,8 @@ principal curves.}
 \value{
 the list of additional curve fitting parameters.
 }
+\examples{
+data("slingshotExample")
+sds <- slingshot(rd, cl)
+curveControl(sds)
+}

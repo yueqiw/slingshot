@@ -1,86 +1,90 @@
 #' @rdname getCurves
-#' 
-#' @description This function takes a reduced data matrix \code{n} by \code{p},
-#'  a vector of cluster identities (optionally including \code{-1}'s for 
-#'  "unclustered"), and a set of lineages consisting of paths through a forest
-#'  constructed on the clusters. It constructs smooth curves for each lineage
-#'  and returns the points along these curves corresponding to the orthogonal 
-#'  projections of each data point, along with corresponding arclength 
-#'  (\code{pseudotime} or \code{lambda}) values.
-#' 
-#' @param sds The \code{SlingshotDataSet} for which to construct simultaneous
-#' principal curves. This should already have lineages identified by
-#' \code{\link{getLineages}}.
+#'   
+#' @description This function takes a reduced data matrix \code{n} by \code{p}, 
+#'   a vector of cluster identities (optionally including \code{-1}'s for 
+#'   "unclustered"), and a set of lineages consisting of paths through a forest 
+#'   constructed on the clusters. It constructs smooth curves for each lineage 
+#'   and returns the points along these curves corresponding to the orthogonal 
+#'   projections of each data point, along with corresponding arclength 
+#'   (\code{pseudotime} or \code{lambda}) values.
+#'   
+#' @param sds The \code{SlingshotDataSet} for which to construct simultaneous 
+#'   principal curves. This should already have lineages identified by 
+#'   \code{\link{getLineages}}.
 #' @param shrink logical or numeric between 0 and 1, determines whether and how 
 #'   much to shrink branching lineages toward their average prior to the split.
 #' @param extend character, how to handle root and leaf clusters of lineages 
-#'  when constructing the initial, piece-wise linear curve. Accepted values are
-#'  \code{'y'} (default), \code{'n'}, and \code{'pc1'}. See 'Details' for more.
-#' @param reweight logical, whether to allow cells shared between lineages to 
-#' be reweighted during curve-fitting. If \code{TRUE}, cells shared between
-#' lineages will be weighted by: distance to nearest curve / distance to curve.
-#' @param drop.multi logical, whether to drop shared cells from lineages which
-#' do not fit them well. If \code{TRUE}, shared cells with a distance to one 
-#' lineage above the 90th percentile and another below the 50th will be dropped
-#' from the further lineage.
-#' @param thresh numeric, determines the convergence criterion. Percent change
-#' in the total distance from cells to their projections along curves must be
-#' less than \code{thresh}. Default is \code{0.001}, similar to 
-#' \code{\link{principal.curve}}.
-#' @param maxit numeric, maximum number of iterations, see
+#'   when constructing the initial, piece-wise linear curve. Accepted values are
+#'   \code{'y'} (default), \code{'n'}, and \code{'pc1'}. See 'Details' for more.
+#' @param reweight logical, whether to allow cells shared between lineages to be
+#'   reweighted during curve-fitting. If \code{TRUE}, cells shared between 
+#'   lineages will be weighted by: distance to nearest curve / distance to
+#'   curve.
+#' @param drop.multi logical, whether to drop shared cells from lineages which 
+#'   do not fit them well. If \code{TRUE}, shared cells with a distance to one 
+#'   lineage above the 90th percentile and another below the 50th will be
+#'   dropped from the further lineage.
+#' @param thresh numeric, determines the convergence criterion. Percent change 
+#'   in the total distance from cells to their projections along curves must be 
+#'   less than \code{thresh}. Default is \code{0.001}, similar to 
 #'   \code{\link{principal.curve}}.
-#' @param stretch numeric factor by which curves can be extrapolated beyond
+#' @param maxit numeric, maximum number of iterations, see 
+#'   \code{\link{principal.curve}}.
+#' @param stretch numeric factor by which curves can be extrapolated beyond 
 #'   endpoints. Default is \code{2}, see \code{\link{principal.curve}}.
-#' @param smoother, choice of scatter plot smoother. Same as
-#'  \code{\link{principal.curve}}, but \code{"lowess"} option is replaced with
-#'  \code{"loess"} for additional flexibility.
+#' @param smoother, choice of scatter plot smoother. Same as 
+#'   \code{\link{principal.curve}}, but \code{"lowess"} option is replaced with 
+#'   \code{"loess"} for additional flexibility.
 #' @param shrink.method character denoting how to determine the appropriate 
-#' amount of shrinkage for a branching lineage. Accepted values are the same as
-#' for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}), as
-#' well as \code{"tricube"} and \code{"density"}. See 'Details' for more.
-#' @param ... Additional parameters to pass to scatter plot smoothing function,
+#'   amount of shrinkage for a branching lineage. Accepted values are the same
+#'   as for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}),
+#'   as well as \code{"tricube"} and \code{"density"}. See 'Details' for more.
+#' @param ... Additional parameters to pass to scatter plot smoothing function, 
 #'   \code{smoother}.
-#' 
-#' @details When there is only a single lineage, the curve-fitting algorithm is
-#'  nearly identical to that of \code{\link{principal.curve}}. When there are 
-#'  multiple lineages and \code{shrink == TRUE}, an additional step is added to
-#'  the iterative procedure, forcing curves to be similar in the neighborhood
-#'  of shared points (ie., before they branch).
 #'   
-#' @details The \code{extend} argument determines how to construct the piece-wise
-#'   linear curve used to initiate the recursive algorithm. The initial curve is
-#'   always based on the lines between cluster centers and if \code{extend = 'n'}, 
-#'   this curve will terminate at the center of the endpoint clusters. Setting 
-#'   \code{extend = 'y'} will allow the first and last segments to extend beyond
-#'   the cluster center to the orthogonal projection of the furthest point. Setting
-#'   \code{extend = 'pc1'} is similar to \code{'y'}, but uses the first principal
-#'   component of the cluster to determine the direction of the curve beyond the
-#'   cluster center. These options typically have little to no impact on the final
-#'   curve, but can occasionally help with stability issues.
+#' @details When there is only a single lineage, the curve-fitting algorithm is 
+#'   nearly identical to that of \code{\link{principal.curve}}. When there are 
+#'   multiple lineages and \code{shrink == TRUE}, an additional step is added to
+#'   the iterative procedure, forcing curves to be similar in the neighborhood 
+#'   of shared points (ie., before they branch).
 #'   
-#' @details When \code{shink == TRUE}, we compute a shrinkage curve, \eqn{w_l(t)}, for 
-#' each lineage, a non-increasing function of pseudotime that determines how much
-#' that lineage should be shrunk toward a shared average curve. We set \eqn{w_l(0) = 1}, 
-#' so that the curves will perfectly overlap the average curve at pseudotime \code{0}. The 
-#' weighting curve decreases from \code{1} to \code{0} over the non-outlying pseudotime values 
-#' of shared cells (where outliers are defined by the \code{1.5*IQR} rule). The 
-#' exact shape of the curve in this region is controlled by \code{shrink.method}, and
-#' can follow the shape of any standard kernel function's cumulative density curve (or
-#' more precisely, survival curve, since we require a decreasing function). Different
-#' choices of \code{shrink.method} seem to have little impact on the final curves, in 
-#' most cases.
-#'
+#' @details The \code{extend} argument determines how to construct the
+#'   piece-wise linear curve used to initiate the recursive algorithm. The
+#'   initial curve is always based on the lines between cluster centers and if
+#'   \code{extend = 'n'}, this curve will terminate at the center of the
+#'   endpoint clusters. Setting \code{extend = 'y'} will allow the first and
+#'   last segments to extend beyond the cluster center to the orthogonal
+#'   projection of the furthest point. Setting \code{extend = 'pc1'} is similar
+#'   to \code{'y'}, but uses the first principal component of the cluster to
+#'   determine the direction of the curve beyond the cluster center. These
+#'   options typically have little to no impact on the final curve, but can
+#'   occasionally help with stability issues.
+#'   
+#' @details When \code{shink == TRUE}, we compute a shrinkage curve,
+#'   \eqn{w_l(t)}, for each lineage, a non-increasing function of pseudotime
+#'   that determines how much that lineage should be shrunk toward a shared
+#'   average curve. We set \eqn{w_l(0) = 1}, so that the curves will perfectly
+#'   overlap the average curve at pseudotime \code{0}. The weighting curve
+#'   decreases from \code{1} to \code{0} over the non-outlying pseudotime values
+#'   of shared cells (where outliers are defined by the \code{1.5*IQR} rule).
+#'   The exact shape of the curve in this region is controlled by
+#'   \code{shrink.method}, and can follow the shape of any standard kernel
+#'   function's cumulative density curve (or more precisely, survival curve,
+#'   since we require a decreasing function). Different choices of
+#'   \code{shrink.method} seem to have little impact on the final curves, in 
+#'   most cases.
+#'   
 #' @return An updated \code{\link{SlingshotDataSet}} object containing the 
-#' oringinal input, arguments provided to \code{getCurves} as well as the
-#' following new elements:
-#' \itemize{
-#' \item{curves}{A list of \code{\link{principal.curve}} objects.}
-#' \item{curveControls}{Additional parameters used for fitting simultaneous principal curves.}}
-#'
-#' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves." \emph{Journal of the American Statistical Association}, 84:502–516.
-#'
+#'   oringinal input, arguments provided to \code{getCurves} as well as the 
+#'   following new elements: \itemize{ \item{curves}{A list of
+#'   \code{\link{principal.curve}} objects.} \item{curveControls}{Additional
+#'   parameters used for fitting simultaneous principal curves.}}
+#'   
+#' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves."
+#'   \emph{Journal of the American Statistical Association}, 84:502–516.
+#'   
 #' @seealso \code{\link{slingshot}}
-#'
+#'   
 #' @examples
 #' data("slingshotExample")
 #' sds <- getLineages(rd, cl, start.clus = '5')
@@ -111,8 +115,8 @@ setMethod(f = "getCurves",
             sds@curveControl$shrink.method <- shrink.method
             
             # CHECKS
-            X <- sds@reducedDim
-            clusterLabels <- sds@clusterLabels
+            X <- reducedDim(sds)
+            clusterLabels <- clusterLabels(sds)
             shrink <- as.numeric(shrink)
             if(shrink < 0 | shrink > 1){
               stop("shrink must be logical or numeric between 0 and 1")
@@ -131,6 +135,14 @@ setMethod(f = "getCurves",
             }
             if(is.null(colnames(X))){
               colnames(X) <- paste('Dim',seq_len(ncol(X)),sep='-')
+            }
+            if(any(rownames(X)=='')){
+              miss.ind <- which(rownames(X) == '')
+              rownames(X)[miss.ind] <- paste('Cell',miss.ind,sep='-')
+            }
+            if(any(colnames(X)=='')){
+              miss.ind <- which(colnames(X) == '')
+              colnames(X)[miss.ind] <- paste('Dim',miss.ind,sep='-')
             }
             # DEFINE SMOOTHER FUNCTION
             smootherFcn <- switch(smoother, loess = function(lambda, xj, w = NULL, ...){

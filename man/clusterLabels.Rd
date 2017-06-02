@@ -10,10 +10,17 @@ clusterLabels(x)
 clusterLabels(x) <- value
 }
 \arguments{
-\item{x}{an object that describes a dataset or a model involving cluster labels.}
+\item{x}{an object that describes a dataset or a model involving cluster
+labels.}
 }
 \value{
 the vector of cluster labels.
 
 Updated object with new vector of cluster labels.
+}
+\examples{
+rd <- matrix(data=rnorm(100), ncol=2)
+cl <- sample(letters[1:5], 50, replace = TRUE)
+sds <- newSlingshotDataSet(rd, cl)
+clusterLabels(sds)
 }

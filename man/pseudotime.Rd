@@ -27,3 +27,11 @@ an \code{n} by \code{L} matrix of cell weights along
 Extract the matrix of pseudotime values or cells' weights along
   each lineage.
 }
+\examples{
+data("slingshotExample")
+sds <- slingshot(rd, cl)
+pseudotime(sds)
+data("slingshotExample")
+sds <- slingshot(rd, cl)
+curveWeights(sds)
+}

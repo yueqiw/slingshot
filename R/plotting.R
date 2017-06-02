@@ -169,7 +169,7 @@ setMethod(
 #' 
 #' # add to existing plot
 #' plot3d(rd, col = 'grey50', aspect = 'iso')
-#' lines3d(sds, lwd = 3)
+#' plot3d(sds, lwd = 3, add = TRUE)
 #' 
 #' @importFrom rgl plot3d
 #' 
@@ -277,26 +277,26 @@ setMethod(
   }
 )
 
-## lines3d
-#' @rdname SlingshotDataSet-plot3d
-#' @importFrom rgl lines3d
-#' @export
-lines3d.SlingshotDataSet <- function(x,
-                                     type = NULL,
-                                     dims = 1:3,
-                                     ...) {
-  plot3d(x, type = type, add = TRUE, dims = dims, ...)
-  invisible(NULL)
-}
-#' @rdname SlingshotDataSet-plot3d
-#' @export
-setMethod(
-  f = "lines3d",
-  signature = "SlingshotDataSet",
-  definition = function(x,
-                        type = NULL,
-                        dims = 1:3,
-                        ...) {
-    lines3d.SlingshotDataSet(x, type = type, add = TRUE, dims = dims, ...)
-  }
-)
+#' ## lines3d
+#' #' @rdname SlingshotDataSet-plot3d
+#' # #' @importFrom rgl lines3d
+#' #' @export
+#' lines3d.SlingshotDataSet <- function(x,
+#'                                      type = NULL,
+#'                                      dims = 1:3,
+#'                                      ...) {
+#'   plot3d(x, type = type, add = TRUE, dims = dims, ...)
+#'   invisible(NULL)
+#' }
+#' #' @rdname SlingshotDataSet-plot3d
+#' #' @export
+#' setMethod(
+#'   f = "lines3d",
+#'   signature = "SlingshotDataSet",
+#'   definition = function(x,
+#'                         type = NULL,
+#'                         dims = 1:3,
+#'                         ...) {
+#'     lines3d.SlingshotDataSet(x, type = type, add = TRUE, dims = dims, ...)
+#'   }
+#' )

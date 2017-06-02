@@ -12,3 +12,8 @@ lineages(x)
 \value{
 the list of lineages, represented by ordered sets of clusters.
 }
+\examples{
+data("slingshotExample")
+sds <- getLineages(rd, cl)
+lineages(sds)
+}

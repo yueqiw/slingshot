@@ -7,8 +7,14 @@
 connectivity(x)
 }
 \arguments{
-\item{x}{an object that describes a dataset or a model involving a connectivity matrix.}
+\item{x}{an object that describes a dataset or a model involving a
+connectivity matrix.}
 }
 \value{
 the matrix of connections between clusters.
+}
+\examples{
+data("slingshotExample")
+sds <- getLineages(rd, cl)
+connectivity(sds)
 }

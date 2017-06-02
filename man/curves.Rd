@@ -13,3 +13,8 @@ principal curves.}
 \value{
 the list of smooth lineage curves.
 }
+\examples{
+data("slingshotExample")
+sds <- slingshot(rd, cl)
+curves(sds)
+}

@@ -41,6 +41,9 @@ setMethod(
                         add = FALSE,
                         dims = 1:2,
                         asp = 1,
+                        cex = 2,
+                        lwd = 2,
+                        show.constraints = FALSE,
                         ...) {
     curves <- FALSE
     lineages <- FALSE
@@ -74,9 +77,9 @@ setMethod(
     }
     
     if(lineages){
-      X <- x@reducedDim
-      clusterLabels <- x@clusterLabels
-      connectivity <- x@connectivity
+      X <- reducedDim(x)
+      clusterLabels <- clusterLabels(x)
+      connectivity <- connectivity(x)
       clusters <- rownames(connectivity)
       nclus <- nrow(connectivity)
       centers <- t(sapply(clusters,function(clID){
@@ -86,6 +89,7 @@ setMethod(
       rownames(centers) <- clusters
       X <- X[clusterLabels %in% clusters,]
       clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+      linC <- lineageControl(x)
     }
     
     if(!add){
@@ -109,13 +113,31 @@ setMethod(
       for(i in 1:(nclus-1)){
         for(j in (i+1):nclus){
           if(connectivity[i,j]==1){
-            lines(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], ...)
+            # if(show.constraints & (clusters[i] %in% linC$start.clus | clusters[j] %in% linC$start.clus)){
+            #   seg.col <- brewer.pal(4,'Set1')[3]
+            # }else if(show.constraints & (clusters[i] %in% linC$end.clus[linC$end.given] | clusters[j] %in% linC$end.clus[linC$end.given])){
+            #   seg.col <- brewer.pal(4,'Set1')[1]
+            # }else{
+            #   seg.col <- 1
+            # }
+            seg.col <- 1
+            lines(centers[c(i,j),], lwd = lwd, col = seg.col, ...)
           }
         }
       }
+      points(centers, cex = cex, pch = 16)
+      if(show.constraints){
+        if(any(linC$start.given)){
+          points(centers[clusters %in% linC$start.clus[linC$start.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[3])
+        }
+        if(any(linC$end.given)){
+          points(centers[clusters %in% linC$end.clus[linC$end.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[1])
+        }
+      }
+      
     }
     if(curves){
-      for(c in x@curves){ lines(c$s[c$tag,dims], ...) }
+      for(c in x@curves){ lines(c$s[c$tag,dims], lwd = lwd, ...) }
     }
     invisible(NULL)
   }

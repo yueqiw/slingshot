@@ -1,15 +1,27 @@
 pairs.SlingshotDataSet <-
-  function (x, labels, col = NULL, ...,
+  function (x, labels, col = NULL, cex=1, lwd=2, ...,
             horInd = 1:nc, verInd = 1:nc,
-            lower.panel = NULL, upper.panel = panel,
+            lower.panel = FALSE, upper.panel = TRUE,
             diag.panel = NULL, text.panel = textPanel,
             label.pos = 0.5 + has.diag/3, line.main = 3,
             cex.labels = NULL, font.labels = 1,
-            row1attop = TRUE, gap = 1,
+            row1attop = TRUE, gap = 1, show.constraints = FALSE,
             type = NULL, pch =16)
   {
     #####
-    panel = points
+    lp.sling <- lower.panel
+    up.sling <- upper.panel
+    panel <- points
+    if(!up.sling){
+      upper.panel <- NULL
+    }else{
+      upper.panel <- panel
+    }
+    if(!lower.panel){
+      lower.panel <- NULL
+    }else{
+      lower.panel <- panel
+    }
     log = ""
     sds <- x
     x <- reducedDim(sds)
@@ -61,7 +73,7 @@ pairs.SlingshotDataSet <-
       return(c(mid - range.max/2, mid + range.max/2))
     })
     if(is.null(col)){
-      cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
+      cc <- c(brewer.pal(9, "Set1")[-c(1,3,6)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
       col <- cc[as.factor(clusterLabels(sds))]
     }
     #####
@@ -172,33 +184,65 @@ pairs.SlingshotDataSet <-
                          cex = cex.labels, font = font.labels)
             }
           } else if(i < j){
-            
-            points(as.vector(x[, j]), as.vector(x[, i]), col = col, pch=pch, ...)
-            if(lineages){
-              for(ii in 1:(nclus-1)){
-                for(jj in (i+1):nclus){
-                  if(forest[ii,jj]==1){
-                    if(clusters[ii] %in% linC$start.clus | clusters[jj] %in% linC$start.clus){
-                      seg.col <- brewer.pal(4,'Set1')[3]
-                    }else if(clusters[ii] %in% linC$end.clus[linC$end.given] | clusters[jj] %in% linC$end.clus[linC$end.given]){
-                      seg.col <- brewer.pal(4,'Set1')[1]
-                    }else{
+            if(up.sling){
+              points(as.vector(x[, j]), as.vector(x[, i]), col = col, cex = cex, pch=pch, ...)
+              if(lineages){
+                for(ii in 1:(nclus-1)){
+                  for(jj in (i+1):nclus){
+                    if(forest[ii,jj]==1){
+                      # if(show.constraints & (clusters[ii] %in% linC$start.clus | clusters[jj] %in% linC$start.clus)){
+                      #   seg.col <- brewer.pal(4,'Set1')[3]
+                      # }else if(show.constraints & (clusters[ii] %in% linC$end.clus[linC$end.given] | clusters[jj] %in% linC$end.clus[linC$end.given])){
+                      #   seg.col <- brewer.pal(4,'Set1')[1]
+                      # }else{
+                      #   seg.col <- 1
+                      # }
                       seg.col <- 1
+                      lines(centers[c(ii,jj),j], centers[c(ii,jj),i], lwd = lwd, col = seg.col, ...)
                     }
-                    lines(centers[c(ii,jj),j], centers[c(ii,jj),i], col = seg.col, ...)
+                  }
+                }
+                points(centers[,j],centers[,i], pch = pch, cex=2*cex)
+                if(show.constraints){
+                  if(any(linC$start.given)){
+                    st.ind <- clusters %in% linC$start.clus[linC$start.given]
+                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, col = brewer.pal(4,'Set1')[3])
+                  }
+                  if(any(linC$end.given)){
+                    en.ind <- clusters %in% linC$end.clus[linC$end.given]
+                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, col = brewer.pal(4,'Set1')[1])
                   }
                 }
               }
-              points(centers[,j],centers[,i], pch = pch, cex=2)
+              if(curves){
+                for(c in curves(sds)){ lines(c$s[c$tag,c(j,i)], lwd = lwd, col=1, ...) }
+              }
             }
-            if(curves){
-              for(c in curves(sds)){ lines(c$s[c$tag,c(j,i)], col=1, ...) }
-            }
-            
           }
           else{
-            #if upper.panel == slingshotPanel
-            localUpperPanel(as.vector(x[, j]), as.vector(x[, i]), ...)
+            if(lp.sling){
+              points(as.vector(x[, j]), as.vector(x[, i]), col = col, cex = cex, pch=pch, ...)
+              if(lineages){
+                for(ii in 1:(nclus-1)){
+                  for(jj in (i+1):nclus){
+                    if(forest[ii,jj]==1){
+                      if(clusters[ii] %in% linC$start.clus | clusters[jj] %in% linC$start.clus){
+                        seg.col <- brewer.pal(4,'Set1')[3]
+                      }else if(clusters[ii] %in% linC$end.clus[linC$end.given] | clusters[jj] %in% linC$end.clus[linC$end.given]){
+                        seg.col <- brewer.pal(4,'Set1')[1]
+                      }else{
+                        seg.col <- 1
+                      }
+                      lines(centers[c(ii,jj),j], centers[c(ii,jj),i], lwd = lwd, col = seg.col, ...)
+                    }
+                  }
+                }
+                points(centers[,j],centers[,i], pch = pch, cex=2*cex)
+              }
+              if(curves){
+                for(c in curves(sds)){ lines(c$s[c$tag,c(j,i)], lwd = lwd, col=1, ...) }
+              }
+            }
           }
           if (any(par("mfg") != mfg))
             stop("the 'panel' function made a new plot")

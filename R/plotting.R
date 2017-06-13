@@ -128,10 +128,10 @@ setMethod(
       points(centers, cex = cex, pch = 16)
       if(show.constraints){
         if(any(linC$start.given)){
-          points(centers[clusters %in% linC$start.clus[linC$start.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[3])
+          points(centers[clusters %in% linC$start.clus[linC$start.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[3], pch = 16)
         }
         if(any(linC$end.given)){
-          points(centers[clusters %in% linC$end.clus[linC$end.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[1])
+          points(centers[clusters %in% linC$end.clus[linC$end.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[1], pch = 16)
         }
       }
       
@@ -202,7 +202,7 @@ plot3d.SlingshotDataSet <- function(x,
                                     dims = 1:3,
                                     aspect = 'iso',
                                     ...){
-  require(rgl)
+  require(rgl) # catch (check if rgl installed)
   curves <- FALSE
   lineages <- FALSE
   if(is.null(type)){

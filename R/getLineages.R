@@ -21,12 +21,11 @@
 #'   number dimensions, the default is to use the joint covariance matrix to
 #'   find squared distance between cluster centers. If not, the default is to
 #'   use the diagonal of the joint covariance matrix.
-#' @param omega (optional) numeric between 0 and 1. This granularity parameter
-#'   determines the distance between every real cluster and the artificial 
-#'   cluster, OMEGA. It is parameterized as a fraction of the largest distance 
-#'   between two real clusters (hence, any value greater than 1 would result in
-#'   a single tree being returned and would be equivalent to setting \code{omega
-#'   = Inf}, which is the default behavior).
+#' @param omega (optional) numeric, this granularity parameter determines the
+#'   distance between every real cluster and the artificial cluster, OMEGA. It
+#'   is parameterized such that this distance is \code{omega / 2}, making
+#'   \code{omega} the maximum distance between two connected clusters. By
+#'   default, \code{omega = Inf}.
 #'   
 #' @details The \code{connectivity} matrix is learned by fitting a (possibly
 #'   constrained) minimum-spanning tree on the clusters and the artificial 
@@ -157,10 +156,14 @@ setMethod(f = "getLineages",
             if(is.null(omega)){
               omega <- max(D) + 1
             }else{
-              if(omega >= 0 && omega <= 1){
-                omega <- omega * max(D)
+              if(omega > 0){
+                if(omega == Inf){
+                  omega <- max(D) + 1
+                }else{
+                  omega <- omega / 2
+                }
               }else{
-                stop("omega must be between 0 and 1")
+                stop("omega must be a positive number.")
               }
             }
             D <- rbind(D, rep(omega, ncol(D)) )

@@ -206,11 +206,11 @@ pairs.SlingshotDataSet <-
                 if(show.constraints){
                   if(any(linC$start.given)){
                     st.ind <- clusters %in% linC$start.clus[linC$start.given]
-                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, col = brewer.pal(4,'Set1')[3])
+                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, col = brewer.pal(4,'Set1')[3], pch = pch)
                   }
                   if(any(linC$end.given)){
                     en.ind <- clusters %in% linC$end.clus[linC$end.given]
-                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, col = brewer.pal(4,'Set1')[1])
+                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, col = brewer.pal(4,'Set1')[1], pch = pch)
                   }
                 }
               }

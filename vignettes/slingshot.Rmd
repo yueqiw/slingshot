@@ -62,8 +62,9 @@ The second dataset is provided with the `slingshot` and consists of a $140 \text
 
 ```{r data_sling}
 data("slingshotExample")
-dim(rd) # data representing cells in a reduced dimensional space
-length(cl) # vector of cluster labels
+rd2 <- rd; cl2 <- cl
+dim(rd2) # data representing cells in a reduced dimensional space
+length(cl2) # vector of cluster labels
 ```
 
 # Upstream Analysis
@@ -72,11 +73,11 @@ length(cl) # vector of cluster labels
 
 To begin our analysis of the first simulated dataset, we need to reduce the dimensionality of our data and filtering out noisy genes is a typical first step. This will help improve the speed of downstream analyses, while keeping the loss of information to a minimum.
 
-For the gene filtering step, we will retain any genes that are robustly expressed in at least some percentage of cells, making them potentially interesting cell-type marker genes. For the `splatter` dataset, we define a gene as being "robustly expressed" if it has a read count of 2 or more and we set the minimum percentage of cells robustly expressing a gene to 5%.
+For the gene filtering step, we will retain any genes that are robustly expressed in at least some percentage of cells, making them potentially interesting cell-type marker genes. For the `splatter` dataset, we define a gene as being "robustly expressed" if it has a simulated count of 2.5 (roughly the median of all non-zero counts) or more and we set the minimum percentage of cells robustly expressing a gene to 10%.
 
 ```{r genefilt, cache=TRUE}
 geneFilt <- apply(exprs(sim),1, function(gene){
-  sum(gene >= 2) >= .05 * ncol(sim)
+  sum(gene >= 2.5) >= .1 * ncol(sim)
 })
 mean(geneFilt) # percentage of genes retained
 sum(exprs(sim)[geneFilt,]) / sum(exprs(sim)) # percentage of reads retained
@@ -112,9 +113,9 @@ When performing PCA, we do not scale the genes by their variance because we do n
 
 ```{r pca, cache=TRUE}
 pca <- prcomp(t(log1p(exprs(sim))), scale. = FALSE)
-splat.rd <- pca$x[,1:2]
+rd1 <- pca$x[,1:2]
 
-plot(splat.rd, col = topo.colors(100)[sim$Step], pch=16, asp = 1)
+plot(rd1, col = topo.colors(100)[sim$Step], pch=16, asp = 1)
 ```
 
 ## Clustering Cells
@@ -126,9 +127,9 @@ The clusters identified in this step will be used to determine the global struct
 For the analysis of the simulated data, we implement k-means clustering which similarly assumes that Euclidean distance in a low-dimensional space reflect biological differences between cells. As shown in [CITE slingshot], simultaneous principal curves are quite robust to the choice of k, so we choose a k of 5 somewhat arbitrarily. If k is too low, we may miss a true branching event and if k is too high or there is an abundance of small clusters, we may begin to see spurious branching events. We will revisit this choice and evaluate its impact on the final ordering later.
 
 ```{r clustering}
-splat.cl <- kmeans(splat.rd, centers = 5)$cluster
+cl1 <- kmeans(rd1, centers = 5)$cluster
 
-plot(splat.rd, col = brewer.pal(9,"Set1")[splat.cl], pch=16, asp = 1)
+plot(rd1, col = brewer.pal(9,"Set1")[cl1], pch=16, asp = 1)
 ```
 
 # Using Slingshot
@@ -144,71 +145,59 @@ The `getLineages` function takes as input an `n \times p` matrix and a vector of
 This analysis can be performed in an entirely unsupervised manner or in a semi-supervised manner by specifying known beginning and end point clusters. For our simulated data, we get a single lineage and because we did not specify an initial cluster, one of the endpoints will be chosen arbitrarily as the beginning.
 
 ```{r splat_lines_unsup}
-l1 <- getLineages(splat.rd, splat.cl)
-l1
-plot(splat.rd, col = brewer.pal(9,"Set1")[splat.cl], asp = 1, pch = 16)
-lines(l1, lwd = 3)
+lin1 <- getLineages(rd1, cl1)
+lin1
+plot(rd1, col = brewer.pal(9,"Set1")[cl1], asp = 1, pch = 16)
+lines(lin1, lwd = 3)
 ```
 
 We generally recommend the specification of a root cluster. This will have no effect on how the MST is constructed, but it will allow for nicer curves in datasets with a branching structure. When no initial cluster is specified and branching is present, `slingshot` will select an endpoint that maximizes the number of shared clusters (ie. the cluster at the end of the longest branch) as the beginning. For the second dataset, this means that the cluster on the left will be chosen as the origin.
 
 ```{r lines_unsup}
-l2 <- getLineages(rd, cl)
-l2
-plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
-lines(l2, lwd = 3)
+lin2 <- getLineages(rd2, cl2)
+lin2
+plot(rd2, col = brewer.pal(9,"Set1")[cl2], asp = 1, pch = 16)
+lines(lin2, lwd = 3)
 ```
 
-At this step, `slingshot` also allows for the specification of known endpoints. Clusters which are specified as terminal cell states will be constrained to havie only one connection when the MST is constructed. This constraint could potentially impact how other parts of the tree are drawn, as shown in the next example where we specified the middle cluster in the branch as an endpoint.
+At this step, `slingshot` also allows for the specification of known endpoints. Clusters which are specified as terminal cell states will be constrained to have only one connection when the MST is constructed (ie., they must be leaf nodes). This constraint could potentially impact how other parts of the tree are drawn, as shown in the next example where we specified the middle cluster in the branch as an endpoint.
 
 ```{r lines_sup_end}
-l3 <- getLineages(rd, cl, start.clus = '4')
-l3
-plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
-lines(l3, lwd = 3, show.constraints = TRUE)
+lin3 <- getLineages(rd2, cl2, end.clus = '3')
+lin3
+plot(rd2, col = brewer.pal(9,"Set1")[cl2], asp = 1, pch = 16)
+lines(lin3, lwd = 3, show.constraints = TRUE)
 ```
-
-When we specify a root cluster we get the same connections and the only difference is which line is drawn in green.
-
-```{r lines_sup_end2}
-l3 <- getLineages(rd, cl, end.clus = '3')
-l3
-plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
-lines(l3, lwd = 3)
-```
-
-Here we demonstrate the ability to specify end point clusters, which puts a constraing on the connections. We now draw the MST subject to the constraint that given end point clusters must be leaves. Pre-specified end point clusters are connected by red lines.
 
 There are a few additional arguments we could have passed to `getLineages` for more greater control:
 
 * `dist.fun` is a function for computing distances between clusters. The default is squared distance between cluster centers normalized by their joint covariance matrix.
-* `omega` is a granularity parameter, allowing the user to set an upper limit on connection distances. It takes values between 0 and 1 (or `Inf`), representing a percentage of the largest observed distance.
-* `distout` is a logical value, indicating whether the user wants the pairwise cluster distance matrix to be returned with the output.
+* `omega` is a granularity parameter, allowing the user to set an upper limit on connection distances. This can be useful for identifying outlier clusters which are not a part of any lineage.
 
-After constructing the MST, `getLineages` identifies paths through the tree to designate as lineages. At this stage, a lineage will consist of an ordered set of cluster names, starting with the root cluster and ending with a leaf. The output of `getLineages` is a list of these vectors, along with some additional information on how they were constructed.
+After constructing the MST, `getLineages` identifies paths through the tree to designate as lineages. At this stage, a lineage will consist of an ordered set of cluster names, starting with the root cluster and ending with a leaf. The output of `getLineages` is a `slingshotDataSet` which holds all of the inputs as well as a list of lineages and some additional information on how they were constructed.
 
 ## Constructing smooth curves and ordering cells
 
 In order to model development along these various lineages, we will construct smooth curves with the function `getCurves`. Using smooth curves based on all the cells eliminates the problem of cells projecting onto vertices of piece-wise linear trajectories and makes `slingshot` more robust to noise in the clustering results.
 
-In order to construct smooth lineages, `getCurves` follows an iterative process similar to that of principal curves presented in [@princurve]. When there is only a single lineage, the resulting curve is simply the principal curve through the center of the data, with one adjustment: the initial curve is constructed with the linear connections between cluster centers rather than the first prinicpal component of the data. This adjustment adds stability and typically hastens the algorithm's convergence.
+In order to construct smooth lineages, `getCurves` follows an iterative process similar to that of principal curves presented in [CITE princurve]. When there is only a single lineage, the resulting curve is simply the principal curve through the center of the data, with one adjustment: the initial curve is constructed with the linear connections between cluster centers rather than the first prinicpal component of the data. This adjustment adds stability and typically hastens the algorithm's convergence.
 
 When there are two or more lineages, we add an additional step to the algorithm: averaging curves near shared cells. Both lineages should agree fairly well on cells that have yet to differentiate, so at each iteration we average the curves in the neighborhood of these cells. This increases the stability of the algorithm and produces smooth branching lineages.
 
 ```{r curves}
-c1 <- getCurves(l1)
-c1
-plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
-lines(c1, lwd = 3)
+crv1 <- getCurves(lin1)
+crv1
+plot(rd1, col = brewer.pal(9,"Set1")[cl1], asp = 1, pch = 16)
+lines(crv1, lwd = 3)
 ```
 
-The output of `getCurves` is a list with one element per curve. Each element is an object of the `principal.curve` class, with the following slots:
+The output of `getCurves` is an updated `slingshotDataSet` which now contains the simultaneous principal curves and additional information on how they were fit. The simultaneous principal curves can be accessed using the `curves` function, which will return a list of `principal.curve` objects. These objects consist of the following slots:
 
-* `s`: the matrix of points that make up the curve. These correspond to the orthogonal projections of the data points, but oredered such the `lines(s)` will produce a smooth curve.
-* `tag`: the indices of the original data points in `s`.
-* `lambda`: arclengths of the points in `s` along the curve.
-* `dist`: the total squared distance between data points and their projections onto the curve.
-* `pseudotime`: the vector of pseudotime values along this lineage.
+* `s`: the matrix of points that make up the curve. These correspond to the orthogonal projections of the data points.
+* `tag`: indices which can be used to put the cells along a curve in order based their projections.
+* `lambda`: arclengths along the curve from the beginning to each cell's projection.
+* `dist`: the squared distances between data points and their projections onto the curve.
+* `w`: the vector of weights along this lineage. Cells that were unambiguously assigned to this lineage will have a weight of `1`, while cells assigned to other lineages will have a weight of `0`. It is possible for cells to have weights of `1` (or very close to 1) for multiple lineages, if they are positioned before a branching event.
 
 # Downstream Analysis
 
@@ -216,41 +205,29 @@ The output of `getCurves` is a list with one element per curve. Each element is 
 
 Typically, the next step will be to find genes that change their expression as a function of developmental time. This can be done using the full genes-by-samples data matrix, but we will use the subset consisting of the 1,000 most variable genes.
 
-```{r genedata}
-#data('var_genes')
-```
-
 For a quick analysis, we will regress each gene on the two pseudotime vectors we have generated, using a general additive model (GAM). This allows us to detect non-linear patterns in gene expression over developmental time.
 
-```{r fitgam}
-# gam.pval <- vector("list",length(crv))
-# for(l in 1:length(crv)){
-#   t <- crv[[l]]$pseudotime
-#   y <- vargenes[, match(rownames(crv[[l]]$s[!is.na(t),]),rownames(rd))]
-#   t <- t[! is.na(t)]
-#   gam.pval[[l]] <- apply(y,1,function(z){
-#     d <- data.frame(z=z, t=t)
-#     tmp <- gam(z ~ lo(t), data=d)
-#     p <- summary(tmp)[4][[1]][1,5]
-#     p
-#   })
-# }
+```{r fitgam, cache=TRUE}
+require(gam)
+t <- pseudotime(crv1)
+y <- exprs(sim)
+gam.pval <- apply(y,1,function(z){
+  d <- data.frame(z=z, t=t)
+  tmp <- gam(z ~ lo(t), data=d)
+  p <- summary(tmp)[4][[1]][1,5]
+  p
+})
 ```
 
 We can then pick out the top genes for each lineage and visualize their expression over developmental time with a heatmap.
 
 ```{r heatmaps}
-# topgenes1 <- names(sort(gam.pval[[1]], decreasing = FALSE))[1:100]
-# heatdata1 <- vargenes[rownames(vargenes) %in% topgenes1, order(crv[[1]]$pseudotime, na.last = NA)]
-# heatclus1 <- clus[clus!='-1'][order(crv[[1]]$pseudotime, na.last = NA)]
-# ce1 <- clusterExperiment(heatdata1, heatclus1, transformation=identity)
-# plotHeatmap(ce1, clusterSamplesData="orderSamplesValue")
-# 
-# topgenes2 <- names(sort(gam.pval[[2]], decreasing = FALSE))[1:100]
-# heatdata2 <- vargenes[rownames(vargenes) %in% topgenes2, order(crv[[2]]$pseudotime, na.last = NA)]
-# heatclus2 <- clus[clus!='-1'][order(crv[[2]]$pseudotime, na.last = NA)]
-# ce2 <- clusterExperiment(heatdata2, heatclus2, transformation=identity)
-# plotHeatmap(ce2, clusterSamplesData="orderSamplesValue")
+require(clusterExperiment)
+topgenes1 <- names(sort(gam.pval, decreasing = FALSE))[1:100]
+heatdata1 <- exprs(sim)[rownames(exprs(sim)) %in% topgenes1, order(t, na.last = NA)]
+heatclus1 <- cl1[order(t, na.last = NA)]
+ce1 <- clusterExperiment(heatdata1, heatclus1, transformation=identity)
+plotHeatmap(ce1, clusterSamplesData="orderSamplesValue")
 ```
 
 # Session Info

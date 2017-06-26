@@ -197,6 +197,7 @@ setMethod(
 #' plot3d(sds, lwd = 3, add = TRUE)
 #' 
 #' @importFrom rgl plot3d
+#' @importFrom rgl lines3d
 #' 
 #' @export
 plot3d.SlingshotDataSet <- function(x,
@@ -276,13 +277,13 @@ plot3d.SlingshotDataSet <- function(x,
     for(i in 1:(nclus-1)){
       for(j in (i+1):nclus){
         if(connectivity[i,j]==1){
-          lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
+          rgl::lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
         }
       }
     }
   }
   if(curves){
-    for(c in x@curves){ lines3d(c$s[c$tag,dims], ...) }
+    for(c in x@curves){ rgl::lines3d(c$s[c$tag,dims], ...) }
   }
   invisible(NULL)
 }

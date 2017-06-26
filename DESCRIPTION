@@ -11,7 +11,8 @@ License: Artistic-2.0
 Depends:
     R (>= 3.4),
     Biobase,
-    princurve
+    princurve,
+    stats
 Imports:
     ape,
     igraph,
@@ -22,7 +23,6 @@ Suggests:
     knitr,
     rmarkdown,
     RColorBrewer,
-    stats,
     testthat
 VignetteBuilder: knitr
 LazyData: false

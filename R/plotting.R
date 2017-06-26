@@ -1,211 +1,328 @@
-#' @title Plot cluster connectivity
+## plot
+#' @title Plot Slingshot output
+#' @name SlingshotDataSet-plot
 #' 
-#' @description \code{plot_tree} visualizes the output from \code{\link{get_lineages}}, 
-#' showing cells (colored by cluster) in a reduced-dimensional space with connecting 
-#' lines between cluster centers representing the inferred structure.
+#' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #' 
-#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
-#'  space.
-#' @param clus.labels character, a vector of length n denoting cluster labels.
-#' @param lineages list, the out put of \code{\link{get_lineages}}, this list denotes 
-#'  which clusters belong to each lineage and contains the inferred connectivity 
-#'  between clusters.
-#' @param threeD logical indicates whether to make a 3D plot with the \code{rgl} 
-#'  package.
-#' @param dim total number of dimensions to be shown in a series of two-dimensional 
-#'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
-#' @param col.clus (optional) vector of colors to use for denoting clusters.
-#' @param labels logical indicating whether to include labels on cluster centers.
+#' @param x a \code{SlingshotDataSet} with results to be plotted.
+#' @param type character, the type of output to be plotted, can be one of
+#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#' Details for more.
+#' @param add logical, indicates whether the output should be added to an existing plot.
+#' @param dims numeric, which dimensions to plot (default is \code{1:2}).
+#' @param asp numeric, the y/x aspect ratio, see \code{\link{plot.window}}.
+#' @param ... additional parameters to be passed to \code{\link{lines}}.
 #' 
-#' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
-#'  If a \code{lineages} argument is given, the plot will include straight lines
-#'  between cluster centers for connections between clusters.
+#' @details If \code{type == 'lineages'}, straight line connectors between cluster
+#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
+#' will be plotted.
 #'
-#' @details The default behavior is to produce a series of 2-D plots representing
-#'  all pairwise combinations of dimensions in \code{X}, or the first \code{dim}
-#'  dimensions. If \code{threeD=TRUE}, a three-dimensional plot will be created,
-#'  using the \code{rgl} package.
+#' @details When \code{type} is not specified, the function will first check the 
+#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
+#' will be plotted, if present.
 #'
 #' @return returns \code{NULL}.
 #'
 #' @examples
-#' data("slingshot_example")
-#' lin <- get_lineages(X, clus.labels, start.clus = 'a')
-#' plot_tree(X, clus.labels, lin)
+#' data("slingshotExample")
+#' sds <- slingshot(rd, cl, start.clus = "5")
+#' plot(sds, type = 'b')
+#' 
+#' # add to existing plot
+#' plot(rd, col = 'grey50')
+#' lines(sds, lwd = 3)
 #' 
 #' @export
-#'
-#' @import RColorBrewer
-#' @import rgl
-#' 
-
-plot_tree <- function(X, clus.labels, lineages = NULL, threeD = FALSE, dim = NA, col.clus = NULL, labels = TRUE){
-  forest <- lineages$forest
-  clusters <- rownames(forest)
-  nclus <- nrow(forest)
-  centers <- t(sapply(clusters,function(clID){
-    x.sub <- X[clus.labels == clID,]
-    return(colMeans(x.sub))
-  }))
-  rownames(centers) <- clusters
-  X <- X[clus.labels %in% clusters,]
-  clus.labels <- clus.labels[clus.labels %in% clusters]
-  if(is.null(col.clus)){
-    cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
-    center.col <- cc[1:nclus]
-  }else{
-    center.col <- rep_len(col.clus, length.out = nclus)
+setMethod(
+  f = "plot",
+  signature = "SlingshotDataSet",
+  definition = function(x,
+                        type = NULL,
+                        add = FALSE,
+                        dims = 1:2,
+                        asp = 1,
+                        cex = 2,
+                        lwd = 2,
+                        show.constraints = FALSE,
+                        ...) {
+    curves <- FALSE
+    lineages <- FALSE
+    if(is.null(type)){
+      if(length(x@curves) > 0){
+        type <- 'curves'
+      }else if(length(x@lineages) > 0){
+        type <- 'lineages'
+      }else{
+        stop('No lineages or curves detected.')
+      }
+    }else{
+      type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages','both'))]
+      if(is.na(type)){
+        stop('Unrecognized type argument.')
+      }
+    }
+    
+    if(type %in% c('lineages','both')){
+      lineages <- TRUE
+    }
+    if(type %in% c('curves','both')){
+      curves <- TRUE
+    }
+    
+    if(lineages & (length(x@lineages)==0)){
+      stop('No lineages detected.')
+    }
+    if(curves & (length(x@curves)==0)){
+      stop('No curves detected.')
+    }
+    
+    if(lineages){
+      X <- reducedDim(x)
+      clusterLabels <- clusterLabels(x)
+      connectivity <- connectivity(x)
+      clusters <- rownames(connectivity)
+      nclus <- nrow(connectivity)
+      centers <- t(sapply(clusters,function(clID){
+        x.sub <- X[clusterLabels == clID,]
+        return(colMeans(x.sub))
+      }))
+      rownames(centers) <- clusters
+      X <- X[clusterLabels %in% clusters,]
+      clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+      linC <- lineageControl(x)
+    }
+    
+    if(!add){
+      xs <- NULL
+      ys <- NULL
+      if(lineages){
+        xs <- c(xs, centers[,dims[1]])
+        ys <- c(ys, centers[,dims[2]])
+      }
+      if(curves){
+        xs <- c(xs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[1]] })))
+        ys <- c(ys, as.numeric(sapply(x@curves, function(c){ c$s[,dims[2]] })))        
+      }
+      plot(x = NULL, y = NULL, asp = asp,
+           xlim = range(xs), ylim = range(ys),
+           xlab = colnames(x@reducedDim)[dims[1]],
+           ylab = colnames(x@reducedDim)[dims[2]])
+    }
+    
+    if(lineages){
+      for(i in 1:(nclus-1)){
+        for(j in (i+1):nclus){
+          if(connectivity[i,j]==1){
+            # if(show.constraints & (clusters[i] %in% linC$start.clus | clusters[j] %in% linC$start.clus)){
+            #   seg.col <- brewer.pal(4,'Set1')[3]
+            # }else if(show.constraints & (clusters[i] %in% linC$end.clus[linC$end.given] | clusters[j] %in% linC$end.clus[linC$end.given])){
+            #   seg.col <- brewer.pal(4,'Set1')[1]
+            # }else{
+            #   seg.col <- 1
+            # }
+            seg.col <- 1
+            lines(centers[c(i,j),], lwd = lwd, col = seg.col, ...)
+          }
+        }
+      }
+      points(centers, cex = cex, pch = 16)
+      if(show.constraints){
+        if(any(linC$start.given)){
+          points(centers[clusters %in% linC$start.clus[linC$start.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[3], pch = 16)
+        }
+        if(any(linC$end.given)){
+          points(centers[clusters %in% linC$end.clus[linC$end.given],,drop=FALSE], cex = cex / 2, col = brewer.pal(4,'Set1')[1], pch = 16)
+        }
+      }
+      
+    }
+    if(curves){
+      for(c in x@curves){ lines(c$s[c$tag,dims], lwd = lwd, ...) }
+    }
+    invisible(NULL)
   }
-  clus.col <- vapply(clus.labels,function(clID) {center.col[which(clusters==clID)]}, character(1))
-  if(threeD){
-    plot3d(X[,1:3],col=clus.col,size=5,box=FALSE,aspect = 'iso')
+)
+
+#' @rdname SlingshotDataSet-plot
+#' @export
+setMethod(
+  f = "lines",
+  signature = "SlingshotDataSet",
+  definition = function(x,
+                        type = NULL,
+                        dims = 1:2,
+                        ...) {
+    plot(x, type = type, add = TRUE, dims = dims, ...)
+    invisible(NULL)
+  }
+)
+
+## Individual gene plots
+
+
+## plot3d
+#' @title Plot Slingshot output in 3D
+#' @name SlingshotDataSet-plot3d
+#' 
+#' @description Tools for visualizing lineages inferred by \code{slingshot}.
+#' 
+#' @param x a \code{SlingshotDataSet} with results to be plotted.
+#' @param type character, the type of output to be plotted, can be one of
+#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#' Details for more.
+#' @param add logical, indicates whether the output should be added to an existing plot.
+#' @param dims numeric, which dimensions to plot (default is \code{1:3}).
+#' @param aspect either a logical indicating whether to adjust the aspect ratio 
+#' or a new ratio, see \code{\link{plot3d}}.
+#' @param ... additional parameters to be passed to \code{\link{lines3d}}.
+#' 
+#' @details If \code{type == 'lineages'}, straight line connectors between cluster
+#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
+#' will be plotted.
+#'
+#' @details When \code{type} is not specified, the function will first check the 
+#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
+#' will be plotted, if present.
+#'
+#' @return returns \code{NULL}.
+#'
+#' @examples
+#' data("slingshotExample")
+#' rd <- cbind(rd, rnorm(nrow(rd)))
+#' sds <- slingshot(rd, cl, start.clus = "5")
+#' plot3d(sds, type = 'b')
+#' 
+#' # add to existing plot
+#' plot3d(rd, col = 'grey50', aspect = 'iso')
+#' plot3d(sds, lwd = 3, add = TRUE)
+#' 
+#' @importFrom rgl plot3d
+#' 
+#' @export
+plot3d.SlingshotDataSet <- function(x,
+                                    type = NULL,
+                                    add = FALSE,
+                                    dims = 1:3,
+                                    aspect = 'iso',
+                                    ...){
+  require(rgl) # catch (check if rgl installed)
+  curves <- FALSE
+  lineages <- FALSE
+  if(is.null(type)){
+    if(length(x@curves) > 0){
+      type <- 'curves'
+    }else if(length(x@lineages) > 0){
+      type <- 'lineages'
+    }else{
+      stop('No lineages or curves detected.')
+    }
+  }else{
+    type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages','both'))]
+    if(is.na(type)){
+      stop('Unrecognized type argument.')
+    }
+  }
+
+  if(type %in% c('lineages','both')){
+    lineages <- TRUE
+  }
+  if(type %in% c('curves','both')){
+    curves <- TRUE
+  }
+
+  if(lineages & (length(x@lineages)==0)){
+    stop('No lineages detected.')
+  }
+  if(curves & (length(x@curves)==0)){
+    stop('No curves detected.')
+  }
+
+  if(lineages){
+    X <- x@reducedDim
+    clusterLabels <- x@clusterLabels
+    connectivity <- x@connectivity
+    clusters <- rownames(connectivity)
+    nclus <- nrow(connectivity)
+    centers <- t(sapply(clusters,function(clID){
+      x.sub <- X[clusterLabels == clID,]
+      return(colMeans(x.sub))
+    }))
+    rownames(centers) <- clusters
+    X <- X[clusterLabels %in% clusters,]
+    clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+  }
+
+  if(!add){
+    xs <- NULL
+    ys <- NULL
+    zs <- NULL
+    if(lineages){
+      xs <- c(xs, centers[,dims[1]])
+      ys <- c(ys, centers[,dims[2]])
+      zs <- c(zs, centers[,dims[3]])
+    }
+    if(curves){
+      xs <- c(xs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[1]] })))
+      ys <- c(ys, as.numeric(sapply(x@curves, function(c){ c$s[,dims[2]] })))
+      zs <- c(zs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[3]] })))
+    }
+    rgl::plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
+           xlim = range(xs), ylim = range(ys), zlim = range(zs),
+           xlab = colnames(x@reducedDim)[dims[1]],
+           ylab = colnames(x@reducedDim)[dims[2]],
+           zlab = colnames(x@reducedDim)[dims[3]])
+  }
+
+  if(lineages){
     for(i in 1:(nclus-1)){
       for(j in (i+1):nclus){
-        if(forest[i,j]==1){
-          if(clusters[i] %in% lineages$start.clus | clusters[j] %in% lineages$start.clus){
-            seg.col <- brewer.pal(4,'Set1')[3]
-          }else if(clusters[i] %in% lineages$end.clus[lineages$end.given] | clusters[j] %in% lineages$end.clus[lineages$end.given]){
-            seg.col <- brewer.pal(4,'Set1')[1]
-          }else{
-            seg.col <- 1
-          }
-          lines3d(centers[c(i,j),1], centers[c(i,j),2], centers[c(i,j),3], lwd=3, col = seg.col)
+        if(connectivity[i,j]==1){
+          lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
         }
       }
     }
-    plot3d(centers, size = 8, add = TRUE, col = center.col)
-    plot3d(centers, size=9, add = TRUE)
-    if(labels){
-      text.col <- rep(1,nclus)
-      #text.col[rownames(centers) %in% lineages$start.clus] <- brewer.pal(4,'Set1')[3]
-      #text.col[rownames(centers) %in% lineages$end.clus] <- brewer.pal(4,'Set1')[1]
-      text3d(centers, texts = rownames(centers), adj = c(1,1), add = TRUE, color = text.col)
-    }
-  }else{
-    if(is.na(dim)){
-      dim <- ncol(X)
-    }
-    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.2,.2))
-    for(ii in 1:(dim-1)){
-      for(jj in 2:dim){
-        if(ii<jj){
-          y <- X[,ii]; x <- X[,jj]
-          if(abs(ii-jj)>1){
-            plot(x,y,col=clus.col,pch=16,asp=1,ylab='',xlab='',axes=F); box()
-          }else{
-            plot(x,y,col=clus.col,pch=16,asp=1,ylab=colnames(X)[ii],xlab=colnames(X)[jj])
-          }
-          for(i in 1:(nclus-1)){
-            for(j in (i+1):nclus){
-              if(forest[i,j]==1){
-                if(clusters[i] %in% lineages$start.clus | clusters[j] %in% lineages$start.clus){
-                  seg.col <- brewer.pal(4,'Set1')[3]
-                }else if(clusters[i] %in% lineages$end.clus[lineages$end.given] | clusters[j] %in% lineages$end.clus[lineages$end.given]){
-                  seg.col <- brewer.pal(4,'Set1')[1]
-                }else{
-                  seg.col <- 1
-                }
-                lines(centers[c(i,j),jj], centers[c(i,j),ii], lwd=1.5, col = seg.col)
-              }
-            }
-          }
-          points(centers[,jj],centers[,ii])
-          points(centers[,jj],centers[,ii],pch=16,col=center.col)
-          #text(centers, labels = rownames(centers))
-        }else{
-          plot.new()
-        }
-      }
-    }
-    par(mfrow=c(1,1),mar=c(5.1,4.1,4.1,2.1))
+  }
+  if(curves){
+    for(c in x@curves){ lines3d(c$s[c$tag,dims], ...) }
   }
   invisible(NULL)
 }
 
-
-#' @title Plot smooth curves
-#' 
-#' @description \code{plot_curves} visualizes the output from \code{\link{get_curves}}, 
-#'  showing cells (colored by cluster) in a reduced-dimensional space with smooth 
-#'  curves representing each inferred lineage.
-#' 
-#' @param X numeric, the \code{n x p} matrix of samples in a reduced dimensionality 
-#'  space.
-#' @param clus.labels character, a vector of length n denoting cluster labels.
-#' @param curves list, the output of \code{\link{get_curves}}, this list includes 
-#'  matrices for each curve in the reduced-dimensional space.
-#' @param threeD logical indicates whether to make a 3D plot with the \code{rgl} 
-#'  package.
-#' @param dim total number of dimensions to be shown in a series of two-dimensional 
-#'  plots, similar to \code{pairs} plots (only applicable if \code{threeD} is false).
-#' @param col.clus (optional) vector of colors to use for denoting clusters.
-#' @param col.lin (optional) vector of colors to use for denoting lineages.
-#' 
-#' @details Plots cells as points in a reduced-dimensional space, colored by cluster.
-#'  If a \code{curves} argument is given, the plot will include curves representing
-#'  each lineage.
-#'
-#' @details The default behavior is to produce a series of 2-D plots representing
-#'  all pairwise combinations of dimensions in \code{X}, or the first \code{dim}
-#'  dimensions. If \code{threeD=TRUE}, a three-dimensional plot will be created,
-#'  using the \code{rgl} package.
-#'
-#' @return returns \code{NULL}.
-#'
-#' @examples
-#' data("slingshot_example")
-#' lin <- get_lineages(X, clus.labels, start.clus = 'a')
-#' crv <- get_curves(X, clus.labels, lin)
-#' plot_curves(X, clus.labels, crv, threeD = FALSE)
-#' 
+#' @rdname SlingshotDataSet-plot3d
 #' @export
-#'
-#' @import RColorBrewer
-#' @import rgl
-#' 
+setMethod(
+  f = "plot3d",
+  signature = "SlingshotDataSet",
+  definition = function(x,
+                        type = NULL,
+                        add = FALSE,
+                        dims = 1:3,
+                        aspect = 'iso',
+                        ...) {
+    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, aspect = aspect, ...)
+  }
+)
 
-plot_curves <- function(X, clus.labels, curves = NULL, threeD = FALSE, dim = NA, col.clus = NULL, col.lin = NULL){
-  X <- X[clus.labels != '-1',]
-  clus.labels <- clus.labels[clus.labels != '-1']
-  clusters <- unique(clus.labels)
-  nclus <- length(clusters)
-  if(is.null(col.clus)){
-    cc <- c(brewer.pal(9, "Set1")[-c(1,3)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
-    center.col <- cc[1:nclus]
-  }else{
-    center.col <- rep_len(col.clus, length.out = nclus)
-  }
-  if(! is.null(col.lin)){
-    lin.col <- rep_len(col.lin, length.out = length(curves))
-  }else{
-    lin.col <- rep(1, length(curves))
-  }
-  clus.col <- sapply(clus.labels,function(clID){center.col[which(clusters==clID)]})
-  if(threeD){
-    plot3d(X[,1:3],col=clus.col,size=5,box=FALSE,aspect='iso')
-    for(i in 1:length(curves)){lines3d(curves[[i]]$s[curves[[i]]$tag,],lwd=3, col=lin.col[i])}
-  }else{
-    if(is.na(dim)){
-      dim <- ncol(X)
-    }
-    par(mfrow=c(dim-1,dim-1),mar=c(4,4,.2,.2))
-    for(ii in 1:(dim-1)){
-      for(jj in 2:dim){
-        if(ii<jj){
-          y <- X[,ii]; x <- X[,jj]
-          if(abs(ii-jj)>1){
-            plot(x,y,col=clus.col,pch=16,asp=1,ylab='',xlab='',axes=F); box()
-          }else{
-            plot(x,y,col=clus.col,pch=16,asp=1,ylab=colnames(X)[ii],xlab=colnames(X)[jj])
-          }
-          for(i in 1:length(curves)){lines(curves[[i]]$s[curves[[i]]$tag,c(jj,ii)],lwd=2, col = lin.col[i])}
-        }else{
-          plot.new()
-        }
-      }
-    }
-    par(mfrow=c(1,1),mar=c(5.1,4.1,4.1,2.1))
-  }
-  invisible(NULL)
-}
-
+#' ## lines3d
+#' #' @rdname SlingshotDataSet-plot3d
+#' # #' @importFrom rgl lines3d
+#' #' @export
+#' lines3d.SlingshotDataSet <- function(x,
+#'                                      type = NULL,
+#'                                      dims = 1:3,
+#'                                      ...) {
+#'   plot3d(x, type = type, add = TRUE, dims = dims, ...)
+#'   invisible(NULL)
+#' }
+#' #' @rdname SlingshotDataSet-plot3d
+#' #' @export
+#' setMethod(
+#'   f = "lines3d",
+#'   signature = "SlingshotDataSet",
+#'   definition = function(x,
+#'                         type = NULL,
+#'                         dims = 1:3,
+#'                         ...) {
+#'     lines3d.SlingshotDataSet(x, type = type, add = TRUE, dims = dims, ...)
+#'   }
+#' )

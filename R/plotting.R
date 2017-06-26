@@ -266,7 +266,7 @@ plot3d.SlingshotDataSet <- function(x,
       ys <- c(ys, as.numeric(sapply(x@curves, function(c){ c$s[,dims[2]] })))
       zs <- c(zs, as.numeric(sapply(x@curves, function(c){ c$s[,dims[3]] })))
     }
-    plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
+    rgl::plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
            xlim = range(xs), ylim = range(ys), zlim = range(zs),
            xlab = colnames(x@reducedDim)[dims[1]],
            ylab = colnames(x@reducedDim)[dims[2]],

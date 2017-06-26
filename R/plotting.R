@@ -205,7 +205,6 @@ plot3d.SlingshotDataSet <- function(x,
                                     dims = 1:3,
                                     aspect = 'iso',
                                     ...){
-  require(rgl) # catch (check if rgl installed)
   curves <- FALSE
   lineages <- FALSE
   if(is.null(type)){

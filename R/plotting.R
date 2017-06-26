@@ -1,5 +1,3 @@
-# Individual gene plots
-
 ## plot
 #' @title Plot Slingshot output
 #' @name SlingshotDataSet-plot
@@ -158,6 +156,9 @@ setMethod(
     invisible(NULL)
   }
 )
+
+## Individual gene plots
+
 
 ## plot3d
 #' @title Plot Slingshot output in 3D

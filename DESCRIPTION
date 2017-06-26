@@ -1,6 +1,6 @@
 Package: slingshot
 Title: Tools for ordering single-cell sequencing
-Version: 0.1.0
+Version: 0.1.1
 Description: This package provides functions for determining lineage structure
     and ordering cellular progressions in single-cell sequencing data.
 Authors@R: c(person("Kelly", "Street", email = "kstreet@berkeley.edu",

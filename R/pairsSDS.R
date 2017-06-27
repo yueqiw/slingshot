@@ -1,3 +1,31 @@
+#' @title Pairs plot of Slingshot output
+#' @name pairs-SlingshotDataSet
+#' 
+#' @description A tool for quickly visualizing lineages inferred by \code{slingshot}.
+#' 
+#' @param x a \code{SlingshotDataSet} with results to be plotted.
+#' @param type character, the type of output to be plotted, can be one of
+#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#' Details for more.
+#' @param ... additional parameters for \code{plot} or \code{axis}, see 
+#' \code{\link{pairs}}.
+#' 
+#' @details If \code{type == 'lineages'}, straight line connectors between cluster
+#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
+#' will be plotted.
+#'
+#' @details When \code{type} is not specified, the function will first check the 
+#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
+#' will be plotted, if present.
+#'
+#' @return returns \code{NULL}.
+#'
+#' @examples
+#' data("slingshotExample")
+#' sds <- slingshot(rd, cl, start.clus = "1")
+#' pairs(sds, type = 'curves')
+#' 
+#' @export
 pairs.SlingshotDataSet <-
   function (x, labels, col = NULL, cex=1, lwd=2, ...,
             horInd = 1:nc, verInd = 1:nc,

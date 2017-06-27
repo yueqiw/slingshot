@@ -6,8 +6,8 @@
 \alias{lines,SlingshotDataSet-method}
 \title{Plot Slingshot output}
 \usage{
-\S4method{plot}{SlingshotDataSet,ANY}(x, type = NULL, add = FALSE,
-  dims = 1:2, asp = 1, ...)
+\S4method{plot}{SlingshotDataSet}(x, type = NULL, add = FALSE, dims = 1:2,
+  asp = 1, cex = 2, lwd = 2, show.constraints = FALSE, ...)
 
 \S4method{lines}{SlingshotDataSet}(x, type = NULL, dims = 1:2, ...)
 }

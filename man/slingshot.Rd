@@ -75,12 +75,11 @@ dimensions, the default is to use the joint covariance matrix to find
 squared distance between cluster centers. If not, the default is to use the
 diagonal of the joint covariance matrix.}
 
-\item{omega}{(optional) numeric, granularity parameter between 0 and 1.
-\code{omega} determines the distance between every real cluster and the
-artificial cluster, \code{OMEGA}. It is parameterized as a fraction of the
-largest distance between two real clusters (hence, any value greater than 1
-would result in a single tree being returned and would be equivalent to
-setting \code{omega = Inf}, which is the default behavior).}
+\item{omega}{(optional) numeric, this granularity parameter determines the
+distance between every real cluster and the artificial cluster, OMEGA. It
+is parameterized such that this distance is \code{omega / 2}, making
+\code{omega} the maximum distance between two connected clusters. By
+default, \code{omega = Inf}.}
 
 \item{lineages}{list, denotes which lineages each cluster is a part of and 
 contains the \code{K x K} connectivity matrix constructed on the clusters

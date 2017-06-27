@@ -73,10 +73,10 @@ test_that("getLineages works as expected", {
   expect_true(all(lineages(sds0)$Lineage2 == as.character(c(5,1,3,2))) || all(lineages(sds0)$Lineage2 == as.character(c(5,1,3,4))))
   expect_false(all(lineages(sds0)$Lineage1 == lineages(sds0)$Lineage2))
   # set start cluster
-  sds1 <- getLineages(rd, cl, start.clus = 1)
+  sds1 <- getLineages(rd, cl, start.clus = 5)
   expect_true(all(sapply(lineages(sds1),function(l){ l[1] == '1' })))
   # set end cluster
-  sds2 <- getLineages(rd,cl, start.clus = 5, end.clus = 3)
+  sds2 <- getLineages(rd,cl, start.clus = 1, end.clus = 3)
   expect_true(any(sapply(lineages(sds2),function(l){ (l[1] == '5') && (l[length(l)] == '3') })))
 })
 

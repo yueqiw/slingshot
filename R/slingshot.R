@@ -138,7 +138,7 @@
 #'   
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(rd, cl, start.clus = '5')
+#' sds <- slingshot(rd, cl, start.clus = '1')
 #' 
 #' plot(rd, col = cl, asp = 1)
 #' lines(sds, lwd = 3)

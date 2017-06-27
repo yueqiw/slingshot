@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(rd, cl, start.clus = "5")
+#' sds <- slingshot(rd, cl, start.clus = "1")
 #' plot(sds, type = 'b')
 #' 
 #' # add to existing plot
@@ -189,7 +189,7 @@ setMethod(
 #' @examples
 #' data("slingshotExample")
 #' rd <- cbind(rd, rnorm(nrow(rd)))
-#' sds <- slingshot(rd, cl, start.clus = "5")
+#' sds <- slingshot(rd, cl, start.clus = "1")
 #' plot3d(sds, type = 'b')
 #' 
 #' # add to existing plot

@@ -18,6 +18,9 @@ the vector of cluster labels.
 
 Updated object with new vector of cluster labels.
 }
+\description{
+Extract cluster labels from a \code{SlingshotDataSet}.
+}
 \examples{
 rd <- matrix(data=rnorm(100), ncol=2)
 cl <- sample(letters[1:5], 50, replace = TRUE)

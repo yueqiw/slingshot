@@ -1,3 +1,32 @@
+#' @title Pairs plot of Slingshot output
+#' @name pairs-SlingshotDataSet
+#' 
+#' @description A tool for quickly visualizing lineages inferred by \code{slingshot}.
+#' 
+#' @param x a \code{SlingshotDataSet} with results to be plotted.
+#' @param type character, the type of output to be plotted, can be one of
+#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#' Details for more.
+#' @param ... additional parameters for \code{plot} or \code{axis}, see 
+#' \code{\link{pairs}}.
+#' 
+#' @details If \code{type == 'lineages'}, straight line connectors between cluster
+#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
+#' will be plotted.
+#'
+#' @details When \code{type} is not specified, the function will first check the 
+#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
+#' will be plotted, if present.
+#'
+#' @return returns \code{NULL}.
+#'
+#' @examples
+#' data("slingshotExample")
+#' sds <- slingshot(rd, cl, start.clus = "1")
+#' pairs(sds, type = 'curves')
+#' 
+#' @importFrom RColorBrewer brewer.pal
+#' @export
 pairs.SlingshotDataSet <-
   function (x, labels, col = NULL, cex=1, lwd=2, ...,
             horInd = 1:nc, verInd = 1:nc,
@@ -73,7 +102,7 @@ pairs.SlingshotDataSet <-
       return(c(mid - range.max/2, mid + range.max/2))
     })
     if(is.null(col)){
-      cc <- c(brewer.pal(9, "Set1")[-c(1,3,6)], brewer.pal(7, "Set2")[-2], brewer.pal(6, "Dark2")[-5], brewer.pal(8, "Set3")[-c(1,2)])
+      cc <- c(RColorBrewer::brewer.pal(9, "Set1")[-c(1,3,6)], RColorBrewer::brewer.pal(7, "Set2")[-2], RColorBrewer::brewer.pal(6, "Dark2")[-5], RColorBrewer::brewer.pal(8, "Set3")[-c(1,2)])
       col <- cc[as.factor(clusterLabels(sds))]
     }
     #####
@@ -206,11 +235,11 @@ pairs.SlingshotDataSet <-
                 if(show.constraints){
                   if(any(linC$start.given)){
                     st.ind <- clusters %in% linC$start.clus[linC$start.given]
-                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, col = brewer.pal(4,'Set1')[3], pch = pch)
+                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, col = RColorBrewer::brewer.pal(4,'Set1')[3], pch = pch)
                   }
                   if(any(linC$end.given)){
                     en.ind <- clusters %in% linC$end.clus[linC$end.given]
-                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, col = brewer.pal(4,'Set1')[1], pch = pch)
+                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, col = RColorBrewer::brewer.pal(4,'Set1')[1], pch = pch)
                   }
                 }
               }
@@ -227,9 +256,9 @@ pairs.SlingshotDataSet <-
                   for(jj in (i+1):nclus){
                     if(forest[ii,jj]==1){
                       if(clusters[ii] %in% linC$start.clus | clusters[jj] %in% linC$start.clus){
-                        seg.col <- brewer.pal(4,'Set1')[3]
+                        seg.col <- RColorBrewer::brewer.pal(4,'Set1')[3]
                       }else if(clusters[ii] %in% linC$end.clus[linC$end.given] | clusters[jj] %in% linC$end.clus[linC$end.given]){
-                        seg.col <- brewer.pal(4,'Set1')[1]
+                        seg.col <- RColorBrewer::brewer.pal(4,'Set1')[1]
                       }else{
                         seg.col <- 1
                       }

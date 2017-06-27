@@ -87,7 +87,7 @@
 #'   
 #' @examples
 #' data("slingshotExample")
-#' sds <- getLineages(rd, cl, start.clus = '5')
+#' sds <- getLineages(rd, cl, start.clus = '1')
 #' sds <- getCurves(sds)
 #' 
 #' plot(rd, col = cl, asp = 1)

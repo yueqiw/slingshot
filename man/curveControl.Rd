@@ -13,6 +13,9 @@ principal curves.}
 \value{
 the list of additional curve fitting parameters.
 }
+\description{
+Extract the curve control parameters from a \code{SlingshotDataSet}.
+}
 \examples{
 data("slingshotExample")
 sds <- slingshot(rd, cl)

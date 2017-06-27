@@ -12,6 +12,9 @@ lineages(x)
 \value{
 the list of lineages, represented by ordered sets of clusters.
 }
+\description{
+Extract lineages labels from a \code{SlingshotDataSet}.
+}
 \examples{
 data("slingshotExample")
 sds <- getLineages(rd, cl)

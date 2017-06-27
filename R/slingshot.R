@@ -35,7 +35,7 @@
 #'   default, \code{omega = Inf}.
 #' @param lineages list, denotes which lineages each cluster is a part of and 
 #'   contains the \code{K x K} connectivity matrix constructed on the clusters
-#'   by \code{\link{get_lineages}}.
+#'   by \code{\link{getLineages}}.
 #' @param thresh numeric, determines the convergence criterion. Percent change
 #'   in the total distance from cells to their projections along curves must be
 #'   less than \code{thresh}. Default is \code{0.001}, similar to 
@@ -138,7 +138,7 @@
 #'   
 #' @examples
 #' data("slingshotExample")
-#' sds <- slingshot(rd, cl, start.clus = '5')
+#' sds <- slingshot(rd, cl, start.clus = '1')
 #' 
 #' plot(rd, col = cl, asp = 1)
 #' lines(sds, lwd = 3)

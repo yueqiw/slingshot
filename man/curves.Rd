@@ -13,6 +13,9 @@ principal curves.}
 \value{
 the list of smooth lineage curves.
 }
+\description{
+Extract the simultaneous principal curves from a \code{SlingshotDataSet}.
+}
 \examples{
 data("slingshotExample")
 sds <- slingshot(rd, cl)

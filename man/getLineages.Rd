@@ -97,7 +97,7 @@ Once the \code{connectivity} is known, lineages are identified in
 }
 \examples{
 data("slingshotExample")
-sds <- getLineages(rd, cl, start.clus = '5')
+sds <- getLineages(rd, cl, start.clus = '1')
 
 plot(rd, col = cl, asp = 1)
 lines(sds, type = 'l', lwd = 3)

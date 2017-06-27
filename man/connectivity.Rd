@@ -13,6 +13,9 @@ connectivity matrix.}
 \value{
 the matrix of connections between clusters.
 }
+\description{
+Extract the connectivity matrix from a \code{SlingshotDataSet}.
+}
 \examples{
 data("slingshotExample")
 sds <- getLineages(rd, cl)

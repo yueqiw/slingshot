@@ -83,7 +83,7 @@ default, \code{omega = Inf}.}
 
 \item{lineages}{list, denotes which lineages each cluster is a part of and 
 contains the \code{K x K} connectivity matrix constructed on the clusters
-by \code{\link{get_lineages}}.}
+by \code{\link{getLineages}}.}
 
 \item{shrink}{logical or numeric between 0 and 1, determines whether and how 
 much to shrink branching lineages toward their average prior to the split.}
@@ -205,7 +205,7 @@ When \code{shink == TRUE}, we compute a shrinkage curve,
 }
 \examples{
 data("slingshotExample")
-sds <- slingshot(rd, cl, start.clus = '5')
+sds <- slingshot(rd, cl, start.clus = '1')
 
 plot(rd, col = cl, asp = 1)
 lines(sds, lwd = 3)

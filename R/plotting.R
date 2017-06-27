@@ -187,6 +187,7 @@ setMethod(
 #' @return returns \code{NULL}.
 #'
 #' @examples
+#' \dontrun{
 #' data("slingshotExample")
 #' rd <- cbind(rd, rnorm(nrow(rd)))
 #' sds <- slingshot(rd, cl, start.clus = "1")
@@ -195,7 +196,7 @@ setMethod(
 #' # add to existing plot
 #' plot3d(rd, col = 'grey50', aspect = 'iso')
 #' plot3d(sds, lwd = 3, add = TRUE)
-#' 
+#' }
 #' @importFrom rgl plot3d
 #' @importFrom rgl lines3d
 #' 

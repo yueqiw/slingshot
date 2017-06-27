@@ -69,21 +69,18 @@ test_that("getLineages works for different input types", {
 
 test_that("getLineages works as expected", {
   sds0 <- getLineages(rd, cl)
-  expect_true(all(lineages(sds0)$Lineage1 == as.character(c(5,1,3,2))) || all(lineages(sds0)$Lineage1 == as.character(c(5,1,3,4))))
-  expect_true(all(lineages(sds0)$Lineage2 == as.character(c(5,1,3,2))) || all(lineages(sds0)$Lineage2 == as.character(c(5,1,3,4))))
+  expect_true(all(lineages(sds0)$Lineage1 == as.character(c(1,2,3,4))) || all(lineages(sds0)$Lineage1 == as.character(c(1,2,3,5))))
+  expect_true(all(lineages(sds0)$Lineage2 == as.character(c(1,2,3,4))) || all(lineages(sds0)$Lineage2 == as.character(c(1,2,3,5))))
   expect_false(all(lineages(sds0)$Lineage1 == lineages(sds0)$Lineage2))
   # set start cluster
-  sds1 <- getLineages(rd, cl, start.clus = 5)
+  sds1 <- getLineages(rd, cl, start.clus = 1)
   expect_true(all(sapply(lineages(sds1),function(l){ l[1] == '1' })))
   # set end cluster
   sds2 <- getLineages(rd,cl, start.clus = 1, end.clus = 3)
-  expect_true(any(sapply(lineages(sds2),function(l){ (l[1] == '5') && (l[length(l)] == '3') })))
+  expect_true(any(sapply(lineages(sds2),function(l){ (l[1] == '1') && (l[length(l)] == '3') })))
 })
 
 test_that("getCurves works as expected", {
-  load("../../data/slingshotExample.RData")
-  data("slingshotExample")
-  
   # 2 dim, 5 clus
   mi <- getLineages(rd, cl)
   mi <- getCurves(mi)
@@ -110,7 +107,7 @@ test_that("getCurves works as expected", {
   
 })
 
-# test heper functions and constructors
+# test helper functions and constructors
 
 # test_that("zinbFit works with genewise dispersion", {
 #   bio <- gl(2, 3)

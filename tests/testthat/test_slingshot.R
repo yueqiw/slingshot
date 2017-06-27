@@ -1,5 +1,5 @@
 context("Test slingshot methods and SlingshotDataSet class.")
-load("../../data/slingshotExample.RData")
+#load("../../data/slingshotExample.RData")
 data("slingshotExample")
 set.seed(1234)
 

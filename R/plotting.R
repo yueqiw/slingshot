@@ -1,28 +1,29 @@
 ## plot
 #' @title Plot Slingshot output
 #' @name SlingshotDataSet-plot
-#' 
+#'   
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
-#' 
+#'   
 #' @param x a \code{SlingshotDataSet} with results to be plotted.
-#' @param type character, the type of output to be plotted, can be one of
-#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
-#' Details for more.
-#' @param add logical, indicates whether the output should be added to an existing plot.
+#' @param type character, the type of output to be plotted, can be one of 
+#'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#'   Details for more.
+#' @param add logical, indicates whether the output should be added to an
+#'   existing plot.
 #' @param dims numeric, which dimensions to plot (default is \code{1:2}).
 #' @param asp numeric, the y/x aspect ratio, see \code{\link{plot.window}}.
 #' @param ... additional parameters to be passed to \code{\link{lines}}.
-#' 
-#' @details If \code{type == 'lineages'}, straight line connectors between cluster
-#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
-#' will be plotted.
-#'
-#' @details When \code{type} is not specified, the function will first check the 
-#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
-#' will be plotted, if present.
-#'
+#'   
+#' @details If \code{type == 'lineages'}, straight line connectors between
+#'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
+#'   princiapl curves will be plotted.
+#'   
+#' @details When \code{type} is not specified, the function will first check the
+#'   \code{curves} slot and plot the curves, if present. Otherwise,
+#'   \code{lineages} will be plotted, if present.
+#'   
 #' @return returns \code{NULL}.
-#'
+#'   
 #' @examples
 #' data("slingshotExample")
 #' sds <- slingshot(rd, cl, start.clus = "1")
@@ -56,7 +57,8 @@ setMethod(
         stop('No lineages or curves detected.')
       }
     }else{
-      type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages','both'))]
+      type <- c('curves','lineages','both')[pmatch(type,c('curves','lineages',
+                                                          'both'))]
       if(is.na(type)){
         stop('Unrecognized type argument.')
       }
@@ -113,9 +115,13 @@ setMethod(
       for(i in 1:(nclus-1)){
         for(j in (i+1):nclus){
           if(connectivity[i,j]==1){
-            # if(show.constraints & (clusters[i] %in% linC$start.clus | clusters[j] %in% linC$start.clus)){
+            # if(show.constraints & (clusters[i] %in% linC$start.clus | 
+            #                        clusters[j] %in% linC$start.clus)){
             #   seg.col <- brewer.pal(4,'Set1')[3]
-            # }else if(show.constraints & (clusters[i] %in% linC$end.clus[linC$end.given] | clusters[j] %in% linC$end.clus[linC$end.given])){
+            # }else if(show.constraints & (clusters[i] %in% 
+            #                              linC$end.clus[linC$end.given] | 
+            #                              clusters[j] %in% 
+            #                              linC$end.clus[linC$end.given])){
             #   seg.col <- brewer.pal(4,'Set1')[1]
             # }else{
             #   seg.col <- 1
@@ -165,27 +171,28 @@ setMethod(
 #' @name SlingshotDataSet-plot3d
 #' 
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
-#' 
+#'   
 #' @param x a \code{SlingshotDataSet} with results to be plotted.
-#' @param type character, the type of output to be plotted, can be one of
-#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
-#' Details for more.
-#' @param add logical, indicates whether the output should be added to an existing plot.
+#' @param type character, the type of output to be plotted, can be one of 
+#'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#'   Details for more.
+#' @param add logical, indicates whether the output should be added to an
+#'   existing plot.
 #' @param dims numeric, which dimensions to plot (default is \code{1:3}).
 #' @param aspect either a logical indicating whether to adjust the aspect ratio 
-#' or a new ratio, see \code{\link{plot3d}}.
+#'   or a new ratio, see \code{\link{plot3d}}.
 #' @param ... additional parameters to be passed to \code{\link{lines3d}}.
-#' 
-#' @details If \code{type == 'lineages'}, straight line connectors between cluster
-#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
-#' will be plotted.
-#'
-#' @details When \code{type} is not specified, the function will first check the 
-#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
-#' will be plotted, if present.
-#'
+#'   
+#' @details If \code{type == 'lineages'}, straight line connectors between
+#'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
+#'   princiapl curves will be plotted.
+#'   
+#' @details When \code{type} is not specified, the function will first check the
+#'   \code{curves} slot and plot the curves, if present. Otherwise,
+#'   \code{lineages} will be plotted, if present.
+#'   
 #' @return returns \code{NULL}.
-#'
+#'   
 #' @examples
 #' \dontrun{
 #' data("slingshotExample")
@@ -278,7 +285,8 @@ plot3d.SlingshotDataSet <- function(x,
     for(i in 1:(nclus-1)){
       for(j in (i+1):nclus){
         if(connectivity[i,j]==1){
-          rgl::lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]], z = centers[c(i,j),dims[3]], ...)
+          rgl::lines3d(x = centers[c(i,j),dims[1]], y = centers[c(i,j),dims[2]],
+                       z = centers[c(i,j),dims[3]], ...)
         }
       }
     }
@@ -300,7 +308,8 @@ setMethod(
                         dims = 1:3,
                         aspect = 'iso',
                         ...) {
-    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, aspect = aspect, ...)
+    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
+                            aspect = aspect, ...)
   }
 )
 

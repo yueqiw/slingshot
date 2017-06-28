@@ -7,14 +7,15 @@
 curves(x)
 }
 \arguments{
-\item{x}{an object that describes a dataset or a model involving a set of
+\item{x}{an object that describes a dataset or a model involving a set of 
 principal curves.}
 }
 \value{
 the list of smooth lineage curves.
 }
 \description{
-Extract the simultaneous principal curves from a \code{SlingshotDataSet}.
+Extract the simultaneous principal curves from a
+  \code{SlingshotDataSet}.
 }
 \examples{
 data("slingshotExample")

@@ -168,7 +168,8 @@ setGeneric(name = "connectivity",
 
 #' @title Returns the lineage control parameters
 #'   
-#' @description Extract lineage control parameters from a \code{SlingshotDataSet}.
+#' @description Extract lineage control parameters from a
+#'   \code{SlingshotDataSet}.
 #'   
 #' @param x an object that describes a dataset or a model involving lineages.
 #' @return the list of additional lineage inference parameters.
@@ -183,9 +184,10 @@ setGeneric(name = "lineageControl",
 
 #' @title Returns the principal curves
 #'   
-#' @description Extract the simultaneous principal curves from a \code{SlingshotDataSet}.
+#' @description Extract the simultaneous principal curves from a
+#'   \code{SlingshotDataSet}.
 #'   
-#' @param x an object that describes a dataset or a model involving a set of
+#' @param x an object that describes a dataset or a model involving a set of 
 #'   principal curves.
 #' @return the list of smooth lineage curves.
 #' @examples
@@ -199,9 +201,10 @@ setGeneric(name = "curves",
 
 #' @title Returns the curve control parameters
 #'   
-#' @description Extract the curve control parameters from a \code{SlingshotDataSet}.
+#' @description Extract the curve control parameters from a
+#'   \code{SlingshotDataSet}.
 #'   
-#' @param x an object that describes a dataset or a model involving a set of
+#' @param x an object that describes a dataset or a model involving a set of 
 #'   principal curves.
 #' @return the list of additional curve fitting parameters.
 #' @examples

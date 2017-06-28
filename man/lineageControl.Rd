@@ -13,7 +13,8 @@ lineageControl(x)
 the list of additional lineage inference parameters.
 }
 \description{
-Extract lineage control parameters from a \code{SlingshotDataSet}.
+Extract lineage control parameters from a
+  \code{SlingshotDataSet}.
 }
 \examples{
 data("slingshotExample")

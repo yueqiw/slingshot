@@ -18,7 +18,7 @@
 \item{...}{additional parameters for \code{plot} or \code{axis}, see 
 \code{\link{pairs}}.}
 
-\item{type}{character, the type of output to be plotted, can be one of
+\item{type}{character, the type of output to be plotted, can be one of 
 \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
 Details for more.}
 }
@@ -26,16 +26,17 @@ Details for more.}
 returns \code{NULL}.
 }
 \description{
-A tool for quickly visualizing lineages inferred by \code{slingshot}.
+A tool for quickly visualizing lineages inferred by
+  \code{slingshot}.
 }
 \details{
-If \code{type == 'lineages'}, straight line connectors between cluster
-centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
-will be plotted.
+If \code{type == 'lineages'}, straight line connectors between
+  cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
+  princiapl curves will be plotted.
 
-When \code{type} is not specified, the function will first check the 
-\code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
-will be plotted, if present.
+When \code{type} is not specified, the function will first check the
+  \code{curves} slot and plot the curves, if present. Otherwise,
+  \code{lineages} will be plotted, if present.
 }
 \examples{
 data("slingshotExample")

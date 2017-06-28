@@ -6,19 +6,21 @@
 \alias{lines,SlingshotDataSet-method}
 \title{Plot Slingshot output}
 \usage{
-\S4method{plot}{SlingshotDataSet}(x, type = NULL, add = FALSE, dims = 1:2,
-  asp = 1, cex = 2, lwd = 2, show.constraints = FALSE, ...)
+\S4method{plot}{SlingshotDataSet,ANY}(x, type = NULL, add = FALSE,
+  dims = 1:2, asp = 1, cex = 2, lwd = 2, show.constraints = FALSE,
+  ...)
 
 \S4method{lines}{SlingshotDataSet}(x, type = NULL, dims = 1:2, ...)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}
 
-\item{type}{character, the type of output to be plotted, can be one of
+\item{type}{character, the type of output to be plotted, can be one of 
 \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
 Details for more.}
 
-\item{add}{logical, indicates whether the output should be added to an existing plot.}
+\item{add}{logical, indicates whether the output should be added to an
+existing plot.}
 
 \item{dims}{numeric, which dimensions to plot (default is \code{1:2}).}
 
@@ -33,13 +35,13 @@ returns \code{NULL}.
 Tools for visualizing lineages inferred by \code{slingshot}.
 }
 \details{
-If \code{type == 'lineages'}, straight line connectors between cluster
-centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
-will be plotted.
+If \code{type == 'lineages'}, straight line connectors between
+  cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
+  princiapl curves will be plotted.
 
-When \code{type} is not specified, the function will first check the 
-\code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
-will be plotted, if present.
+When \code{type} is not specified, the function will first check the
+  \code{curves} slot and plot the curves, if present. Otherwise,
+  \code{lineages} will be plotted, if present.
 }
 \examples{
 data("slingshotExample")

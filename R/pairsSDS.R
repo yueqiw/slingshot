@@ -1,25 +1,26 @@
 #' @title Pairs plot of Slingshot output
 #' @name pairs-SlingshotDataSet
-#' 
-#' @description A tool for quickly visualizing lineages inferred by \code{slingshot}.
-#' 
+#'   
+#' @description A tool for quickly visualizing lineages inferred by
+#'   \code{slingshot}.
+#'   
 #' @param x a \code{SlingshotDataSet} with results to be plotted.
-#' @param type character, the type of output to be plotted, can be one of
-#' \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
-#' Details for more.
+#' @param type character, the type of output to be plotted, can be one of 
+#'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
+#'   Details for more.
 #' @param ... additional parameters for \code{plot} or \code{axis}, see 
-#' \code{\link{pairs}}.
-#' 
-#' @details If \code{type == 'lineages'}, straight line connectors between cluster
-#' centers will be plotted. If \code{type == 'curves'}, simultaneous princiapl curves
-#' will be plotted.
-#'
-#' @details When \code{type} is not specified, the function will first check the 
-#' \code{curves} slot and plot the curves, if present. Otherwise, \code{lineages} 
-#' will be plotted, if present.
-#'
+#'   \code{\link{pairs}}.
+#'   
+#' @details If \code{type == 'lineages'}, straight line connectors between
+#'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
+#'   princiapl curves will be plotted.
+#'   
+#' @details When \code{type} is not specified, the function will first check the
+#'   \code{curves} slot and plot the curves, if present. Otherwise,
+#'   \code{lineages} will be plotted, if present.
+#'   
 #' @return returns \code{NULL}.
-#'
+#'   
 #' @examples
 #' data("slingshotExample")
 #' sds <- slingshot(rd, cl, start.clus = "1")
@@ -214,7 +215,8 @@ pairs.SlingshotDataSet <-
             }
           } else if(i < j){
             if(up.sling){
-              points(as.vector(x[, j]), as.vector(x[, i]), col = col, cex = cex, pch=pch, ...)
+              points(as.vector(x[, j]), as.vector(x[, i]), col = col, cex = cex,
+                     pch=pch, ...)
               if(lineages){
                 for(ii in 1:(nclus-1)){
                   for(jj in (i+1):nclus){
@@ -235,22 +237,28 @@ pairs.SlingshotDataSet <-
                 if(show.constraints){
                   if(any(linC$start.given)){
                     st.ind <- clusters %in% linC$start.clus[linC$start.given]
-                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, col = RColorBrewer::brewer.pal(4,'Set1')[3], pch = pch)
+                    points(centers[st.ind,j],centers[st.ind,i], cex = cex, 
+                           col = RColorBrewer::brewer.pal(4,'Set1')[3], 
+                           pch = pch)
                   }
                   if(any(linC$end.given)){
                     en.ind <- clusters %in% linC$end.clus[linC$end.given]
-                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, col = RColorBrewer::brewer.pal(4,'Set1')[1], pch = pch)
+                    points(centers[en.ind,j],centers[en.ind,i], cex = cex, 
+                           col = RColorBrewer::brewer.pal(4,'Set1')[1], 
+                           pch = pch)
                   }
                 }
               }
               if(curves){
-                for(c in curves(sds)){ lines(c$s[c$tag,c(j,i)], lwd = lwd, col=1, ...) }
+                for(c in curves(sds)){ lines(c$s[c$tag,c(j,i)], lwd = lwd, 
+                                             col=1, ...) }
               }
             }
           }
           else{
             if(lp.sling){
-              points(as.vector(x[, j]), as.vector(x[, i]), col = col, cex = cex, pch=pch, ...)
+              points(as.vector(x[, j]), as.vector(x[, i]), col = col, cex = cex,
+                     pch=pch, ...)
               if(lineages){
                 for(ii in 1:(nclus-1)){
                   for(jj in (i+1):nclus){

@@ -112,13 +112,15 @@ setValidity("SlingshotDataSet", function(object) {
       return("lineages must be a list of character vectors.")
     }
     if(!all(sapply(lineages(object), function(lin){all(lin %in% clus.names)}))){
-      return("lineages must be a list of character vectors composed of cluster names.")
+      return("lineages must be a list of character vectors composed of cluster 
+             names.")
     }
     if(!is.numeric(connectivity(object))) {
       return("Connectivity matrix must be numeric or logical.")
     }
     if(any(dim(connectivity(object)) != K)){
-      return("Connectivity matrix must be square with number of dimensions equal to number of clusters")
+      return("Connectivity matrix must be square with number of dimensions 
+             equal to number of clusters")
     }
     if(! is.null(lineageControl(object)$start.clus)){
       if(!all(lineageControl(object)$start.clus %in% clus.names)){
@@ -136,7 +138,9 @@ setValidity("SlingshotDataSet", function(object) {
       }
     }
     if(! is.null(lineageControl(object)$omega)){
-      if(lineageControl(object)$omega < 0 | (lineageControl(object)$omega > 1 & lineageControl(object)$omega != Inf)){
+      if(lineageControl(object)$omega < 0 | 
+         (lineageControl(object)$omega > 1 & 
+          lineageControl(object)$omega != Inf)){
         return("Omega must be numeric element of [0,1] or Inf.")
       }
     }
@@ -156,12 +160,14 @@ setValidity("SlingshotDataSet", function(object) {
     }
     if(dim(pseudotime(object))[1] > 0){
       if(any(dim(pseudotime(object)) != c(n,L))){
-        return("Dimensions for pseudotime matrix are incorrect. Should be n (number of cells) by L (number of lineages).")
+        return("Dimensions for pseudotime matrix are incorrect. Should be n 
+               (number of cells) by L (number of lineages).")
       }
     }
     if(dim(curveWeights(object))[1] > 0){
       if(any(dim(curveWeights(object)) != c(n,L))){
-        return("Dimensions for curveWeights matrix are incorrect. Should be n (number of cells) by L (number of lineages).")
+        return("Dimensions for curveWeights matrix are incorrect. Should be n 
+               (number of cells) by L (number of lineages).")
       }
     }
     if(!is.null(curveControl(object)$shrink)){

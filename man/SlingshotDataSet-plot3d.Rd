@@ -3,10 +3,13 @@
 \name{SlingshotDataSet-plot3d}
 \alias{SlingshotDataSet-plot3d}
 \alias{plot3d.SlingshotDataSet}
+\alias{lines3d.SlingshotDataSet}
 \title{Plot Slingshot output in 3D}
 \usage{
 \method{plot3d}{SlingshotDataSet}(x, type = NULL, add = FALSE, dims = 1:3,
   aspect = "iso", ...)
+
+lines3d.SlingshotDataSet(x, type = NULL, dims = 1:3, ...)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}
@@ -30,6 +33,22 @@ returns \code{NULL}.
 }
 \description{
 Tools for visualizing lineages inferred by \code{slingshot}.
+
+#' @rdname SlingshotDataSet-plot3d
+#' @export
+setMethod(
+  f = "plot3d",
+  signature = "SlingshotDataSet",
+  definition = function(x,
+                        type = NULL,
+                        add = FALSE,
+                        dims = 1:3,
+                        aspect = 'iso',
+                        ...) {
+    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
+                            aspect = aspect, ...)
+  }
+)
 }
 \details{
 If \code{type == 'lineages'}, straight line connectors between
@@ -52,4 +71,11 @@ plot3d(rd, col = 'grey50', aspect = 'iso')
 plot3d(sds, lwd = 3, add = TRUE)
 }
 
+\dontrun{
+data("slingshotExample")
+rd <- cbind(rd, rnorm(nrow(rd)))
+sds <- slingshot(rd, cl, start.clus = "1")
+plot3d(rd, col = 'grey50', aspect = 'iso')
+lines3d(sds, lwd = 3)
+}
 }

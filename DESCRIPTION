@@ -16,11 +16,11 @@ Depends:
 Imports:
     ape,
     igraph,
-    methods,
-    RColorBrewer
+    methods
 Suggests:
     BiocGenerics,
     knitr,
+    RColorBrewer,
     rgl,
     rmarkdown,
     testthat

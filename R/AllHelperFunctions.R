@@ -328,10 +328,12 @@ setMethod(
     bw1 <- bw.SJ(pst)
     bw2 <- bw.SJ(pst[share.idx])
     bw <- (bw1 + bw2) / 2
-    d2 <- density(pst[share.idx], bw = bw, weights = crv$w[share.idx]/sum(crv$w[share.idx]))
+    d2 <- density(pst[share.idx], bw = bw, 
+                  weights = crv$w[share.idx]/sum(crv$w[share.idx]))
     d1 <- density(pst, bw = bw, weights = crv$w/sum(crv$w))
     scale <- sum(crv$w[share.idx]) / sum(crv$w)
-    pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
+    pct.l <- (approx(d2$x,d2$y,xout = pst, yleft = 0, yright = 0)$y * scale) / 
+      approx(d1$x,d1$y,xout = pst, yleft = 0, yright = 0)$y
     pct.l[is.na(pct.l)] <- 0
     pct.l <- .cumMin(pct.l, pst)
   }
@@ -342,7 +344,8 @@ setMethod(
   lam <- pcurve$lambda
   s <- sapply(1:p,function(jj){
     orig.jj <- pcurve$s[,jj]
-    avg.jj <- approx(x = avg.curve$lambda, y = avg.curve$s[,jj], xout = lam, rule = 2)$y
+    avg.jj <- approx(x = avg.curve$lambda, y = avg.curve$s[,jj], xout = lam, 
+                     rule = 2)$y
     return(avg.jj * pct + orig.jj * (1-pct))
   })
   w <- pcurve$w
@@ -364,8 +367,8 @@ setMethod(
   p <- np[2]
   tt <- .Fortran("getlam", n, p, x, s = x, lambda = double(n), 
                  tag = integer(n), dist = double(n), as.integer(nrow(s)), 
-                 s, stretch, double(p), double(p), PACKAGE = "princurve")[c("s", 
-                                                                            "tag", "lambda", "dist")]
+                 s, stretch, double(p), double(p), 
+                 PACKAGE = "princurve")[c("s","tag", "lambda", "dist")]
   #tt$dist <- sum(tt$dist)
   class(tt) <- "principal.curve"
   tt

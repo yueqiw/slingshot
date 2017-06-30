@@ -68,7 +68,8 @@
 #' @importFrom ape mst
 #'   
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clusterLabels = "character"),
+          signature = signature(reducedDim = "matrix", 
+                                clusterLabels = "character"),
           definition = function(reducedDim, clusterLabels,
                    start.clus = NULL, end.clus = NULL,
                    dist.fun = NULL, omega = NULL){
@@ -169,7 +170,8 @@ setMethod(f = "getLineages",
             D <- rbind(D, rep(omega, ncol(D)) )
             D <- cbind(D, c(rep(omega, ncol(D)), 0) )
             
-            # draw MST on cluster centers + OMEGA (possibly excluding endpoint clusters)
+            # draw MST on cluster centers + OMEGA
+            # (possibly excluding endpoint clusters)
             if(! is.null(end.clus)){
               end.idx <- which(clusters %in% end.clus)
               mstree <- ape::mst(D[-end.idx, -end.idx, drop = FALSE])
@@ -184,7 +186,8 @@ setMethod(f = "getLineages",
               for(clID in end.clus){
                 cl.idx <- which(clusters == clID)
                 dists <- D[! rownames(D) %in% end.clus, cl.idx]
-                closest <- names(dists)[which.min(dists)] # get closest non-endpoint cluster
+                # get closest non-endpoint cluster
+                closest <- names(dists)[which.min(dists)] 
                 closest.idx <- which.max(clusters == closest)
                 forest[cl.idx, closest.idx] <- 1
                 forest[closest.idx, cl.idx] <- 1
@@ -224,52 +227,63 @@ setMethod(f = "getLineages",
               degree <- rowSums(tree.graph)
               g <- graph.adjacency(tree.graph, mode="undirected")
               
-              # if you have starting cluster(s) in this tree, draw lineages to each leaf
+              # if you have starting cluster(s) in this tree, draw lineages to
+              # each leaf
               if(! is.null(start.clus)){
                 if(sum(start.clus %in% tree) > 0){
                   starts <- start.clus[start.clus %in% tree]
-                  ends <- rownames(tree.graph)[degree == 1 & ! rownames(tree.graph) %in% starts]
+                  ends <- rownames(tree.graph)[degree == 1 & 
+                                                 ! rownames(tree.graph) %in% 
+                                                 starts]
                   for(st in starts){
-                    paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+                    paths <- shortest_paths(g, from = st, to = ends, 
+                                            mode = 'out', 
+                                            output = 'vpath')$vpath
                     for(p in paths){
                       lineages[[length(lineages)+1]] <- names(p)
                     }
                   }
                 }else{
                   # else, need a criteria for picking root
-                  # highest average length (~parsimony, but this was just the easiest thing I came up with)
+                  # highest average length (~parsimony)
                   leaves <- rownames(tree.graph)[degree == 1]
                   avg.lineage.length <- sapply(leaves,function(l){
                     ends <- leaves[leaves != l]
-                    paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+                    paths <- shortest_paths(g, from = l, to = ends, 
+                                            mode = 'out', 
+                                            output = 'vpath')$vpath
                     mean(sapply(paths, length))
                   })
                   st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
                   ends <- leaves[leaves != st]
-                  paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+                  paths <- shortest_paths(g, from = st, to = ends, mode = 'out',
+                                          output = 'vpath')$vpath
                   for(p in paths){
                     lineages[[length(lineages)+1]] <- names(p)
                   }
                 }
               }else{
                 # else, need a criteria for picking root
-                # highest average length (~parsimony, but this was just the easiest thing I came up with)
+                # highest average length (~parsimony)
                 leaves <- rownames(tree.graph)[degree == 1]
                 avg.lineage.length <- sapply(leaves,function(l){
                   ends <- leaves[leaves != l]
-                  paths <- shortest_paths(g, from = l, to = ends, mode = 'out', output = 'vpath')$vpath
+                  paths <- shortest_paths(g, from = l, to = ends, mode = 'out',
+                                          output = 'vpath')$vpath
                   mean(sapply(paths, length))
                 })
                 st <- names(avg.lineage.length)[which.max(avg.lineage.length)]
                 ends <- leaves[leaves != st]
-                paths <- shortest_paths(g, from = st, to = ends, mode = 'out', output = 'vpath')$vpath
+                paths <- shortest_paths(g, from = st, to = ends, mode = 'out',
+                                        output = 'vpath')$vpath
                 for(p in paths){
                   lineages[[length(lineages)+1]] <- names(p)
                 }
               }
             }
             # sort by number of clusters included
-            lineages <- lineages[order(sapply(lineages, length), decreasing = TRUE)]
+            lineages <- lineages[order(sapply(lineages, length), 
+                                       decreasing = TRUE)]
             names(lineages) <- paste('Lineage',1:length(lineages),sep='')
             
             lineageControl <- list()
@@ -287,7 +301,11 @@ setMethod(f = "getLineages",
             lineageControl$dist <- D[1:nclus,1:nclus, drop = FALSE]
             connectivity <- forest
             
-            out <- newSlingshotDataSet(reducedDim = X, clusterLabels = clusterLabels, lineages = lineages, connectivity = connectivity, lineageControl = lineageControl)
+            out <- newSlingshotDataSet(reducedDim = X, 
+                                       clusterLabels = clusterLabels, 
+                                       lineages = lineages, 
+                                       connectivity = connectivity, 
+                                       lineageControl = lineageControl)
             
             validObject(out)
             return(out)
@@ -315,7 +333,8 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "SlingshotDataSet", clusterLabels = "ANY"),
+          signature = signature(reducedDim = "SlingshotDataSet", 
+                                clusterLabels = "ANY"),
           definition = function(reducedDim,
                                 clusterLabels = clusterLabels(reducedDim),
                                 start.clus = NULL, end.clus = NULL,
@@ -329,7 +348,8 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "data.frame", clusterLabels = "ANY"),
+          signature = signature(reducedDim = "data.frame", 
+                                clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
@@ -344,7 +364,8 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clusterLabels = "numeric"),
+          signature = signature(reducedDim = "matrix", 
+                                clusterLabels = "numeric"),
           definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
@@ -357,7 +378,8 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clusterLabels = "factor"),
+          signature = signature(reducedDim = "matrix", 
+                                clusterLabels = "factor"),
           definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){

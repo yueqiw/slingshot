@@ -217,7 +217,7 @@ setMethod(
           l <- loess(y ~ pst[,l])
         }
         if(loessCI){
-          pl <- predict(l, se=T)
+          pl <- predict(l, se=TRUE)
           polygon(c(l$x[order(l$x)],rev(l$x[order(l$x)])), c((pl$fit+qt(0.975,pl$df)*pl$se)[order(l$x)], rev((pl$fit-qt(0.975,pl$df)*pl$se)[order(l$x)])),
                   border = NA, col = rgb(0,0,0,.3))
         }
@@ -270,8 +270,6 @@ setMethod(
 #' plot3d(rd, col = 'grey50', aspect = 'iso')
 #' plot3d(sds, lwd = 3, add = TRUE)
 #' }
-#' @importFrom rgl plot3d
-#' @importFrom rgl lines3d
 #' 
 #' @export
 plot3d.SlingshotDataSet <- function(x,
@@ -367,21 +365,21 @@ plot3d.SlingshotDataSet <- function(x,
   invisible(NULL)
 }
 
-#' @rdname SlingshotDataSet-plot3d
-#' @export
-setMethod(
-  f = "plot3d",
-  signature = "SlingshotDataSet",
-  definition = function(x,
-                        type = NULL,
-                        add = FALSE,
-                        dims = 1:3,
-                        aspect = 'iso',
-                        ...) {
-    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
-                            aspect = aspect, ...)
-  }
-)
+#' #' @rdname SlingshotDataSet-plot3d
+#' #' @export
+#' setMethod(
+#'   f = "plot3d",
+#'   signature = "SlingshotDataSet",
+#'   definition = function(x,
+#'                         type = NULL,
+#'                         add = FALSE,
+#'                         dims = 1:3,
+#'                         aspect = 'iso',
+#'                         ...) {
+#'     plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
+#'                             aspect = aspect, ...)
+#'   }
+#' )
 
 #' ## lines3d
 #' #' @rdname SlingshotDataSet-plot3d

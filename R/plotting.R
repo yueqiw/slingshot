@@ -164,6 +164,72 @@ setMethod(
 )
 
 ## Individual gene plots
+#' @rdname plotGenePseudotime
+#'
+#' @param loess logical, whether to include a loess fit in each plot (default is
+#' \code{TRUE}).
+#' @param loessCI logical, whether to include a confidence band around the loess
+#' curve (default is \code{TRUE}).
+#' @param ... additional parameters to be passed to \code{\link{plot}}.
+#'   
+#' @return returns \code{NULL}.
+#'   
+#' @examples
+#' data("slingshotExample")
+#' sds <- slingshot(rd, cl, start.clus = "1")
+#' ex <- matrix(c(rchisq(100,1),rchisq(20,3),rchisq(20,6)),nrow=1)
+#' rownames(ex) <- 'Gene-1'
+#' plotGenePseudotime('Gene-1', sds, ex)
+#' 
+#' @export
+setMethod(
+  f = "plotGenePseudotime",
+  signature = signature(gene = "character",
+                        sds = "SlingshotDataSet",
+                        exprs = "matrix"),
+  definition = function(gene,
+                        sds,
+                        exprs,
+                        loess = TRUE,
+                        loessCI = TRUE,
+                        ...) {
+    y <- exprs[which.max(rownames(exprs)==gene),]
+    pst <- pseudotime(sds)
+    w <- curveWeights(sds)
+    if(length(lineages(sds))==1){
+      plot(pst, y, xlab = 'Pseudotime', ylab = 'Expression', main=paste(gene, ', Lineage 1'), ...)
+      if(loess | loessCI){
+        l <- loess(y ~ pst)
+      }
+      if(loessCI){
+        pl <- predict(l, se=T)
+        polygon(c(l$x[order(l$x)],rev(l$x[order(l$x)])), c((pl$fit+qt(0.975,pl$df)*pl$se)[order(l$x)], rev((pl$fit-qt(0.975,pl$df)*pl$se)[order(l$x)])),
+                border = NA, col = rgb(0,0,0,.3))
+      }
+      if(loess){
+        lines(l$x[order(l$x)], l$fitted[order(l$x)], lwd=2)
+      }
+    }else{
+      par(mfrow = c(length(lineages(sds)),1))
+      for(l in 1:length(lineages(sds))){
+        plot(pst[,l], y, xlab = 'Pseudotime', ylab = 'Expression', main=paste(gene, ', Lineage ',l, sep=''), ...)
+        if(loess | loessCI){
+          l <- loess(y ~ pst[,l])
+        }
+        if(loessCI){
+          pl <- predict(l, se=T)
+          polygon(c(l$x[order(l$x)],rev(l$x[order(l$x)])), c((pl$fit+qt(0.975,pl$df)*pl$se)[order(l$x)], rev((pl$fit-qt(0.975,pl$df)*pl$se)[order(l$x)])),
+                  border = NA, col = rgb(0,0,0,.3))
+        }
+        if(loess){
+          lines(l$x[order(l$x)], l$fitted[order(l$x)], lwd=2)
+        }
+      }
+      par(mfrow = c(1,1))
+    }
+    invisible(NULL)
+  }
+)
 
 
 ## plot3d
@@ -214,6 +280,10 @@ plot3d.SlingshotDataSet <- function(x,
                                     dims = 1:3,
                                     aspect = 'iso',
                                     ...){
+  if (!requireNamespace("rgl", quietly = TRUE)) {
+    stop("Package 'rgl' is required for 3D plotting.",
+         call. = FALSE)
+  }
   curves <- FALSE
   lineages <- FALSE
   if(is.null(type)){

@@ -17,11 +17,11 @@ Imports:
     ape,
     igraph,
     methods,
-    RColorBrewer,
-    rgl
+    RColorBrewer
 Suggests:
     BiocGenerics,
     knitr,
+    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: knitr

@@ -21,9 +21,9 @@ existing plot.}
 \item{dims}{numeric, which dimensions to plot (default is \code{1:3}).}
 
 \item{aspect}{either a logical indicating whether to adjust the aspect ratio 
-or a new ratio, see \code{\link{plot3d}}.}
+or a new ratio, see \code{plot3d}.}
 
-\item{...}{additional parameters to be passed to \code{\link{lines3d}}.}
+\item{...}{additional parameters to be passed to \code{lines3d}.}
 }
 \value{
 returns \code{NULL}.

@@ -29,61 +29,6 @@ returns \code{NULL}.
 A tool for quickly visualizing lineages inferred by
   \code{slingshot}.
 }
-\details{
-#' @rdname SlingshotDataSet-plot3d
-#' @export
-setMethod(
-  f = "plot3d",
-  signature = "SlingshotDataSet",
-  definition = function(x,
-                        type = NULL,
-                        add = FALSE,
-                        dims = 1:3,
-                        aspect = 'iso',
-                        ...) {
-    plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
-                            aspect = aspect, ...)
-  }
-)
-#' @rdname SlingshotDataSet-plot3d
-#' @examples
-#' \dontrun{
-#' data("slingshotExample")
-#' rd <- cbind(rd, rnorm(nrow(rd)))
-#' sds <- slingshot(rd, cl, start.clus = "1")
-#' plot3d(rd, col = 'grey50', aspect = 'iso')
-#' lines3d(sds, lwd = 3)
-#' }
-#' @export
-lines3d.SlingshotDataSet <- function(x,
-                                     type = NULL,
-                                     dims = 1:3,
-                                     ...) {
-  plot3d(x, type = type, add = TRUE, dims = dims, ...)
-  invisible(NULL)
-}
-#' @rdname SlingshotDataSet-plot3d
-#' @export
-setMethod(
-  f = "lines3d",
-  signature = "SlingshotDataSet",
-  definition = function(x,
-                        type = NULL,
-                        dims = 1:3,
-                        ...) {
-    lines3d.SlingshotDataSet(x, type = type, add = TRUE, dims = dims, ...)
-  }
-)
-
-If \code{type == 'lineages'}, straight line connectors between
-  cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
-  princiapl curves will be plotted.
-  
-
-When \code{type} is not specified, the function will first check the
-  \code{curves} slot and plot the curves, if present. Otherwise,
-  \code{lineages} will be plotted, if present.
-}
 \examples{
 data("slingshotExample")
 sds <- slingshot(rd, cl, start.clus = "1")

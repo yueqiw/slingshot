@@ -251,8 +251,8 @@ setMethod(
 #'   existing plot.
 #' @param dims numeric, which dimensions to plot (default is \code{1:3}).
 #' @param aspect either a logical indicating whether to adjust the aspect ratio 
-#'   or a new ratio, see \code{\link{plot3d}}.
-#' @param ... additional parameters to be passed to \code{\link{lines3d}}.
+#'   or a new ratio, see \code{plot3d}.
+#' @param ... additional parameters to be passed to \code{lines3d}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
 #'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous

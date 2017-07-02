@@ -389,7 +389,7 @@ plot3d.SlingshotDataSet <- function(x,
 
 #' #' @rdname SlingshotDataSet-plot3d
 #' #' @examples
-#' #' \dontrun{
+#' #' %\dontrun{
 #' #' data("slingshotExample")
 #' #' rd <- cbind(rd, rnorm(nrow(rd)))
 #' #' sds <- slingshot(rd, cl, start.clus = "1")

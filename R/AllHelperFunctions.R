@@ -163,6 +163,12 @@ setMethod(
 # replacement methods
 #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
 #'   matrix.
+#' @param value matrix, the new reduced dimensional dataset.
+#' 
+#' @details 
+#' Warning: this will remove any existing lineages or curves from the 
+#' \code{SlingshotDataSet} object.
+#' 
 #' @export
 setReplaceMethod(
   f = "reducedDim", 
@@ -171,11 +177,26 @@ setReplaceMethod(
 
 #' @describeIn SlingshotDataSet Updated object with new vector of cluster
 #'   labels.
+#' @param value character, the new vector of cluster labels.
+#' 
+#' @details 
+#' Warning: this will remove any existing lineages or curves from the 
+#' \code{SlingshotDataSet} object.
 #' @export
 setReplaceMethod(
   f = "clusterLabels", 
   signature = "SlingshotDataSet",
   definition = function(x, value) initialize(x, clusterLabels = value))
+
+#' @describeIn SlingshotDataSet Subset dataset and cluster labels.
+#' @param i indices to be applied to rows (cells) of the reduced dimensional
+#' matrix and cluster labels.
+#' @param j indices to be applied to the columns (dimensions) of the reduced
+#' dimensional matrix.
+#' @details 
+#' Warning: this will remove any existing lineages or curves from the 
+#' \code{SlingshotDataSet} object.
+#' @export
 setMethod(f = "[", 
           signature = c("SlingshotDataSet", "ANY", "ANY", "ANY"),
           function(x, i, j, ..., drop=FALSE)
@@ -195,6 +216,9 @@ setMethod(f = "[",
 
 
 #' @describeIn SlingshotDataSet returns the matrix of pseudotime values.
+#' @param na logical indicating whether a cell with zero weight along a 
+#' particular lineage should have a pseudotime of \code{NA} (the default) or
+#' a time corresponding to its index of projection.
 #' @export
 setMethod(
   f = "pseudotime",
@@ -235,6 +259,8 @@ setMethod(
 
 
 # internal functions
+#' @import stats
+#' @import graphics
 .get_connections <- function(clus, forest, parent = NULL){
   children.idx <- forest[,clus] == 1
   children <- rownames(forest)[children.idx]

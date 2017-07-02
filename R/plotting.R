@@ -33,6 +33,8 @@
 #' plot(rd, col = 'grey50')
 #' lines(sds, lwd = 3)
 #' 
+#' @import graphics
+#' @import grDevices
 #' @export
 setMethod(
   f = "plot",
@@ -385,23 +387,23 @@ plot3d.SlingshotDataSet <- function(x,
 #'   }
 #' )
 
-#' @rdname SlingshotDataSet-plot3d
-#' @examples
-#' \dontrun{
-#' data("slingshotExample")
-#' rd <- cbind(rd, rnorm(nrow(rd)))
-#' sds <- slingshot(rd, cl, start.clus = "1")
-#' plot3d(rd, col = 'grey50', aspect = 'iso')
-#' lines3d(sds, lwd = 3)
+#' #' @rdname SlingshotDataSet-plot3d
+#' #' @examples
+#' #' \dontrun{
+#' #' data("slingshotExample")
+#' #' rd <- cbind(rd, rnorm(nrow(rd)))
+#' #' sds <- slingshot(rd, cl, start.clus = "1")
+#' #' plot3d(rd, col = 'grey50', aspect = 'iso')
+#' #' lines3d(sds, lwd = 3)
+#' #' }
+#' #' @export
+#' lines3d.SlingshotDataSet <- function(x,
+#'                                      type = NULL,
+#'                                      dims = 1:3,
+#'                                      ...) {
+#'   plot3d(x, type = type, add = TRUE, dims = dims, ...)
+#'   invisible(NULL)
 #' }
-#' @export
-lines3d.SlingshotDataSet <- function(x,
-                                     type = NULL,
-                                     dims = 1:3,
-                                     ...) {
-  plot3d(x, type = type, add = TRUE, dims = dims, ...)
-  invisible(NULL)
-}
 #' #' @rdname SlingshotDataSet-plot3d
 #' #' @export
 #' setMethod(
@@ -549,10 +551,6 @@ pairs.SlingshotDataSet <-
       else Axis(y, side = side, xpd = xpd, ...)
     }
     
-    slingshotPanel <- function(..., main, oma, font.main, cex.main){
-      
-    }
-    
     localPlot <- function(..., main, oma, font.main, cex.main) plot(...)
     localLowerPanel <- function(..., main, oma, font.main, cex.main)
       lower.panel(...)
@@ -645,7 +643,7 @@ pairs.SlingshotDataSet <-
                      pch=pch, ...)
               if(lineages){
                 for(ii in 1:(nclus-1)){
-                  for(jj in (i+1):nclus){
+                  for(jj in (ii+1):nclus){
                     if(forest[ii,jj]==1){
                       seg.col <- 1
                       lines(centers[c(ii,jj),j], centers[c(ii,jj),i], lwd = lwd,
@@ -681,7 +679,7 @@ pairs.SlingshotDataSet <-
                      pch=pch, ...)
               if(lineages){
                 for(ii in 1:(nclus-1)){
-                  for(jj in (i+1):nclus){
+                  for(jj in (ii+1):nclus){
                     if(forest[ii,jj]==1){
                       if(clusters[ii] %in% linC$start.clus | 
                          clusters[jj] %in% linC$start.clus){

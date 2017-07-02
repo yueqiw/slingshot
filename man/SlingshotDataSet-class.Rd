@@ -14,6 +14,7 @@
 \alias{curveControl,SlingshotDataSet-method}
 \alias{reducedDim<-,SlingshotDataSet-method}
 \alias{clusterLabels<-,SlingshotDataSet-method}
+\alias{[,SlingshotDataSet-method}
 \alias{pseudotime,SlingshotDataSet-method}
 \alias{curveWeights,SlingshotDataSet-method}
 \title{Class \code{SlingshotDataSet}}
@@ -38,6 +39,8 @@
 
 \S4method{clusterLabels}{SlingshotDataSet}(x) <- value
 
+\S4method{[}{SlingshotDataSet}(x, i, j, ..., drop = FALSE)
+
 \S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
 
 \S4method{curveWeights}{SlingshotDataSet}(x)
@@ -46,6 +49,20 @@
 \item{object}{a \code{SlingshotDataSet} object.}
 
 \item{x}{a \code{SlingshotDataSet} object.}
+
+\item{value}{matrix, the new reduced dimensional dataset.}
+
+\item{i}{indices to be applied to rows (cells) of the reduced dimensional
+matrix and cluster labels.}
+
+\item{j}{indices to be applied to the columns (dimensions) of the reduced
+dimensional matrix.}
+
+\item{na}{logical indicating whether a cell with zero weight along a 
+particular lineage should have a pseudotime of \code{NA} (the default) or
+a time corresponding to its index of projection.}
+
+\item{value}{character, the new vector of cluster labels.}
 }
 \value{
 The accessor functions \code{reducedDim}, \code{clusterLabels}, 
@@ -62,6 +79,16 @@ The \code{SlingshotDataSet} class holds data relevant for
   reduced dimensional representation of the data and a set of cluster labels.
   All \code{slingshot} methods can take an object of the class 
   \code{SlingshotDataSet} as input and will output the same.
+}
+\details{
+Warning: this will remove any existing lineages or curves from the 
+\code{SlingshotDataSet} object.
+
+Warning: this will remove any existing lineages or curves from the 
+\code{SlingshotDataSet} object.
+
+Warning: this will remove any existing lineages or curves from the 
+\code{SlingshotDataSet} object.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -92,6 +119,8 @@ matrix.
 
 \item \code{clusterLabels<-}: Updated object with new vector of cluster
 labels.
+
+\item \code{[}: Subset dataset and cluster labels.
 
 \item \code{pseudotime}: returns the matrix of pseudotime values.
 

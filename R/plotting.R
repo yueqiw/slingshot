@@ -1,4 +1,3 @@
-## plot
 #' @title Plot Slingshot output
 #' @name SlingshotDataSet-plot
 #'   

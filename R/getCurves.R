@@ -148,8 +148,9 @@ setMethod(f = "getCurves",
             smootherFcn <- switch(smoother, loess = function(lambda, xj, 
                                                              w = NULL, ...){
               loess(xj ~ lambda, weights = w, ...)$fitted
-            }, smooth.spline = function(lambda, xj, w = NULL, ..., df = 5){
-              fit <- smooth.spline(lambda, xj, w = w, ..., df = df, 
+            }, smooth.spline = function(lambda, xj, w = NULL, ..., df = 5, 
+                                        tol = 1e-4){
+              fit <- smooth.spline(lambda, xj, w = w, ..., df = df, tol = tol,
                                    keep.data = FALSE)
               predict(fit, x = lambda)$y
             })

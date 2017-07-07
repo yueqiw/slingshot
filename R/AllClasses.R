@@ -61,136 +61,141 @@
 #' @export
 #' 
 setClass(
-  Class = "SlingshotDataSet",
-  slots = list(
-    reducedDim = "matrix",
-    clusterLabels = "character",
-    lineages = "list",
-    connectivity = "matrix",
-    lineageControl = "list",
-    curves = "list",
-    pseudotime = "matrix",
-    curveWeights = "matrix",
-    curveControl = "list"
-  )
+    Class = "SlingshotDataSet",
+    slots = list(
+        reducedDim = "matrix",
+        clusterLabels = "character",
+        lineages = "list",
+        connectivity = "matrix",
+        lineageControl = "list",
+        curves = "list",
+        pseudotime = "matrix",
+        curveWeights = "matrix",
+        curveControl = "list"
+    )
 )
 
 setValidity("SlingshotDataSet", function(object) {
-  X <- reducedDim(object)
-  n <- nrow(X)
-  p <- ncol(X)
-  if(!is.numeric(X)) {
-    return("Reduced dimensional coordinates must be numeric.")
-  }
-  if(nrow(X)==0){
-    return('reducedDim has zero rows.')
-  }
-  if(ncol(X)==0){
-    return('reducedDim has zero columns.')
-  }
-  if(length(clusterLabels(object)) != n){
-    return('nrow(reducedDim) must equal length(clusterLabels).')
-  }
-  # something requires row and column names. Princurve?
-  if(is.null(rownames(reducedDim(object)))){
-    rownames(reducedDim(object)) <- paste('Cell',
-                                         seq_len(nrow(reducedDim(object))),
-                                         sep='-')
-  }
-  if(is.null(colnames(reducedDim(object)))){
-    colnames(reducedDim(object)) <- paste('Dim',
-                                         seq_len(ncol(reducedDim(object))),
-                                         sep='-')
-  }
-  
-  # if lineages present
-  if(length(lineages(object)) > 0){
-    L <- length(lineages(object))
-    clus.names <- unique(clusterLabels(object))
-    K <- length(clus.names)
-    if(any(sapply(lineages(object),class) != 'character')){
-      return("lineages must be a list of character vectors.")
+    X <- reducedDim(object)
+    n <- nrow(X)
+    p <- ncol(X)
+    if(!is.numeric(X)) {
+        return("Reduced dimensional coordinates must be numeric.")
     }
-    if(!all(sapply(lineages(object), function(lin){all(lin %in% clus.names)}))){
-      return("lineages must be a list of character vectors composed of cluster 
-             names.")
+    if(nrow(X)==0){
+        return('reducedDim has zero rows.')
     }
-    if(!is.numeric(connectivity(object))) {
-      return("Connectivity matrix must be numeric or logical.")
+    if(ncol(X)==0){
+        return('reducedDim has zero columns.')
     }
-    if(any(dim(connectivity(object)) != K)){
-      return("Connectivity matrix must be square with number of dimensions 
-             equal to number of clusters")
+    if(length(clusterLabels(object)) != n){
+        return('nrow(reducedDim) must equal length(clusterLabels).')
     }
-    if(! is.null(lineageControl(object)$start.clus)){
-      if(!all(lineageControl(object)$start.clus %in% clus.names)){
-        return("Specified starting cluster not found in cluster labels")
-      }
+    # something requires row and column names. Princurve?
+    if(is.null(rownames(reducedDim(object)))){
+        rownames(reducedDim(object)) <- paste('Cell',
+                                              seq_len(nrow(reducedDim(object))),
+                                              sep='-')
     }
-    if(! is.null(lineageControl(object)$end.clus)){
-      if(!all(lineageControl(object)$end.clus %in% clus.names)){
-        return("Specified terminal cluster(s) not found in cluster labels")
-      }
+    if(is.null(colnames(reducedDim(object)))){
+        colnames(reducedDim(object)) <- paste('Dim',
+                                              seq_len(ncol(reducedDim(object))),
+                                              sep='-')
     }
-    if(! is.null(lineageControl(object)$dist.fun)){
-      if(!is.function(lineageControl(object)$dist.fun)){
-        return("Pairwise cluster distance function must be a function.")
-      }
-    }
-    if(! is.null(lineageControl(object)$omega)){
-      if(lineageControl(object)$omega < 0 | 
-         (lineageControl(object)$omega > 1 & 
-          lineageControl(object)$omega != Inf)){
-        return("Omega must be numeric element of [0,1] or Inf.")
-      }
-    }
-  }
-  
-  # if curves present
-  if(length(curves(object)) > 0){
+    
+    # if lineages present
     if(length(lineages(object)) > 0){
-      L <- length(lineages(object))
-      if(length(curves(object)) != L){
-        return("Number of curves does not match number of lineages")
-      }
+        L <- length(lineages(object))
+        clus.names <- unique(clusterLabels(object))
+        K <- length(clus.names)
+        if(any(sapply(lineages(object),class) != 'character')){
+            return("lineages must be a list of character vectors.")
+        }
+        if(!all(sapply(lineages(object), 
+                       function(lin){all(lin %in% clus.names)}))){
+            return("lineages must be a list of character vectors composed of 
+                   cluster names.")
+        }
+        if(!is.numeric(connectivity(object))) {
+            return("Connectivity matrix must be numeric or logical.")
+        }
+        if(any(dim(connectivity(object)) != K)){
+            return("Connectivity matrix must be square with number of dimensions
+                    equal to number of clusters")
+        }
+        if(! is.null(lineageControl(object)$start.clus)){
+            if(!all(lineageControl(object)$start.clus %in% clus.names)){
+                return("Specified starting cluster not found in cluster labels")
+            }
+        }
+        if(! is.null(lineageControl(object)$end.clus)){
+            if(!all(lineageControl(object)$end.clus %in% clus.names)){
+                return("Specified terminal cluster(s) not found in cluster 
+                       labels")
+            }
+        }
+        if(! is.null(lineageControl(object)$dist.fun)){
+            if(!is.function(lineageControl(object)$dist.fun)){
+                return("Pairwise cluster distance function must be a function.")
+            }
+        }
+        if(! is.null(lineageControl(object)$omega)){
+            if(lineageControl(object)$omega < 0 | 
+               (lineageControl(object)$omega > 1 & 
+                lineageControl(object)$omega != Inf)){
+                return("Omega must be numeric element of [0,1] or Inf.")
+            }
+        }
     }
-    L <- length(curves(object))
-    if(any(sapply(curves(object),class) != 'principal.curve')){
-      return("curves must be a list of principal.curve objects.")
+    
+    # if curves present
+    if(length(curves(object)) > 0){
+        if(length(lineages(object)) > 0){
+            L <- length(lineages(object))
+            if(length(curves(object)) != L){
+                return("Number of curves does not match number of lineages")
+            }
+        }
+        L <- length(curves(object))
+        if(any(sapply(curves(object),class) != 'principal.curve')){
+            return("curves must be a list of principal.curve objects.")
+        }
+        if(dim(pseudotime(object))[1] > 0){
+            if(any(dim(pseudotime(object)) != c(n,L))){
+                return("Dimensions for pseudotime matrix are incorrect. Should 
+                       be n (number of cells) by L (number of lineages).")
+            }
+        }
+        if(dim(curveWeights(object))[1] > 0){
+            if(any(dim(curveWeights(object)) != c(n,L))){
+                return("Dimensions for curveWeights matrix are incorrect. 
+                       Should be n (number of cells) by L 
+                       (number of lineages).")
+            }
+        }
+        if(!is.null(curveControl(object)$shrink)){
+            if(curveControl(object)$shrink < 0 | 
+               curveControl(object)$shrink > 1){
+                stop("shrink argument must be logical or numeric between 
+                     0 and 1.")
+            }
+        }
+        if(!is.null(curveControl(object)$extend)){
+            if(! curveControl(object)$extend %in% c('y','n','pc1')){
+                stop("extend argument must be one of 'y', 'n', or 'pc1'.")
+            }
+        }
+        if(!is.null(curveControl(object)$reweight)){
+            if(!is.logical(curveControl(object)$reweight)){
+                stop("reweight argument must be logical.")
+            }
+        }
+        if(!is.null(curveControl(object)$drop.multi)){
+            if(!is.logical(curveControl(object)$drop.multi)){
+                stop("drop.multi argument must be logical.")
+            }
+        }
     }
-    if(dim(pseudotime(object))[1] > 0){
-      if(any(dim(pseudotime(object)) != c(n,L))){
-        return("Dimensions for pseudotime matrix are incorrect. Should be n 
-               (number of cells) by L (number of lineages).")
-      }
-    }
-    if(dim(curveWeights(object))[1] > 0){
-      if(any(dim(curveWeights(object)) != c(n,L))){
-        return("Dimensions for curveWeights matrix are incorrect. Should be n 
-               (number of cells) by L (number of lineages).")
-      }
-    }
-    if(!is.null(curveControl(object)$shrink)){
-      if(curveControl(object)$shrink < 0 | curveControl(object)$shrink > 1){
-        stop("shrink argument must be logical or numeric between 0 and 1.")
-      }
-    }
-    if(!is.null(curveControl(object)$extend)){
-      if(! curveControl(object)$extend %in% c('y','n','pc1')){
-        stop("extend argument must be one of 'y', 'n', or 'pc1'.")
-      }
-    }
-    if(!is.null(curveControl(object)$reweight)){
-      if(!is.logical(curveControl(object)$reweight)){
-        stop("reweight argument must be logical.")
-      }
-    }
-    if(!is.null(curveControl(object)$drop.multi)){
-      if(!is.logical(curveControl(object)$drop.multi)){
-        stop("drop.multi argument must be logical.")
-      }
-    }
-  }
-  return(TRUE)
-  })
+    return(TRUE)
+})
 

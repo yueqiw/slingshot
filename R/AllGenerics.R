@@ -59,46 +59,46 @@
 #' @import methods
 #' @export
 setGeneric(
-  name = "newSlingshotDataSet",
-  signature = c('reducedDim','clusterLabels'),
-  def = function(reducedDim,  clusterLabels, ...) {
-    standardGeneric("newSlingshotDataSet")
-  }
+    name = "newSlingshotDataSet",
+    signature = c('reducedDim','clusterLabels'),
+    def = function(reducedDim,  clusterLabels, ...) {
+        standardGeneric("newSlingshotDataSet")
+    }
 )
 
 #' @title Infer Lineage Structure from Clustered Samples
 #' @name getLineages
 #' @export
 setGeneric(
-  name = "getLineages",
-  signature = c('reducedDim','clusterLabels'),
-  def = function(reducedDim,
-                 clusterLabels, ...) {
-    standardGeneric("getLineages")
-  }
+    name = "getLineages",
+    signature = c('reducedDim','clusterLabels'),
+    def = function(reducedDim,
+                   clusterLabels, ...) {
+        standardGeneric("getLineages")
+    }
 )
 
 #' @title Construct Smooth Lineage Curves
 #' @name getCurves
 #' @export
 setGeneric(
-  name = "getCurves",
-  signature = 'sds',
-  def = function(sds, ...) {
-    standardGeneric("getCurves")
-  }
+    name = "getCurves",
+    signature = 'sds',
+    def = function(sds, ...) {
+        standardGeneric("getCurves")
+    }
 )
 
 #' @title Perform lineage inference with Slingshot
 #' @name slingshot
 #' @export
 setGeneric(
-  name = "slingshot",
-  signature = c('reducedDim','clusterLabels'),
-  def = function(reducedDim,
-                 clusterLabels, ...) {
-    standardGeneric("slingshot")
-  }
+    name = "slingshot",
+    signature = c('reducedDim','clusterLabels'),
+    def = function(reducedDim,
+                   clusterLabels, ...) {
+        standardGeneric("slingshot")
+    }
 )
 
 # accessor functions
@@ -279,18 +279,18 @@ setGeneric(name = "curveWeights",
 #' 
 #' @export
 setGeneric(
-  name = "plotGenePseudotime",
-  signature = c('gene','sds','exprs'),
-  def = function(gene,
-                 sds,
-                 exprs,
-                 ...) {
-    standardGeneric("plotGenePseudotime")
-  }
+    name = "plotGenePseudotime",
+    signature = c('gene','sds','exprs'),
+    def = function(gene,
+                   sds,
+                   exprs,
+                   ...) {
+        standardGeneric("plotGenePseudotime")
+    }
 )
 
 # plot3d generic, in case rgl is not loaded
 #' @export
 plot3d <- function(x, ...){
-  UseMethod('plot3d')
+    UseMethod('plot3d')
 }

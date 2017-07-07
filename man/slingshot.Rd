@@ -17,38 +17,42 @@ slingshot(reducedDim, clusterLabels, ...)
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
-  smoother = "smooth.spline", shrink.method = "cosine", ...)
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
 
 \S4method{slingshot}{SlingshotDataSet,ANY}(reducedDim,
   clusterLabels = reducedDim@clusterLabels, start.clus = NULL,
   end.clus = NULL, dist.fun = NULL, omega = NULL, lineages = list(),
   shrink = TRUE, extend = "y", reweight = TRUE, drop.multi = TRUE,
   thresh = 0.001, maxit = 15, stretch = 2, smoother = "smooth.spline",
-  shrink.method = "cosine", ...)
+  shrink.method = "cosine", allow.breaks = TRUE, ...)
 
 \S4method{slingshot}{data.frame,ANY}(reducedDim, clusterLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
-  smoother = "smooth.spline", shrink.method = "cosine", ...)
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
 
 \S4method{slingshot}{matrix,numeric}(reducedDim, clusterLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
-  smoother = "smooth.spline", shrink.method = "cosine", ...)
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
 
 \S4method{slingshot}{matrix,factor}(reducedDim, clusterLabels,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
-  smoother = "smooth.spline", shrink.method = "cosine", ...)
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
 
 \S4method{slingshot}{matrix,ANY}(reducedDim, clusterLabels, start.clus = NULL,
   end.clus = NULL, dist.fun = NULL, omega = NULL, lineages = list(),
   shrink = TRUE, extend = "y", reweight = TRUE, drop.multi = TRUE,
   thresh = 0.001, maxit = 15, stretch = 2, smoother = "smooth.spline",
-  shrink.method = "cosine", ...)
+  shrink.method = "cosine", allow.breaks = TRUE, ...)
 }
 \arguments{
 \item{reducedDim}{numeric matrix or \code{SlingshotDataSet} object containing

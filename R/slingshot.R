@@ -158,7 +158,8 @@ setMethod(f = "slingshot",
                                 drop.multi = TRUE,
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
+                                shrink.method = 'cosine',
+                                allow.breaks = TRUE, ...){
             sds <- getLineages(reducedDim, clusterLabels,
                                start.clus = start.clus, end.clus = end.clus,
                                dist.fun = dist.fun, omega = omega)
@@ -167,7 +168,8 @@ setMethod(f = "slingshot",
                              reweight = reweight, drop.multi = drop.multi,
                              thresh = thresh, maxit = maxit,
                              stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...)
+                             shrink.method = shrink.method,
+                             allow.breaks = allow.breaks, ...)
             return(sds)
           }
 )
@@ -188,7 +190,8 @@ setMethod(f = "slingshot",
                                 drop.multi = TRUE,
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
+                                shrink.method = 'cosine', 
+                                allow.breaks = TRUE, ...){
             return(slingshot(reducedDim = reducedDim@reducedDim,
                              clusterLabels = reducedDim@clusterLabels,
                              start.clus = start.clus, end.clus = end.clus,
@@ -197,7 +200,8 @@ setMethod(f = "slingshot",
                              reweight = reweight, drop.multi = drop.multi,
                              thresh = thresh, maxit = maxit,
                              stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
+                             shrink.method = shrink.method,
+                             allow.breaks = allow.breaks, ...))
           })
 
 #' @rdname slingshot
@@ -215,7 +219,8 @@ setMethod(f = "slingshot",
                                 drop.multi = TRUE,
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
+                                shrink.method = 'cosine',
+                                allow.breaks = TRUE, ...){
             RD <- as.matrix(reducedDim)
             rownames(RD) <- rownames(reducedDim)
             return(slingshot(reducedDim = RD,
@@ -226,7 +231,8 @@ setMethod(f = "slingshot",
                              reweight = reweight, drop.multi = drop.multi,
                              thresh = thresh, maxit = maxit,
                              stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
+                             shrink.method = shrink.method,
+                             allow.breaks = allow.breaks, ...))
           })
 
 #' @rdname slingshot
@@ -244,7 +250,8 @@ setMethod(f = "slingshot",
                                 drop.multi = TRUE,
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
+                                shrink.method = 'cosine', 
+                                allow.breaks = TRUE, ...){
             return(slingshot(reducedDim = reducedDim,
                              clusterLabels = as.character(clusterLabels),
                              start.clus = start.clus, end.clus = end.clus,
@@ -253,7 +260,8 @@ setMethod(f = "slingshot",
                              reweight = reweight, drop.multi = drop.multi,
                              thresh = thresh, maxit = maxit,
                              stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
+                             shrink.method = shrink.method, 
+                             allow.breaks = allow.breaks, ...))
           })
 
 #' @rdname slingshot
@@ -271,7 +279,8 @@ setMethod(f = "slingshot",
                                 drop.multi = TRUE,
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
+                                shrink.method = 'cosine', 
+                                allow.breaks = TRUE, ...){
             return(slingshot(reducedDim = reducedDim,
                              clusterLabels = as.character(clusterLabels),
                              start.clus = start.clus, end.clus = end.clus,
@@ -280,7 +289,8 @@ setMethod(f = "slingshot",
                              reweight = reweight, drop.multi = drop.multi,
                              thresh = thresh, maxit = maxit,
                              stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
+                             shrink.method = shrink.method, 
+                             allow.breaks = allow.breaks, ...))
           })
 
 
@@ -299,7 +309,8 @@ setMethod(f = "slingshot",
                                 drop.multi = TRUE,
                                 thresh = 0.001, maxit = 15, stretch = 2,
                                 smoother = 'smooth.spline',
-                                shrink.method = 'cosine', ...){
+                                shrink.method = 'cosine', 
+                                allow.breaks = TRUE, ...){
             if(missing(clusterLabels)){
               message('Unclustered data detected.')
               clusterLabels <- rep('1', nrow(reducedDim))
@@ -312,5 +323,6 @@ setMethod(f = "slingshot",
                              reweight = reweight, drop.multi = drop.multi,
                              thresh = thresh, maxit = maxit,
                              stretch = stretch, smoother = smoother,
-                             shrink.method = shrink.method, ...))
+                             shrink.method = shrink.method, 
+                             allow.breaks = allow.breaks, ...))
           })

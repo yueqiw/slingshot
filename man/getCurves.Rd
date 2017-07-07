@@ -11,7 +11,8 @@ getCurves(sds, ...)
 \S4method{getCurves}{SlingshotDataSet}(sds, clusterLabels = sds@clusterLabels,
   lineages = sds@lineages, shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
-  smoother = "smooth.spline", shrink.method = "cosine", ...)
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
 }
 \arguments{
 \item{sds}{The \code{SlingshotDataSet} for which to construct simultaneous 

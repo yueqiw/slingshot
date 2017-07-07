@@ -84,15 +84,20 @@ Constructs a \code{SlingshotDataSet} object. Additional helper
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{reducedDim = data.frame,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = data.frame,clusterLabels = ANY}: returns a 
+\code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = numeric}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = numeric}: returns a 
+\code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = factor}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = factor}: returns a 
+\code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = ANY}: returns a 
+\code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = character}: returns a 
+\code{SlingshotDataSet} object.
 }}
 
 \examples{

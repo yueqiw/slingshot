@@ -14,7 +14,7 @@
 \alias{curveControl,SlingshotDataSet-method}
 \alias{reducedDim<-,SlingshotDataSet-method}
 \alias{clusterLabels<-,SlingshotDataSet-method}
-\alias{[,SlingshotDataSet-method}
+\alias{[,SlingshotDataSet,ANY,ANY,ANY-method}
 \alias{pseudotime,SlingshotDataSet-method}
 \alias{curveWeights,SlingshotDataSet-method}
 \title{Class \code{SlingshotDataSet}}
@@ -39,7 +39,7 @@
 
 \S4method{clusterLabels}{SlingshotDataSet}(x) <- value
 
-\S4method{[}{SlingshotDataSet}(x, i, j, ..., drop = FALSE)
+\S4method{[}{SlingshotDataSet,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
 \S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
 
@@ -131,20 +131,20 @@ lineage.
 \section{Slots}{
 
 \describe{
-\item{\code{reducedDim}}{matrix. An \code{n} by \code{p} numeric matrix or data frame
-giving the coordinates of the cells in a reduced dimensionality space.}
+\item{\code{reducedDim}}{matrix. An \code{n} by \code{p} numeric matrix or data 
+frame giving the coordinates of the cells in a reduced dimensionality space.}
 
-\item{\code{clusterLabels}}{character. A character vector of length \code{n} denoting
-each cell's cluster label.}
+\item{\code{clusterLabels}}{character. A character vector of length \code{n}
+denoting each cell's cluster label.}
 
-\item{\code{lineages}}{list. A list with each element a character vector of cluster 
-names representing a lineage as an ordered set of clusters.}
+\item{\code{lineages}}{list. A list with each element a character vector of 
+cluster names representing a lineage as an ordered set of clusters.}
 
 \item{\code{connectivity}}{matrix. A binary matrix describing the connectivity 
 between clusters induced by the minimum spanning tree.}
 
-\item{\code{lineageControl}}{list. Additional parameters specifying how the minimum 
-spanning tree on clusters was constructed. \itemize{ 
+\item{\code{lineageControl}}{list. Additional parameters specifying how the 
+minimum spanning tree on clusters was constructed. \itemize{ 
 \item{\code{start.clus}}{character. The label of the root cluster.} 
 \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
 terminal clusters.} \item{\code{start.given}}{logical. A logical value 

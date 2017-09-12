@@ -341,7 +341,7 @@ setMethod(
     if(method %in% eval(formals(density.default)$kernel)){
         dens <- density(0, bw=1, kernel = method)
         surv <- list(x = dens$x, y = (sum(dens$y) - cumsum(dens$y))/sum(dens$y))
-        box.vals <- boxplot(pst, plot = FALSE)$stats
+        box.vals <- boxplot(pst[share.idx], plot = FALSE)$stats
         surv$x <- .scaleAB(surv$x, a = box.vals[1], b = box.vals[5])
         if(box.vals[1]==box.vals[5]){
             pct.l <- rep(0, length(pst))
@@ -354,7 +354,7 @@ setMethod(
         dens <- list(x = seq(-3,3,length.out = 512))
         dens$y <- tc(dens$x)
         surv <- list(x = dens$x, y = (sum(dens$y) - cumsum(dens$y))/sum(dens$y))
-        box.vals <- boxplot(pst, plot = FALSE)$stats
+        box.vals <- boxplot(pst[share.idx], plot = FALSE)$stats
         surv$x <- .scaleAB(surv$x, a = box.vals[1], b = box.vals[5])
         if(box.vals[1]==box.vals[5]){
             pct.l <- rep(0, length(pst))

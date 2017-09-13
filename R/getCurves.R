@@ -170,7 +170,6 @@ setMethod(f = "getCurves",
                   x.sub <- X[clusterLabels == clID, ,drop = FALSE]
                   return(colMeans(x.sub))
               }))
-              rownames(centers) <- clusters
               if(p == 1){
                   centers <- t(centers)
               }

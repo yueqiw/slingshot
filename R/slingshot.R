@@ -115,7 +115,7 @@
 #'   most cases.
 #'   
 #' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves."
-#'   \emph{Journal of the American Statistical Association}, 84:502–516.
+#'   \emph{Journal of the American Statistical Association}, 84:502--516.
 #'   
 #' @return An object of class \code{\link{SlingshotDataSet}} containing the 
 #'   arguments provided to \code{slingshot} as well as the following output: 

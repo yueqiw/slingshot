@@ -119,7 +119,7 @@ lines(sds, type = 'c', lwd = 3)
 }
 \references{
 Hastie, T., and Stuetzle, W. (1989). "Principal Curves."
-  \emph{Journal of the American Statistical Association}, 84:502–516.
+  \emph{Journal of the American Statistical Association}, 84:502--516.
 }
 \seealso{
 \code{\link{slingshot}}

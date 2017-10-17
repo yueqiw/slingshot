@@ -34,7 +34,6 @@
 #' 
 #' @import graphics
 #' @import grDevices
-#' @rdname SlingshotDataSet-plot
 #' @export
 setMethod(
     f = "plot",
@@ -150,7 +149,6 @@ setMethod(
     }
 )
 
-#' @rdname SlingshotDataSet-plot
 #' @export
 setMethod(
     f = "lines",

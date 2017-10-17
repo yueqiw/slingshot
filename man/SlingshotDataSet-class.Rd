@@ -177,5 +177,10 @@ Accepted values are the same as for \code{kernel} in  the \code{density}
 function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 \code{"density"}. See \code{\link{getCurves}} for details.} \item{Other 
 parameters specified by \code{\link{principal.curve}}}. }}
+
+\item{\code{curveWeights}}{matrix. A matrix of cell weights along each lineage.}
+
+\item{\code{pseudotime}}{matrix. A matrix of pseudotime values or cells' weights
+along each lineage.}
 }}
 

@@ -90,6 +90,7 @@ setGeneric(
 )
 
 #' @title Perform lineage inference with Slingshot
+#' @description Perform lineage inference with Slingshot
 #' @name slingshot
 #' @export
 setGeneric(
@@ -103,6 +104,7 @@ setGeneric(
 
 # accessor functions
 #' @title Returns the reduced dimensional representation of a dataset.
+#' @description Returns the reduced dimensional representation of a dataset.
 #'
 #' @param x an object that describes a dataset or a model involving reduced
 #'   dimensional data.
@@ -290,6 +292,9 @@ setGeneric(
 )
 
 # plot3d generic, in case rgl is not loaded
+#' 3D scatterplot
+#' @param x Data
+#' @param ... Extra params for plot3d
 #' @export
 plot3d <- function(x, ...){
     UseMethod('plot3d')

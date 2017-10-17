@@ -147,6 +147,8 @@ An object of class \code{\link{SlingshotDataSet}} containing the
   principal curves.}}
 }
 \description{
+Perform lineage inference with Slingshot
+
 Given a reduced-dimensional data matrix \code{n} by \code{p} and
   a vector of cluster labels (potentially including \code{-1}'s for 
   "unclustered"), this function performs lineage inference using a 

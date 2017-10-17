@@ -22,6 +22,7 @@ Imports:
 Suggests:
     BiocGenerics,
     knitr,
+    splatter,
     RColorBrewer,
     rgl,
     rmarkdown,

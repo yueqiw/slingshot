@@ -29,6 +29,15 @@ returns \code{NULL}.
 A tool for quickly visualizing lineages inferred by
   \code{slingshot}.
 }
+\details{
+If \code{type == 'lineages'}, straight line connectors between
+  cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
+  princiapl curves will be plotted.
+
+When \code{type} is not specified, the function will first check the
+  \code{curves} slot and plot the curves, if present. Otherwise,
+  \code{lineages} will be plotted, if present.
+}
 \examples{
 data("slingshotExample")
 sds <- slingshot(rd, cl, start.clus = "1")

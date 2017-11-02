@@ -226,6 +226,8 @@ setMethod(f = "getCurves",
                       # on all lineages, but only those points on the lineage
                       # should extend it
                       pcurve <- .get_lam(X, s = curve$s[curve$tag,], stretch=0)
+                      pcurve$dist <- abs(pcurve$dist) 
+                      # ^ force non-negative distances
                       pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
                                                            na.rm=TRUE)
                       # ^ force pseudotime to start at 0
@@ -238,10 +240,12 @@ setMethod(f = "getCurves",
                   if(extend == 'y'){
                       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
                                         stretch = 9999)
+                      curve$dist <- abs(curve$dist)
                   }
                   if(extend == 'n'){
                       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
                                         stretch = 0)
+                      curve$dist <- abs(curve$dist)
                   }
                   if(extend == 'pc1'){
                       pc1.1 <- prcomp(X[clusterLabels == lineages[[l]][1],])
@@ -265,10 +269,13 @@ setMethod(f = "getCurves",
                                             line.initial[K] + pc1.2)
                       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
                                         stretch = 9999)
+                      curve$dist <- abs(curve$dist)
                   }
                   
                   pcurve <- .get_lam(X, s = curve$s[curve$tag, ,drop=FALSE], 
                                      stretch=0)
+                  # force non-negative distances
+                  pcurve$dist <- abs(pcurve$dist)
                   # force pseudotime to start at 0
                   pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
                                                        na.rm=TRUE) 
@@ -324,6 +331,7 @@ setMethod(f = "getCurves",
                                                  w = pcurve$w, ...)[ord]
                       }
                       new.pcurve <- .get_lam(X, s = s, stretch = stretch)
+                      new.pcurve$dist <- abs(new.pcurve$dist)
                       new.pcurve$lambda <- new.pcurve$lambda - 
                           min(new.pcurve$lambda, na.rm = TRUE)
                       new.pcurve$w <- W[,l]

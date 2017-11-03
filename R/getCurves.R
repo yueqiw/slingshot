@@ -151,8 +151,15 @@ setMethod(f = "getCurves",
                   loess(xj ~ lambda, weights = w, ...)$fitted
               }, smooth.spline = function(lambda, xj, w = NULL, ..., df = 5, 
                                           tol = 1e-4){
-                  fit <- smooth.spline(lambda, xj, w = w, ..., df = df, 
-                                       tol = tol, keep.data = FALSE)
+                  # fit <- smooth.spline(lambda, xj, w = w, ..., df = df, 
+                  #                      tol = tol, keep.data = FALSE)
+                  fit <- tryCatch({
+                      smooth.spline(lambda, xj, w = w, ..., df = df, 
+                                    tol = tol, keep.data = FALSE)
+                  }, error = function(e){
+                      smooth.spline(lambda, xj, w = w, ..., df = df, 
+                                    tol = tol, keep.data = FALSE, spar = 1)
+                  })
                   predict(fit, x = lambda)$y
               })
               
@@ -302,6 +309,7 @@ setMethod(f = "getCurves",
                           return(out)
                       }))
                       W[W > 1] <- 1
+                      W[W < 0] <- 0
                       W[W.orig==0] <- 0
                   }
                   if(drop.multi){
@@ -447,6 +455,7 @@ setMethod(f = "getCurves",
                       return(out)
                   }))
                   W[W > 1] <- 1
+                  W[W < 0] <- 0
                   W[W.orig==0] <- 0
               }
               if(drop.multi){

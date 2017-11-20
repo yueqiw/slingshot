@@ -30,7 +30,7 @@ Suggests:
 Remotes:
     Bioc::Biobase,
     Bioc::BiocGenerics,
-    Bioc::splatter
+    dynverse/splatter
 VignetteBuilder: knitr
 LazyData: false
 RoxygenNote: 6.0.1

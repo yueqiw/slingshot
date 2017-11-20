@@ -14,7 +14,7 @@ language: r
 cache: packages
 
 # R versions to be tested on
-r: 
+r:
   - bioc-release
   - bioc-devel
 
@@ -36,6 +36,11 @@ r_packages:
 ## BiocCheck
 bioc_packages:
   - BiocCheck
+
+## install and upgrade dependencies
+install:
+  - R -e 'install.packages("devtools")'
+  - R -e 'devtools::install(dependencies = TRUE, upgrade_dependencies = TRUE)'
 
 after_success:
   - Rscript -e 'covr::coveralls()'

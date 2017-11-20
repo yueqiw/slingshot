@@ -375,21 +375,21 @@ plot3d.SlingshotDataSet <- function(x,
     invisible(NULL)
 }
 
-#' #' @rdname SlingshotDataSet-plot3d
-#' #' @export
-#' setMethod(
-#'   f = "plot3d",
-#'   signature = "SlingshotDataSet",
-#'   definition = function(x,
-#'                         type = NULL,
-#'                         add = FALSE,
-#'                         dims = 1:3,
-#'                         aspect = 'iso',
-#'                         ...) {
-#'     plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
-#'                             aspect = aspect, ...)
-#'   }
-#' )
+# #' @rdname SlingshotDataSet-plot3d
+# #' @export
+# setMethod(
+#   f = "plot3d",
+#   signature = "SlingshotDataSet",
+#   definition = function(x,
+#                         type = NULL,
+#                         add = FALSE,
+#                         dims = 1:3,
+#                         aspect = 'iso',
+#                         ...) {
+#     plot3d.SlingshotDataSet(x, type = type, add = add, dims = dims, 
+#                             aspect = aspect, ...)
+#   }
+# )
 
 # #' @rdname SlingshotDataSet-plot3d
 # #' @examples

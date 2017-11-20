@@ -151,8 +151,15 @@ setMethod(f = "getCurves",
                   loess(xj ~ lambda, weights = w, ...)$fitted
               }, smooth.spline = function(lambda, xj, w = NULL, ..., df = 5, 
                                           tol = 1e-4){
-                  fit <- smooth.spline(lambda, xj, w = w, ..., df = df, 
-                                       tol = tol, keep.data = FALSE)
+                  # fit <- smooth.spline(lambda, xj, w = w, ..., df = df, 
+                  #                      tol = tol, keep.data = FALSE)
+                  fit <- tryCatch({
+                      smooth.spline(lambda, xj, w = w, ..., df = df, 
+                                    tol = tol, keep.data = FALSE)
+                  }, error = function(e){
+                      smooth.spline(lambda, xj, w = w, ..., df = df, 
+                                    tol = tol, keep.data = FALSE, spar = 1)
+                  })
                   predict(fit, x = lambda)$y
               })
               
@@ -226,6 +233,8 @@ setMethod(f = "getCurves",
                       # on all lineages, but only those points on the lineage
                       # should extend it
                       pcurve <- .get_lam(X, s = curve$s[curve$tag,], stretch=0)
+                      pcurve$dist <- abs(pcurve$dist) 
+                      # ^ force non-negative distances
                       pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
                                                            na.rm=TRUE)
                       # ^ force pseudotime to start at 0
@@ -238,10 +247,12 @@ setMethod(f = "getCurves",
                   if(extend == 'y'){
                       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
                                         stretch = 9999)
+                      curve$dist <- abs(curve$dist)
                   }
                   if(extend == 'n'){
                       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
                                         stretch = 0)
+                      curve$dist <- abs(curve$dist)
                   }
                   if(extend == 'pc1'){
                       pc1.1 <- prcomp(X[clusterLabels == lineages[[l]][1],])
@@ -265,10 +276,13 @@ setMethod(f = "getCurves",
                                             line.initial[K] + pc1.2)
                       curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
                                         stretch = 9999)
+                      curve$dist <- abs(curve$dist)
                   }
                   
                   pcurve <- .get_lam(X, s = curve$s[curve$tag, ,drop=FALSE], 
                                      stretch=0)
+                  # force non-negative distances
+                  pcurve$dist <- abs(pcurve$dist)
                   # force pseudotime to start at 0
                   pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
                                                        na.rm=TRUE) 
@@ -295,6 +309,7 @@ setMethod(f = "getCurves",
                           return(out)
                       }))
                       W[W > 1] <- 1
+                      W[W < 0] <- 0
                       W[W.orig==0] <- 0
                   }
                   if(drop.multi){
@@ -324,6 +339,7 @@ setMethod(f = "getCurves",
                                                  w = pcurve$w, ...)[ord]
                       }
                       new.pcurve <- .get_lam(X, s = s, stretch = stretch)
+                      new.pcurve$dist <- abs(new.pcurve$dist)
                       new.pcurve$lambda <- new.pcurve$lambda - 
                           min(new.pcurve$lambda, na.rm = TRUE)
                       new.pcurve$w <- W[,l]
@@ -439,6 +455,7 @@ setMethod(f = "getCurves",
                       return(out)
                   }))
                   W[W > 1] <- 1
+                  W[W < 0] <- 0
                   W[W.orig==0] <- 0
               }
               if(drop.multi){

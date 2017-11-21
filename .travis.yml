@@ -17,6 +17,12 @@ cache: packages
 r:
   - bioc-release
   - bioc-devel
+  
+# dependency for gsl>copula>zinbwave>splatter
+addons:
+  apt:
+    packages:
+      - libgsl-dev
 
 ## Turn this to true before submission to CRAN/Bioconductor
 warnings_are_errors: true

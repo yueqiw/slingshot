@@ -28,8 +28,6 @@ Suggests:
     rmarkdown,
     testthat
 Remotes:
-    Bioc::Biobase,
-    Bioc::BiocGenerics,
     dynverse/splatter
 VignetteBuilder: knitr
 LazyData: false

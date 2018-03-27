@@ -74,7 +74,7 @@ library(HSMMSingleCell)
 data("HSMM_expr_matrix")
 counts <- round(HSMM_expr_matrix)
 params <- splatEstimate(counts)
-params <- setParams(params, update = list(groupCells = 200, 
+params <- setParams(params, update = list(batchCells = 200, 
                                           path.nonlinearProb = .5, 
                                           de.prob = .6, de.facLoc = 1, 
                                           de.facScale = 2, path.length=100))
@@ -111,11 +111,11 @@ median of all non-zero counts) or more and we set the minimum percentage of
 cells robustly expressing a gene to 10%.
 
 ```{r genefilt, cache=TRUE}
-geneFilt <- apply(exprs(sim),1, function(gene){
+geneFilt <- apply(assays(sim)$counts,1, function(gene){
   sum(gene >= 2.5) >= .1 * ncol(sim)
 })
 mean(geneFilt) # percentage of genes retained
-sum(exprs(sim)[geneFilt,]) / sum(exprs(sim)) # percentage of reads retained
+sum(assays(sim)$counts[geneFilt,]) / sum(assays(sim)$counts) # percentage of reads retained
 sim <- sim[geneFilt,]
 ```
 
@@ -143,7 +143,7 @@ FQnorm <- function(counts){
   rownames(norm) <- rownames(counts)
   return(norm)
 }
-exprs(sim) <- FQnorm(exprs(sim))
+assays(sim)$norm <- FQnorm(assays(sim)$counts)
 ```
 
 ## Dimensionality Reduction
@@ -166,7 +166,7 @@ the robustly expressed, highly variable genes, not dampen this signal by forcing
 equal variance across genes.
 
 ```{r pca, cache=TRUE}
-pca <- prcomp(t(log1p(exprs(sim))), scale. = FALSE)
+pca <- prcomp(t(log1p(assays(sim)$norm)), scale. = FALSE)
 rd1 <- pca$x[,1:2]
 
 plot(rd1, col = topo.colors(100)[sim$Step], pch=16, asp = 1)
@@ -344,7 +344,7 @@ non-linear patterns in gene expression over developmental time.
 ```{r fitgam, cache=TRUE}
 require(gam)
 t <- pseudotime(crv1)
-y <- exprs(sim)
+y <- assays(sim)$counts
 gam.pval <- apply(y,1,function(z){
   d <- data.frame(z=z, t=t)
   tmp <- gam(z ~ lo(t), data=d)
@@ -359,7 +359,7 @@ expression over developmental time with a heatmap.
 ```{r heatmaps}
 require(clusterExperiment)
 topgenes1 <- names(sort(gam.pval, decreasing = FALSE))[1:100]
-heatdata1 <- exprs(sim)[rownames(exprs(sim)) %in% topgenes1, 
+heatdata1 <- assays(sim)$counts[rownames(assays(sim)$counts) %in% topgenes1, 
                         order(t, na.last = NA)]
 heatclus1 <- cl1[order(t, na.last = NA)]
 ce1 <- clusterExperiment(heatdata1, heatclus1, transformation=identity)

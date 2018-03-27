@@ -83,16 +83,17 @@ setMethod(
         if(lineages){
             X <- reducedDim(x)
             clusterLabels <- clusterLabels(x)
-            connectivity <- connectivity(x)
+            connectivity <- adjacency(x)
             clusters <- rownames(connectivity)
             nclus <- nrow(connectivity)
             centers <- t(sapply(clusters,function(clID){
-                x.sub <- X[clusterLabels == clID,]
-                return(colMeans(x.sub))
+                w <- clusterLabels[,clID]
+                return(apply(X, 2, weighted.mean, w = w))
             }))
             rownames(centers) <- clusters
-            X <- X[clusterLabels %in% clusters,]
-            clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+            X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
+            clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
+                                           drop = FALSE]
             linC <- lineageControl(x)
         }
         
@@ -321,18 +322,19 @@ plot3d.SlingshotDataSet <- function(x,
     }
     
     if(lineages){
-        X <- x@reducedDim
-        clusterLabels <- x@clusterLabels
-        connectivity <- x@connectivity
+        X <- reducedDim(x)
+        clusterLabels <- clusterLabels(x)
+        connectivity <- adjacency(x)
         clusters <- rownames(connectivity)
         nclus <- nrow(connectivity)
         centers <- t(sapply(clusters,function(clID){
-            x.sub <- X[clusterLabels == clID,]
-            return(colMeans(x.sub))
+            w <- clusterLabels[,clID]
+            return(apply(X, 2, weighted.mean, w = w))
         }))
         rownames(centers) <- clusters
-        X <- X[clusterLabels %in% clusters,]
-        clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+        X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
+        clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
+                                       drop = FALSE]
     }
     
     if(!add){
@@ -514,8 +516,8 @@ pairs.SlingshotDataSet <-
             clusters <- rownames(forest)
             nclus <- nrow(forest)
             centers <- t(sapply(clusters,function(clID){
-                x.sub <- x[clusterLabels(sds) == clID,]
-                return(colMeans(x.sub))
+                w <- clusterLabels[,clID]
+                return(apply(X, 2, weighted.mean, w = w))
             }))
             rownames(centers) <- clusters
             linC <- lineageControl(sds)
@@ -537,7 +539,7 @@ pairs.SlingshotDataSet <-
             } else {
                 cc <- 1:100
             }
-            col <- cc[as.factor(clusterLabels(sds))]
+            col <- cc[apply(clusterLabels(sds),1,which.max)]
         }
         #####
         if(doText <- missing(text.panel) || is.function(text.panel))

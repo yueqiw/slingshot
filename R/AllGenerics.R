@@ -101,21 +101,6 @@ setGeneric(
     }
 )
 
-# accessor functions
-#' @title Returns the reduced dimensional representation of a dataset.
-#'
-#' @param x an object that describes a dataset or a model involving reduced
-#'   dimensional data.
-#' @return the matrix representing the reduced dimensional data.
-#' @examples 
-#' rd <- matrix(data=rnorm(100), ncol=2)
-#' cl <- sample(letters[1:5], 50, replace = TRUE)
-#' sds <- newSlingshotDataSet(rd, cl)
-#' reducedDim(sds)
-#' @export
-setGeneric(name = "reducedDim",
-           signature = "x",
-           def = function(x) standardGeneric("reducedDim"))
 
 #' @title Returns the cluster labels
 #' @name clusterLabels
@@ -150,38 +135,56 @@ setGeneric(name = "lineages",
            signature = "x",
            def = function(x) standardGeneric("lineages"))
 
-#' @title Returns the connectivity matrix
-#'   
-#' @description Extract the connectivity matrix from a \code{SlingshotDataSet}.
+#' @title Returns the adjacency matrix
+#' @aliases adjacency connectivity
+#' @description Extract the adjacency matrix from a \code{SlingshotDataSet}.
 #' 
-#' @param x an object that describes a dataset or a model involving a
-#'   connectivity matrix.
-#' @return the matrix of connections between clusters.
+#' @param x an object that describes a dataset or a model involving an
+#'   adjacency matrix.
+#' @return the matrix of connections between clusters, inferred by the MST.
 #' @examples
 #' data("slingshotExample")
 #' sds <- getLineages(rd, cl)
-#' connectivity(sds)
+#' adjacency(sds)
+#' @export
+setGeneric(name = "adjacency",
+           signature = "x",
+           def = function(x) standardGeneric("adjacency"))
+#' @rdname adjacency
+#' @return the matrix of connections between clusters, inferred by the MST.
 #' @export
 setGeneric(name = "connectivity",
            signature = "x",
            def = function(x) standardGeneric("connectivity"))
 
-#' @title Returns the lineage control parameters
+#' @title Methods for parameters used by Slingshot
+#' @aliases slingParams lineageControl curveControl
+#' @description Extracts additional control parameters used by Slingshot in 
+#' lineage inference and fitting simultaneous principal curves. Note that 
+#' \code{lineageControl} and \code{curveControl} are deprecated and both now
+#' return the full \code{slingParams} list.
 #'   
-#' @description Extract lineage control parameters from a
-#'   \code{SlingshotDataSet}.
-#'   
-#' @param x an object that describes a dataset or a model involving lineages.
-#' @return the list of additional lineage inference parameters.
+#' @param x an object that includes output from Slingshot, either a 
+#' \code{SlingshotDataSet} or \code{SingleCellExperiment} object.
+#' @return the list of additional parameters used by Slingshot.
 #' @examples
 #' data("slingshotExample")
-#' sds <- getLineages(rd, cl, start.clus = '5')
-#' lineageControl(sds)
+#' sds <- slingshot(rd, cl, start.clus = '5')
+#' slingParams(sds)
+#' @export
+setGeneric(name = "slingParams",
+           signature = "x",
+           def = function(x) standardGeneric("slingParams"))
+#' @rdname slingParams
 #' @export
 setGeneric(name = "lineageControl",
            signature = "x",
            def = function(x) standardGeneric("lineageControl"))
-
+#' @rdname slingParams
+#' @export
+setGeneric(name = "curveControl",
+           signature = "x",
+           def = function(x) standardGeneric("curveControl"))
 #' @title Returns the principal curves
 #'   
 #' @description Extract the simultaneous principal curves from a
@@ -217,12 +220,6 @@ setGeneric(name = "curveControl",
            def = function(x) standardGeneric("curveControl"))
 
 # replacement functions
-#' @rdname reducedDim 
-#' @return Updated object with new reduced dimensional matrix.
-#' @export
-setGeneric(name = "reducedDim<-", 
-           signature = "x",
-           def = function(x, value) standardGeneric("reducedDim<-"))
 
 #' @rdname clusterLabels 
 #' @return Updated object with new vector of cluster labels.

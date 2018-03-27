@@ -12,55 +12,56 @@ test_that("getLineages works for different input types", {
   # matrix / integer
   mi <- getLineages(reducedDim, clusterLabels)
   expect_is(mi, "SlingshotDataSet")
-  expect_equal(dim(connectivity(mi)), c(5,5))
+  expect_equal(dim(adjacency(mi)), c(5,5))
   # 1-column matrix / integer
   m1i <- getLineages(reducedDim[,1,drop = FALSE], clusterLabels)
   expect_is(mi, "SlingshotDataSet")
-  expect_equal(dim(connectivity(mi)), c(5,5))
+  expect_equal(dim(adjacency(mi)), c(5,5))
   # matrix / character
   mc <- getLineages(reducedDim, as.character(clusterLabels))
   expect_is(mc, "SlingshotDataSet")
-  expect_equal(dim(connectivity(mc)), c(5,5))
+  expect_equal(dim(adjacency(mc)), c(5,5))
   # matrix / factor
   mf <- getLineages(reducedDim, as.factor(clusterLabels))
   expect_is(mf, "SlingshotDataSet")
-  expect_equal(dim(connectivity(mf)), c(5,5))
+  expect_equal(dim(adjacency(mf)), c(5,5))
   
   df <- data.frame(reducedDim)
   # data frame / integer
   dfi <- getLineages(df, clusterLabels)
   expect_is(dfi, "SlingshotDataSet")
-  expect_equal(dim(connectivity(dfi)), c(5,5))
+  expect_equal(dim(adjacency(dfi)), c(5,5))
   # data frame / character
   dfc <- getLineages(df, as.character(clusterLabels))
   expect_is(dfc, "SlingshotDataSet")
-  expect_equal(dim(connectivity(dfc)), c(5,5))
+  expect_equal(dim(adjacency(dfc)), c(5,5))
   # data frame / factor
   dff <- getLineages(df, as.factor(clusterLabels))
   expect_is(dff, "SlingshotDataSet")
-  expect_equal(dim(connectivity(dff)), c(5,5))
+  expect_equal(dim(adjacency(dff)), c(5,5))
   
   sds <- newSlingshotDataSet(reducedDim, clusterLabels)
   # SlingshotDataSet
   s <- getLineages(sds)
   expect_is(s, "SlingshotDataSet")
-  expect_equal(dim(connectivity(s)), c(5,5))
+  expect_equal(dim(adjacency(s)), c(5,5))
   
   # one cluster
   clus1 <- rep(1,50)
   c1 <- getLineages(reducedDim, clus1)
   expect_is(c1, "SlingshotDataSet")
-  expect_equal(dim(connectivity(c1)), c(1,1))
+  expect_equal(dim(adjacency(c1)), c(1,1))
   
   # no clusters (default = make one cluster)
   c0 <- getLineages(reducedDim)
   expect_is(c1, "SlingshotDataSet")
-  expect_equal(dim(connectivity(c1)), c(1,1))
+  expect_equal(dim(adjacency(c1)), c(1,1))
   
   # invalid inputs
   expect_error(getLineages(reducedDim[,-(seq_len(ncol(reducedDim)))], clusterLabels), 'has zero columns')
   expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels), 'has zero rows')
-  expect_error(getLineages(reducedDim, clusterLabels[1:10]), 'must equal length')
+  expect_error(getLineages(reducedDim, clusterLabels[1:10]), 'must equal')
+  expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels[integer(0)]), 'has zero rows')
   rdna <- reducedDim; rdna[1,1] <- NA
   expect_error(getLineages(rdna, clusterLabels), 'cannot contain missing values')
   rdc <- reducedDim; rdc[1,1] <- 'a'

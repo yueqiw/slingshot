@@ -3,6 +3,7 @@
 \docType{methods}
 \name{getLineages}
 \alias{getLineages}
+\alias{getLineages,matrix,matrix-method}
 \alias{getLineages,matrix,character-method}
 \alias{getLineages,matrix,ANY-method}
 \alias{getLineages,SlingshotDataSet,ANY-method}
@@ -13,24 +14,33 @@
 \usage{
 getLineages(reducedDim, clusterLabels, ...)
 
+\S4method{getLineages}{matrix,matrix}(reducedDim, clusterLabels,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  data = NULL)
+
 \S4method{getLineages}{matrix,character}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  data = NULL)
 
 \S4method{getLineages}{matrix,ANY}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  data = NULL)
 
 \S4method{getLineages}{SlingshotDataSet,ANY}(reducedDim,
   clusterLabels = clusterLabels(reducedDim), start.clus = NULL,
-  end.clus = NULL, dist.fun = NULL, omega = NULL)
+  end.clus = NULL, dist.fun = NULL, omega = NULL, data = NULL)
 
 \S4method{getLineages}{data.frame,ANY}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  data = NULL)
 
 \S4method{getLineages}{matrix,numeric}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  data = NULL)
 
 \S4method{getLineages}{matrix,factor}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  data = NULL)
 }
 \arguments{
 \item{reducedDim}{numeric, the \code{n} by \code{p} matrix of samples in a
@@ -54,11 +64,21 @@ number dimensions, the default is to use the joint covariance matrix to
 find squared distance between cluster centers. If not, the default is to
 use the diagonal of the joint covariance matrix.}
 
-\item{omega}{(optional) numeric, this granularity parameter determines the
-distance between every real cluster and the artificial cluster, OMEGA. It
-is parameterized such that this distance is \code{omega / 2}, making
-\code{omega} the maximum distance between two connected clusters. By
+\item{omega}{(optional) numeric, this granularity parameter determines the 
+distance between every real cluster and the artificial cluster, OMEGA. It 
+is parameterized such that this distance is \code{omega / 2}, making 
+\code{omega} the maximum distance between two connected clusters. By 
 default, \code{omega = Inf}.}
+
+\item{data}{(optional) a data object, such as a 
+\code{\link{SingleCellExperiment}}, compatible with the 
+\code{\link{reducedDims}} and \code{\link{colData}} accessor functions. If 
+provided, the arguments \code{reducedDim} and \code{clusterLabels} should
+be characters that identify elements of \code{reducedDims(data)} (assumed
+to be a \code{list}) and \code{colData(data)} (assumed to be a
+\code{data.frame}), respectively. If provided as a
+\code{\link{SingleCellExperiment}}, \code{slingshot} results will be
+returned as the same.}
 }
 \value{
 An object of class \code{\link{SlingshotDataSet}} containing the 

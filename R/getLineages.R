@@ -21,11 +21,20 @@
 #'   number dimensions, the default is to use the joint covariance matrix to
 #'   find squared distance between cluster centers. If not, the default is to
 #'   use the diagonal of the joint covariance matrix.
-#' @param omega (optional) numeric, this granularity parameter determines the
-#'   distance between every real cluster and the artificial cluster, OMEGA. It
-#'   is parameterized such that this distance is \code{omega / 2}, making
-#'   \code{omega} the maximum distance between two connected clusters. By
+#' @param omega (optional) numeric, this granularity parameter determines the 
+#'   distance between every real cluster and the artificial cluster, OMEGA. It 
+#'   is parameterized such that this distance is \code{omega / 2}, making 
+#'   \code{omega} the maximum distance between two connected clusters. By 
 #'   default, \code{omega = Inf}.
+#' @param data (optional) a data object, such as a 
+#'   \code{\link{SingleCellExperiment}}, compatible with the 
+#'   \code{\link{reducedDims}} and \code{\link{colData}} accessor functions. If 
+#'   provided, the arguments \code{reducedDim} and \code{clusterLabels} should
+#'   be characters that identify elements of \code{reducedDims(data)} (assumed
+#'   to be a \code{list}) and \code{colData(data)} (assumed to be a
+#'   \code{data.frame}), respectively. If provided as a
+#'   \code{\link{SingleCellExperiment}}, \code{slingshot} results will be
+#'   returned as the same.
 #'   
 #' @details The \code{connectivity} matrix is learned by fitting a (possibly
 #'   constrained) minimum-spanning tree on the clusters and the artificial 
@@ -69,23 +78,22 @@
 #'   
 setMethod(f = "getLineages",
           signature = signature(reducedDim = "matrix", 
-                                clusterLabels = "character"),
+                                clusterLabels = "matrix"),
           definition = function(reducedDim, clusterLabels,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
+                                dist.fun = NULL, omega = NULL, data = NULL){
               
-              X <- reducedDim
+              X <- as.matrix(reducedDim)
+              clusterLabels <- as.matrix(clusterLabels)
               # CHECKS
-              clusterLabels <- as.character(clusterLabels)
-              X <- as.matrix(X)
               if(nrow(X)==0){
                   stop('reducedDim has zero rows.')
               }
               if(ncol(X)==0){
                   stop('reducedDim has zero columns.')
               }
-              if(nrow(X) != length(clusterLabels)){
-                  stop('nrow(reducedDim) must equal length(clusterLabels).')
+              if(nrow(X) != nrow(clusterLabels)){
+                  stop('nrow(reducedDim) must equal nrow(clusterLabels).')
               }
               if(any(is.na(X))){
                   stop('reducedDim cannot contain missing values.')
@@ -93,11 +101,17 @@ setMethod(f = "getLineages",
               if(!all(apply(X,2,is.numeric))){
                   stop('reducedDim must only contain numeric values.')
               }
-              if(is.null(rownames(X))){
-                  rownames(X) <- paste('Cell',seq_len(nrow(X)),sep='-')
+              if (is.null(rownames(X)) &
+                  is.null(rownames(clusterLabels))) {
+                  rownames(X) <- paste('Cell', seq_len(nrow(X)), sep = '-')
+                  rownames(clusterLabels) <-
+                      paste('Cell', seq_len(nrow(X)), sep = '-')
               }
               if(is.null(colnames(X))){
                   colnames(X) <- paste('Dim',seq_len(ncol(X)),sep='-')
+              }
+              if(is.null(colnames(clusterLabels))) {
+                  colnames(clusterLabels) <- seq_len(ncol(clusterLabels))
               }
               if(any(rownames(X)=='')){
                   miss.ind <- which(rownames(X) == '')
@@ -107,13 +121,29 @@ setMethod(f = "getLineages",
                   miss.ind <- which(colnames(X) == '')
                   colnames(X)[miss.ind] <- paste('Dim',miss.ind,sep='-')
               }
-              
+              if(is.null(rownames(clusterLabels)) & 
+                 !is.null(rownames(X))){
+                  rownames(clusterLabels) <- rownames(X)
+              }
+              if(is.null(rownames(X)) & 
+                 !is.null(rownames(clusterLabels))){
+                  rownames(X) <- rownames(clusterLabels)
+              }
+              if(any(rowSums(clusterLabels)>1)){
+                  rs <- matrix(rowSums(clusterLabels), 
+                               ncol = ncol(clusterLabels))
+                  clusterLabels <- clusterLabels / rs
+              }
+              if(any(colSums(clusterLabels)==0)){
+                  clusterLabels <- clusterLabels[, colSums(clusterLabels)!=0, 
+                                                 drop = FALSE]
+              }
               
               # set up, remove unclustered cells (-1's)
               X.original <- X
-              X <- X[clusterLabels != -1, ,drop = FALSE]
-              clusterLabels <- clusterLabels[clusterLabels != -1]
-              clusters <- unique(clusterLabels)
+              clusterLabels <- clusterLabels[, colnames(clusterLabels) != -1, 
+                                             drop = FALSE]
+              clusters <- colnames(clusterLabels)
               nclus <- length(clusters)
               if(!is.null(start.clus)){
                   start.clus <- as.character(start.clus)
@@ -122,32 +152,31 @@ setMethod(f = "getLineages",
                   end.clus <- as.character(end.clus)
               }
               
-              
               ### get the connectivity matrix
               # get cluster centers
               centers <- t(sapply(clusters,function(clID){
-                  x.sub <- X[clusterLabels == clID, ,drop = FALSE]
-                  return(colMeans(x.sub))
+                  w <- clusterLabels[,clID]
+                  return(apply(X, 2, weighted.mean, w = w))
               }))
               
               # determine the distance function
               if(is.null(dist.fun)){
-                  min.clus.size <- min(table(clusterLabels))
+                  min.clus.size <- min(colSums(clusterLabels))
                   if(min.clus.size <= ncol(X)){
                       message('Using diagonal covariance matrix')
-                      dist.fun <- function(c1,c2) .dist_clusters_diag(c1,c2)
+                      dist.fun <- function(X,w1,w2) .dist_clusters_diag(X,w1,w2)
                   }else{
                       message('Using full covariance matrix')
-                      dist.fun <- function(c1,c2) .dist_clusters_full(c1,c2)
+                      dist.fun <- function(X,w1,w2) .dist_clusters_full(X,w1,w2)
                   }
               }
               
               ### get pairwise cluster distance matrix
               D <- as.matrix(sapply(clusters,function(clID1){
                   sapply(clusters,function(clID2){
-                      clus1 <- X[clusterLabels == clID1, ,drop = FALSE]
-                      clus2 <- X[clusterLabels == clID2, ,drop = FALSE]
-                      return(dist.fun(clus1, clus2))
+                      w1 <- clusterLabels[,clID1]
+                      w2 <- clusterLabels[,clID2]
+                      return(dist.fun(X, w1, w2))
                   })
               }))
               rownames(D) <- clusters
@@ -303,16 +332,54 @@ setMethod(f = "getLineages",
               lineageControl$end.given <- end.given
               
               lineageControl$dist <- D[1:nclus,1:nclus, drop = FALSE]
-              connectivity <- forest
               
               out <- newSlingshotDataSet(reducedDim = X, 
                                          clusterLabels = clusterLabels, 
                                          lineages = lineages, 
-                                         connectivity = connectivity, 
-                                         lineageControl = lineageControl)
+                                         adjacency = forest, 
+                                         slingParams = lineageControl)
               
               validObject(out)
               return(out)
+          }
+)
+
+#' @rdname getLineages
+#' @export
+setMethod(f = "getLineages",
+          signature = signature(reducedDim = "matrix", 
+                                clusterLabels = "character"),
+          definition = function(reducedDim, clusterLabels,
+                                start.clus = NULL, end.clus = NULL,
+                                dist.fun = NULL, omega = NULL, data = NULL){
+              
+              # CHECKS
+              clusterLabels <- as.character(clusterLabels)
+              X <- as.matrix(reducedDim)
+              if(nrow(X)==0){
+                  stop('reducedDim has zero rows.')
+              }
+              if(ncol(X)==0){
+                  stop('reducedDim has zero columns.')
+              }
+              if(nrow(X) != length(clusterLabels)){
+                  stop('nrow(reducedDim) must equal length(clusterLabels).')
+              }
+              if(any(is.na(clusterLabels))){
+                  message("Cluster labels of 'NA' being treated as 
+                          unclustered.")
+                  clusterLabels[is.na(clusterLabels)] <- '-1'
+              }
+
+              # convert clusterLabels into cluster weights matrix
+              clusters <- unique(clusterLabels)
+              clusWeight <- sapply(clusters,function(clID){
+                  as.numeric(clusterLabels == clID)
+              })
+              return(getLineages(reducedDim = reducedDim, 
+                                 clusterLabels = clusWeight, 
+                                 start.clus = start.clus, end.clus = end.clus,
+                                 dist.fun = dist.fun, omega = omega))
           }
 )
 
@@ -323,9 +390,10 @@ setMethod(f = "getLineages",
           definition = function(reducedDim,
                                 clusterLabels,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
+                                dist.fun = NULL, omega = NULL, data = NULL){
               if(missing(clusterLabels)){
-                  message('Unclustered data detected.')
+                  message('No cluster labels found. Continuing with one 
+                          cluster.')
                   clusterLabels <- rep('1', nrow(reducedDim))
               }
               return(getLineages(reducedDim = reducedDim, 
@@ -342,7 +410,7 @@ setMethod(f = "getLineages",
           definition = function(reducedDim,
                                 clusterLabels = clusterLabels(reducedDim),
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
+                                dist.fun = NULL, omega = NULL, data = NULL){
               return(getLineages(reducedDim = reducedDim(reducedDim), 
                                  clusterLabels = reducedDim@clusterLabels, 
                                  start.clus = start.clus, end.clus = end.clus,
@@ -356,7 +424,7 @@ setMethod(f = "getLineages",
                                 clusterLabels = "ANY"),
           definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
+                                dist.fun = NULL, omega = NULL, data = NULL){
               RD <- as.matrix(reducedDim)
               rownames(RD) <- rownames(reducedDim)
               return(getLineages(reducedDim = RD, 
@@ -372,7 +440,7 @@ setMethod(f = "getLineages",
                                 clusterLabels = "numeric"),
           definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
+                                dist.fun = NULL, omega = NULL, data = NULL){
               return(getLineages(reducedDim = reducedDim, 
                                  clusterLabels = as.character(clusterLabels), 
                                  start.clus = start.clus, end.clus = end.clus,
@@ -386,7 +454,7 @@ setMethod(f = "getLineages",
                                 clusterLabels = "factor"),
           definition = function(reducedDim, clusterLabels, 
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
+                                dist.fun = NULL, omega = NULL, data = NULL){
               return(getLineages(reducedDim = reducedDim, 
                                  clusterLabels = as.character(clusterLabels), 
                                  start.clus = start.clus, end.clus = end.clus,

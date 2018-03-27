@@ -8,6 +8,7 @@
 \alias{newSlingshotDataSet,matrix,factor-method}
 \alias{newSlingshotDataSet,matrix,ANY-method}
 \alias{newSlingshotDataSet,matrix,character-method}
+\alias{newSlingshotDataSet,matrix,matrix-method}
 \title{Initialize an object of class \code{SlingshotDataSet}}
 \usage{
 newSlingshotDataSet(reducedDim, clusterLabels, ...)
@@ -20,10 +21,11 @@ newSlingshotDataSet(reducedDim, clusterLabels, ...)
 
 \S4method{newSlingshotDataSet}{matrix,ANY}(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,character}(reducedDim, clusterLabels,
-  lineages = list(), connectivity = matrix(NA, 0, 0),
-  lineageControl = list(), curves = list(), pseudotime = matrix(NA, 0, 0),
-  curveWeights = matrix(NA, 0, 0), curveControl = list())
+\S4method{newSlingshotDataSet}{matrix,character}(reducedDim, clusterLabels, ...)
+
+\S4method{newSlingshotDataSet}{matrix,matrix}(reducedDim, clusterLabels,
+  lineages = list(), adjacency = matrix(NA, 0, 0), curves = list(),
+  slingParams = list())
 }
 \arguments{
 \item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data
@@ -35,6 +37,9 @@ denoting each cell's cluster label.}
 
 \item{lineages}{list. A list with each element a character vector of cluster 
 names representing a lineage as an ordered set of clusters.}
+
+\item{curves}{list. A list of \code{principal.curve} objects produced by 
+\code{\link{getCurves}}.}
 
 \item{connectivity}{matrix. A binary matrix describing the connectivity 
 between clusters induced by the minimum spanning tree.}
@@ -48,9 +53,6 @@ indicating whether the initial state was pre-specified.}
 \item{\code{end.given}}{logical. A vector of logical values indicating 
 whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
 numeric matrix of pairwise cluster distances.} }}
-
-\item{curves}{list. A list of \code{principal.curve} objects produced by 
-\code{\link{getCurves}}.}
 
 \item{curveControl}{list. Additional parameters specifying how the 
 simultaneous principal curves were constructed. \itemize{ 
@@ -93,6 +95,8 @@ Constructs a \code{SlingshotDataSet} object. Additional helper
 \item \code{reducedDim = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
 
 \item \code{reducedDim = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
+
+\item \code{reducedDim = matrix,clusterLabels = matrix}: returns a \code{SlingshotDataSet} object.
 }}
 
 \examples{

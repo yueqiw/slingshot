@@ -6,26 +6,33 @@
 \alias{SlingshotDataSet}
 \alias{show,SlingshotDataSet-method}
 \alias{reducedDim,SlingshotDataSet-method}
-\alias{clusterLabels,SlingshotDataSet-method}
+\alias{reducedDims,SlingshotDataSet-method}
 \alias{connectivity,SlingshotDataSet-method}
+\alias{adjacency,SlingshotDataSet-method}
 \alias{lineages,SlingshotDataSet-method}
 \alias{lineageControl,SlingshotDataSet-method}
 \alias{curves,SlingshotDataSet-method}
 \alias{curveControl,SlingshotDataSet-method}
+\alias{slingParams,SlingshotDataSet-method}
 \alias{reducedDim<-,SlingshotDataSet-method}
+\alias{reducedDims<-,SlingshotDataSet-method}
 \alias{clusterLabels<-,SlingshotDataSet-method}
-\alias{[,SlingshotDataSet-method}
+\alias{[,SlingshotDataSet,ANY,ANY,ANY-method}
 \alias{pseudotime,SlingshotDataSet-method}
 \alias{curveWeights,SlingshotDataSet-method}
+\alias{combine,SingleCellExperiment,SlingshotDataSet-method}
+\alias{combine,SlingshotDataSet,SingleCellExperiment-method}
 \title{Class \code{SlingshotDataSet}}
 \usage{
 \S4method{show}{SlingshotDataSet}(object)
 
 \S4method{reducedDim}{SlingshotDataSet}(x)
 
-\S4method{clusterLabels}{SlingshotDataSet}(x)
+\S4method{reducedDims}{SlingshotDataSet}(x)
 
 \S4method{connectivity}{SlingshotDataSet}(x)
+
+\S4method{adjacency}{SlingshotDataSet}(x)
 
 \S4method{lineages}{SlingshotDataSet}(x)
 
@@ -35,15 +42,23 @@
 
 \S4method{curveControl}{SlingshotDataSet}(x)
 
+\S4method{slingParams}{SlingshotDataSet}(x)
+
 \S4method{reducedDim}{SlingshotDataSet}(x) <- value
+
+\S4method{reducedDims}{SlingshotDataSet}(x) <- value
 
 \S4method{clusterLabels}{SlingshotDataSet}(x) <- value
 
-\S4method{[}{SlingshotDataSet}(x, i, j, ..., drop = FALSE)
+\S4method{[}{SlingshotDataSet,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
 \S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
 
 \S4method{curveWeights}{SlingshotDataSet}(x)
+
+\S4method{combine}{SingleCellExperiment,SlingshotDataSet}(x, y)
+
+\S4method{combine}{SlingshotDataSet,SingleCellExperiment}(x, y)
 }
 \arguments{
 \item{object}{a \code{SlingshotDataSet} object.}
@@ -62,14 +77,18 @@ dimensional matrix.}
 particular lineage should have a pseudotime of \code{NA} (the default) or
 a time corresponding to its index of projection.}
 
+\item{x}{a \code{SlingshotDataSet} object.}
+
+\item{value}{matrix, the new reduced dimensional dataset.}
+
 \item{value}{character, the new vector of cluster labels.}
 }
 \value{
 The accessor functions \code{reducedDim}, \code{clusterLabels}, 
-  \code{lineages}, \code{connectivity}, \code{lineageControl}, \code{curves},
-  and \code{curveControl} return the corresponding elements of a 
+  \code{lineages}, \code{adjacency}, \code{curves},
+  and \code{slingParams} return the corresponding elements of a 
   \code{SlingshotDataSet}. The functions \code{pseudotime} and 
-  \code{curveWeights} extract useful output elements of a 
+  \code{lineageWeights} extract useful output elements of a 
   \code{SlingshotDataSet}, provided that curves have already been fit with 
   either \code{slingshot} or \code{getCurves}.
 }
@@ -89,6 +108,9 @@ Warning: this will remove any existing lineages or curves from the
 
 Warning: this will remove any existing lineages or curves from the 
 \code{SlingshotDataSet} object.
+
+Warning: this will remove any existing lineages or curves from the 
+\code{SlingshotDataSet} object.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -98,9 +120,13 @@ object.
 \item \code{reducedDim}: returns the matrix representing the reduced
 dimensional dataset.
 
-\item \code{clusterLabels}: returns the vector of cluster labels.
+\item \code{reducedDims}: returns the matrix representing the reduced
+dimensional dataset.
 
-\item \code{connectivity}: returns the connectivity matrix between
+\item \code{connectivity}: returns the adjacency matrix between
+clusters.
+
+\item \code{adjacency}: returns the adjacency matrix between
 clusters.
 
 \item \code{lineages}: returns the list of lineages, represented by
@@ -114,7 +140,13 @@ parameters.
 \item \code{curveControl}: returns the list of additional curve fitting
 parameters.
 
+\item \code{slingParams}: returns the list of additional parameters used
+by Slingshot.
+
 \item \code{reducedDim<-}: Updated object with new reduced dimensional
+matrix.
+
+\item \code{reducedDims<-}: Updated object with new reduced dimensional
 matrix.
 
 \item \code{clusterLabels<-}: Updated object with new vector of cluster
@@ -126,6 +158,12 @@ labels.
 
 \item \code{curveWeights}: returns the matrix of cell weights along each
 lineage.
+
+\item \code{combine}: incpororates Slingshot output into a 
+\code{\link{SingleCellExperiment}} object.
+
+\item \code{combine}: incpororates Slingshot output into a 
+\code{\link{SingleCellExperiment}} object.
 }}
 
 \section{Slots}{
@@ -134,48 +172,55 @@ lineage.
 \item{\code{reducedDim}}{matrix. An \code{n} by \code{p} numeric matrix or data frame
 giving the coordinates of the cells in a reduced dimensionality space.}
 
-\item{\code{clusterLabels}}{character. A character vector of length \code{n} denoting
-each cell's cluster label.}
+\item{\code{clusterLabels}}{matrix or character. An \code{n} by \code{K} matrix of 
+weights indicating each cell's cluster assignment or a character vector of
+cluster assignments, which will be converted into a binary matrix.}
 
 \item{\code{lineages}}{list. A list with each element a character vector of cluster 
 names representing a lineage as an ordered set of clusters.}
 
-\item{\code{connectivity}}{matrix. A binary matrix describing the connectivity 
+\item{\code{adjacency}}{matrix. A binary matrix describing the adjacency 
 between clusters induced by the minimum spanning tree.}
-
-\item{\code{lineageControl}}{list. Additional parameters specifying how the minimum 
-spanning tree on clusters was constructed. \itemize{ 
-\item{\code{start.clus}}{character. The label of the root cluster.} 
-\item{\code{end.clus}}{character. Vector of cluster labels indicating the 
-terminal clusters.} \item{\code{start.given}}{logical. A logical value 
-indicating whether the initial state was pre-specified.} 
-\item{\code{end.given}}{logical. A vector of logical values indicating 
-whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
-numeric matrix of pairwise cluster distances.} }}
 
 \item{\code{curves}}{list. A list of \code{principal.curve} objects produced by 
 \code{\link{getCurves}}.}
 
-\item{\code{curveControl}}{list. Additional parameters specifying how the 
-simultaneous principal curves were constructed. \itemize{ 
+\item{\code{slingParams}}{list. Additional parameters used by Slingshot. These may 
+specify how the minimum spanning tree on clusters was constructed: 
+\itemize{ 
+\item{\code{start.clus}}{character. The label of the root cluster.} 
+\item{\code{end.clus}}{character. Vector of cluster labels indicating the 
+terminal clusters.}
+\item{\code{start.given}}{logical. A logical value 
+indicating whether the initial state was pre-specified.} 
+\item{\code{end.given}}{logical. A vector of logical values indicating 
+whether each terminal state was pre-specified}
+\item{\code{dist}}{matrix. A
+numeric matrix of pairwise cluster distances.} }
+They may also specify how simultaneous principal curves were constructed:
+\itemize{ 
 \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
 and how much to shrink branching lineages toward their shared average 
-curve.} \item{\code{extend}}{character. Specifies the method for handling 
+curve.} 
+\item{\code{extend}}{character. Specifies the method for handling 
 root and leaf clusters of lineages when constructing the initial, 
 piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
-See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical. 
+See \code{\link{getCurves}} for details.} 
+\item{\code{reweight}}{logical. 
 Indicates whether to reweight cells shared by multiple lineages during 
 curve-fitting. If \code{TRUE}, cells shared between lineages will have 
 lineage-specific weights determined by the ratio: (distance to nearest 
-curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical. 
+curve) / (distance to specific curve).} 
+\item{\code{drop.multi}}{logical. 
 Indicates whether to drop shared cells from lineages which do not fit them 
 well. If \code{TRUE}, shared cells with a distance to one lineage above the
 90th percentile and another lineage below the 50th percentile will be 
-dropped from the farther lineage.} \item{\code{shrink.method}}{character. 
+dropped from the farther lineage.} 
+\item{\code{shrink.method}}{character. 
 Denotes how to determine the amount of shrinkage for a branching lineage. 
 Accepted values are the same as for \code{kernel} in  the \code{density} 
 function (default is \code{"cosine"}), as well as \code{"tricube"} and 
-\code{"density"}. See \code{\link{getCurves}} for details.} \item{Other 
-parameters specified by \code{\link{principal.curve}}}. }}
+\code{"density"}. See \code{\link{getCurves}} for details.} 
+\item{Other parameters specified by \code{\link{principal.curve}}}. }}
 }}
 

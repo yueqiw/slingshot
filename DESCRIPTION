@@ -18,7 +18,8 @@ Imports:
     graphics,
     grDevices,
     igraph,
-    methods
+    methods,
+    SingleCellExperiment
 Suggests:
     BiocGenerics,
     knitr,

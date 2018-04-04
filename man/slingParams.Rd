@@ -2,17 +2,9 @@
 % Please edit documentation in R/AllGenerics.R
 \name{slingParams}
 \alias{slingParams}
-\alias{lineageControl}
-\alias{curveControl}
-\alias{lineageControl}
-\alias{curveControl}
 \title{Methods for parameters used by Slingshot}
 \usage{
 slingParams(x)
-
-lineageControl(x)
-
-curveControl(x)
 }
 \arguments{
 \item{x}{an object that includes output from Slingshot, either a 
@@ -23,9 +15,7 @@ the list of additional parameters used by Slingshot.
 }
 \description{
 Extracts additional control parameters used by Slingshot in 
-lineage inference and fitting simultaneous principal curves. Note that 
-\code{lineageControl} and \code{curveControl} are deprecated and both now
-return the full \code{slingParams} list.
+lineage inference and fitting simultaneous principal curves.
 }
 \examples{
 data("slingshotExample")

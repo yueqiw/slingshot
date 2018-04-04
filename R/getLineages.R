@@ -58,9 +58,9 @@
 #'   by a character vector with the names of the clusters included in that
 #'   lineage, in order.} \item{\code{connectivity}}{ the inferred cluster
 #'   connectivity matrix.} 
-#'   \item{\code{lineageControl$start.given},\code{lineageControl$end.given}} {
+#'   \item{\code{slingParams$start.given},\code{slingParams$end.given}} {
 #'   logical values indicating whether the starting and ending clusters were 
-#'   specified a priori.} \item{\code{lineageControl$dist}}{ the pairwise
+#'   specified a priori.} \item{\code{slingParams$dist}}{ the pairwise
 #'   cluster distance matrix.}}
 #'   
 #' @examples
@@ -77,13 +77,13 @@
 #' @importFrom ape mst
 #'   
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", 
+          signature = signature(data = "matrix", 
                                 clusterLabels = "matrix"),
-          definition = function(reducedDim, clusterLabels,
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
+                                dist.fun = NULL, omega = NULL){
               
-              X <- as.matrix(reducedDim)
+              X <- as.matrix(data)
               clusterLabels <- as.matrix(clusterLabels)
               # CHECKS
               if(nrow(X)==0){
@@ -347,15 +347,15 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", 
+          signature = signature(data = "matrix", 
                                 clusterLabels = "character"),
-          definition = function(reducedDim, clusterLabels,
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
+                                dist.fun = NULL, omega = NULL){
               
               # CHECKS
               clusterLabels <- as.character(clusterLabels)
-              X <- as.matrix(reducedDim)
+              X <- as.matrix(data)
               if(nrow(X)==0){
                   stop('reducedDim has zero rows.')
               }
@@ -376,8 +376,8 @@ setMethod(f = "getLineages",
               clusWeight <- sapply(clusters,function(clID){
                   as.numeric(clusterLabels == clID)
               })
-              return(getLineages(reducedDim = reducedDim, 
-                                 clusterLabels = clusWeight, 
+              return(getLineages(data = data, clusterLabels = clusWeight,
+                                 reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,
                                  dist.fun = dist.fun, omega = omega))
           }
@@ -386,18 +386,17 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", clusterLabels = "ANY"),
-          definition = function(reducedDim,
-                                clusterLabels,
+          signature = signature(data = "matrix", clusterLabels = "ANY"),
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
+                                dist.fun = NULL, omega = NULL){
               if(missing(clusterLabels)){
-                  message('No cluster labels found. Continuing with one 
+                  message('No cluster labels detected. Continuing with one 
                           cluster.')
-                  clusterLabels <- rep('1', nrow(reducedDim))
+                  clusterLabels <- rep('1', nrow(data))
               }
-              return(getLineages(reducedDim = reducedDim, 
-                                 clusterLabels = clusterLabels, 
+              return(getLineages(data = data, clusterLabels = clusterLabels,
+                                 reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,
                                  dist.fun = dist.fun, omega = omega))
           })
@@ -405,14 +404,15 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "SlingshotDataSet", 
+          signature = signature(data = "SlingshotDataSet", 
                                 clusterLabels = "ANY"),
-          definition = function(reducedDim,
-                                clusterLabels = clusterLabels(reducedDim),
+          definition = function(data, clusterLabels = clusterLabels(data),
+                                reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
-              return(getLineages(reducedDim = reducedDim(reducedDim), 
-                                 clusterLabels = reducedDim@clusterLabels, 
+                                dist.fun = NULL, omega = NULL){
+              return(getLineages(data = reducedDim(data), 
+                                 clusterLabels = data@clusterLabels,
+                                 reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,
                                  dist.fun = dist.fun, omega = omega))
           })
@@ -420,15 +420,15 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "data.frame", 
+          signature = signature(data = "data.frame", 
                                 clusterLabels = "ANY"),
-          definition = function(reducedDim, clusterLabels, 
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
-              RD <- as.matrix(reducedDim)
-              rownames(RD) <- rownames(reducedDim)
-              return(getLineages(reducedDim = RD, 
-                                 clusterLabels = clusterLabels, 
+                                dist.fun = NULL, omega = NULL){
+              RD <- as.matrix(data)
+              rownames(RD) <- rownames(data)
+              return(getLineages(data = RD, clusterLabels = clusterLabels,
+                                 reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,
                                  dist.fun = dist.fun, omega = omega))
           })
@@ -436,13 +436,14 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", 
+          signature = signature(data = "matrix", 
                                 clusterLabels = "numeric"),
-          definition = function(reducedDim, clusterLabels, 
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
-              return(getLineages(reducedDim = reducedDim, 
-                                 clusterLabels = as.character(clusterLabels), 
+                                dist.fun = NULL, omega = NULL){
+              return(getLineages(data = data, 
+                                 clusterLabels = as.character(clusterLabels),
+                                 reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,
                                  dist.fun = dist.fun, omega = omega))
           })
@@ -450,13 +451,14 @@ setMethod(f = "getLineages",
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(reducedDim = "matrix", 
+          signature = signature(data = "matrix", 
                                 clusterLabels = "factor"),
-          definition = function(reducedDim, clusterLabels, 
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL, data = NULL){
-              return(getLineages(reducedDim = reducedDim, 
+                                dist.fun = NULL, omega = NULL){
+              return(getLineages(data = data, 
                                  clusterLabels = as.character(clusterLabels), 
+                                 reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,
                                  dist.fun = dist.fun, omega = omega))
           })

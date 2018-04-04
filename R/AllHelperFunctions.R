@@ -115,8 +115,8 @@ setMethod(
     signature = "SlingshotDataSet",
     definition = function(object) {
         cat("class:", class(object), "\n\n")
-        df <- data.frame(Samples = dim(reducedDim(object))[1], 
-                         Dimensions = dim(reducedDim(object))[2])
+        df <- data.frame(Samples = nrow(reducedDim(object)), 
+                         Dimensions = ncol(reducedDim(object)))
         print(df, row.names = FALSE)
         cat('\nlineages:', length(lineages(object)), "\n")
         for(i in seq_len(length(lineages(object)))){
@@ -208,28 +208,12 @@ setMethod(
     signature = "SlingshotDataSet",
     definition = function(x) x@lineages
 )
-#' @describeIn SlingshotDataSet returns the list of additional lineage inference
-#'   parameters.
-#' @export
-setMethod(
-    f = "lineageControl",
-    signature = "SlingshotDataSet",
-    definition = function(x) x@slingParams
-)
 #' @describeIn SlingshotDataSet returns the list of smooth lineage curves.
 #' @export
 setMethod(
     f = "curves",
     signature = "SlingshotDataSet",
     definition = function(x) x@curves
-)
-#' @describeIn SlingshotDataSet returns the list of additional curve fitting
-#'   parameters.
-#' @export
-setMethod(
-    f = "curveControl",
-    signature = "SlingshotDataSet",
-    definition = function(x) x@slingParams
 )
 #' @describeIn SlingshotDataSet returns the list of additional parameters used
 #' by Slingshot.

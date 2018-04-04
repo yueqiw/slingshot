@@ -12,44 +12,49 @@
 \alias{getLineages,matrix,factor-method}
 \title{Infer Lineage Structure from Clustered Samples}
 \usage{
-getLineages(reducedDim, clusterLabels, ...)
+getLineages(data, clusterLabels, ...)
 
-\S4method{getLineages}{matrix,matrix}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
-  data = NULL)
+\S4method{getLineages}{matrix,matrix}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{matrix,character}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
-  data = NULL)
+\S4method{getLineages}{matrix,character}(data, clusterLabels,
+  reducedDim = NULL, start.clus = NULL, end.clus = NULL,
+  dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{matrix,ANY}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
-  data = NULL)
+\S4method{getLineages}{matrix,ANY}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{SlingshotDataSet,ANY}(reducedDim,
-  clusterLabels = clusterLabels(reducedDim), start.clus = NULL,
-  end.clus = NULL, dist.fun = NULL, omega = NULL, data = NULL)
+\S4method{getLineages}{SlingshotDataSet,ANY}(data,
+  clusterLabels = clusterLabels(data), reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{data.frame,ANY}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
-  data = NULL)
+\S4method{getLineages}{data.frame,ANY}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{matrix,numeric}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
-  data = NULL)
+\S4method{getLineages}{matrix,numeric}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{matrix,factor}(reducedDim, clusterLabels,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
-  data = NULL)
+\S4method{getLineages}{matrix,factor}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 }
 \arguments{
-\item{reducedDim}{numeric, the \code{n} by \code{p} matrix of samples in a
-reduced dimensionality space.}
+\item{data}{(optional) a data object, such as a 
+\code{\link{SingleCellExperiment}}, compatible with the 
+\code{\link{reducedDims}} and \code{\link{colData}} accessor functions. If 
+provided, the arguments \code{reducedDim} and \code{clusterLabels} should
+be characters that identify elements of \code{reducedDims(data)} (assumed
+to be a \code{list}) and \code{colData(data)} (assumed to be a
+\code{data.frame}), respectively. If provided as a
+\code{\link{SingleCellExperiment}}, \code{slingshot} results will be
+returned as the same.}
 
 \item{clusterLabels}{character, a vector of length \code{n} denoting cluster
 labels, optionally including \code{-1}'s for "unclustered." If
 \code{reducedDim} is a \code{SlingshotDataSet}, cluster labels will be
 taken from it.}
+
+\item{reducedDim}{numeric, the \code{n} by \code{p} matrix of samples in a
+reduced dimensionality space.}
 
 \item{start.clus}{(optional) character, indicates the cluster(s) *from* which
 lineages will be drawn.}
@@ -69,16 +74,6 @@ distance between every real cluster and the artificial cluster, OMEGA. It
 is parameterized such that this distance is \code{omega / 2}, making 
 \code{omega} the maximum distance between two connected clusters. By 
 default, \code{omega = Inf}.}
-
-\item{data}{(optional) a data object, such as a 
-\code{\link{SingleCellExperiment}}, compatible with the 
-\code{\link{reducedDims}} and \code{\link{colData}} accessor functions. If 
-provided, the arguments \code{reducedDim} and \code{clusterLabels} should
-be characters that identify elements of \code{reducedDims(data)} (assumed
-to be a \code{list}) and \code{colData(data)} (assumed to be a
-\code{data.frame}), respectively. If provided as a
-\code{\link{SingleCellExperiment}}, \code{slingshot} results will be
-returned as the same.}
 }
 \value{
 An object of class \code{\link{SlingshotDataSet}} containing the 
@@ -88,9 +83,9 @@ An object of class \code{\link{SlingshotDataSet}} containing the
   by a character vector with the names of the clusters included in that
   lineage, in order.} \item{\code{connectivity}}{ the inferred cluster
   connectivity matrix.} 
-  \item{\code{lineageControl$start.given},\code{lineageControl$end.given}} {
+  \item{\code{slingParams$start.given},\code{slingParams$end.given}} {
   logical values indicating whether the starting and ending clusters were 
-  specified a priori.} \item{\code{lineageControl$dist}}{ the pairwise
+  specified a priori.} \item{\code{slingParams$dist}}{ the pairwise
   cluster distance matrix.}}
 }
 \description{

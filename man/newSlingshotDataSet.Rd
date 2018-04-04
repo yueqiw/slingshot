@@ -11,27 +11,23 @@
 \alias{newSlingshotDataSet,matrix,matrix-method}
 \title{Initialize an object of class \code{SlingshotDataSet}}
 \usage{
-newSlingshotDataSet(reducedDim, clusterLabels, ...)
+newSlingshotDataSet(data, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{data.frame,ANY}(reducedDim, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{data.frame,ANY}(data, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,numeric}(reducedDim, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,numeric}(data, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,factor}(reducedDim, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,factor}(data, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,ANY}(reducedDim, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,ANY}(data, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,character}(reducedDim, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,character}(data, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,matrix}(reducedDim, clusterLabels,
+\S4method{newSlingshotDataSet}{matrix,matrix}(data, clusterLabels,
   lineages = list(), adjacency = matrix(NA, 0, 0), curves = list(),
   slingParams = list())
 }
 \arguments{
-\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data
-frame giving the coordinates of the cells in a reduced dimensionality
-space.}
-
 \item{clusterLabels}{character. A character vector of length \code{n}
 denoting each cell's cluster label.}
 
@@ -41,40 +37,50 @@ names representing a lineage as an ordered set of clusters.}
 \item{curves}{list. A list of \code{principal.curve} objects produced by 
 \code{\link{getCurves}}.}
 
-\item{connectivity}{matrix. A binary matrix describing the connectivity 
-between clusters induced by the minimum spanning tree.}
-
-\item{lineageControl}{list. Additional parameters specifying how the minimum 
-spanning tree on clusters was constructed. \itemize{ 
+\item{slingParams}{list. Additional parameters used by Slingshot. These may 
+specify how the minimum spanning tree on clusters was constructed: 
+\itemize{ 
 \item{\code{start.clus}}{character. The label of the root cluster.} 
 \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
-terminal clusters.} \item{\code{start.given}}{logical. A logical value 
+terminal clusters.}
+\item{\code{start.given}}{logical. A logical value 
 indicating whether the initial state was pre-specified.} 
 \item{\code{end.given}}{logical. A vector of logical values indicating 
-whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
-numeric matrix of pairwise cluster distances.} }}
-
-\item{curveControl}{list. Additional parameters specifying how the 
-simultaneous principal curves were constructed. \itemize{ 
+whether each terminal state was pre-specified}
+\item{\code{dist}}{matrix. A
+numeric matrix of pairwise cluster distances.} }
+They may also specify how simultaneous principal curves were constructed:
+\itemize{ 
 \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
 and how much to shrink branching lineages toward their shared average 
-curve.} \item{\code{extend}}{character. Specifies the method for handling 
+curve.} 
+\item{\code{extend}}{character. Specifies the method for handling 
 root and leaf clusters of lineages when constructing the initial, 
 piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
-See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical. 
+See \code{\link{getCurves}} for details.} 
+\item{\code{reweight}}{logical. 
 Indicates whether to reweight cells shared by multiple lineages during 
 curve-fitting. If \code{TRUE}, cells shared between lineages will have 
 lineage-specific weights determined by the ratio: (distance to nearest 
-curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical. 
+curve) / (distance to specific curve).} 
+\item{\code{drop.multi}}{logical. 
 Indicates whether to drop shared cells from lineages which do not fit them 
 well. If \code{TRUE}, shared cells with a distance to one lineage above the
 90th percentile and another lineage below the 50th percentile will be 
-dropped from the farther lineage.} \item{\code{shrink.method}}{character. 
+dropped from the farther lineage.} 
+\item{\code{shrink.method}}{character. 
 Denotes how to determine the amount of shrinkage for a branching lineage. 
 Accepted values are the same as for \code{kernel} in  the \code{density} 
 function (default is \code{"cosine"}), as well as \code{"tricube"} and 
-\code{"density"}. See \code{\link{getCurves}} for details.} \item{Other 
-parameters specified by \code{\link{principal.curve}}}. }}
+\code{"density"}. See \code{\link{getCurves}} for details.} 
+\item{Other parameters specified by \code{\link{principal.curve}}}. }}
+
+\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data
+frame giving the coordinates of the cells in a reduced dimensionality
+space.}
+
+\item{connectivity}{matrix. A binary matrix describing the connectivity 
+between clusters induced by the minimum spanning tree.}
 }
 \value{
 A \code{SlingshotDataSet} object with all specified values.
@@ -86,17 +92,17 @@ Constructs a \code{SlingshotDataSet} object. Additional helper
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{reducedDim = data.frame,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+\item \code{data = data.frame,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = numeric}: returns a \code{SlingshotDataSet} object.
+\item \code{data = matrix,clusterLabels = numeric}: returns a \code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = factor}: returns a \code{SlingshotDataSet} object.
+\item \code{data = matrix,clusterLabels = factor}: returns a \code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+\item \code{data = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
+\item \code{data = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
 
-\item \code{reducedDim = matrix,clusterLabels = matrix}: returns a \code{SlingshotDataSet} object.
+\item \code{data = matrix,clusterLabels = matrix}: returns a \code{SlingshotDataSet} object.
 }}
 
 \examples{

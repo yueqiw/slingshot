@@ -10,9 +10,7 @@
 \alias{connectivity,SlingshotDataSet-method}
 \alias{adjacency,SlingshotDataSet-method}
 \alias{lineages,SlingshotDataSet-method}
-\alias{lineageControl,SlingshotDataSet-method}
 \alias{curves,SlingshotDataSet-method}
-\alias{curveControl,SlingshotDataSet-method}
 \alias{slingParams,SlingshotDataSet-method}
 \alias{reducedDim<-,SlingshotDataSet-method}
 \alias{reducedDims<-,SlingshotDataSet-method}
@@ -36,11 +34,7 @@
 
 \S4method{lineages}{SlingshotDataSet}(x)
 
-\S4method{lineageControl}{SlingshotDataSet}(x)
-
 \S4method{curves}{SlingshotDataSet}(x)
-
-\S4method{curveControl}{SlingshotDataSet}(x)
 
 \S4method{slingParams}{SlingshotDataSet}(x)
 
@@ -132,13 +126,7 @@ clusters.
 \item \code{lineages}: returns the list of lineages, represented by
 ordered sets of clusters.
 
-\item \code{lineageControl}: returns the list of additional lineage inference
-parameters.
-
 \item \code{curves}: returns the list of smooth lineage curves.
-
-\item \code{curveControl}: returns the list of additional curve fitting
-parameters.
 
 \item \code{slingParams}: returns the list of additional parameters used
 by Slingshot.

@@ -4,6 +4,7 @@
 \name{slingshot}
 \alias{slingshot}
 \alias{slingshot,matrix,character-method}
+\alias{slingshot,matrix,matrix-method}
 \alias{slingshot,SlingshotDataSet,ANY-method}
 \alias{slingshot,data.frame,ANY-method}
 \alias{slingshot,matrix,numeric-method}
@@ -11,52 +12,61 @@
 \alias{slingshot,matrix,ANY-method}
 \title{Perform lineage inference with Slingshot}
 \usage{
-slingshot(reducedDim, clusterLabels, ...)
+slingshot(data, clusterLabels, ...)
 
-\S4method{slingshot}{matrix,character}(reducedDim, clusterLabels,
+\S4method{slingshot}{matrix,character}(data, clusterLabels, reducedDim = NULL,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 
-\S4method{slingshot}{SlingshotDataSet,ANY}(reducedDim,
-  clusterLabels = reducedDim@clusterLabels, start.clus = NULL,
-  end.clus = NULL, dist.fun = NULL, omega = NULL, lineages = list(),
-  shrink = TRUE, extend = "y", reweight = TRUE, drop.multi = TRUE,
-  thresh = 0.001, maxit = 15, stretch = 2, smoother = "smooth.spline",
+\S4method{slingshot}{matrix,matrix}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
+  drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
+
+\S4method{slingshot}{SlingshotDataSet,ANY}(data, clusterLabels,
+  reducedDim = NULL, start.clus = NULL, end.clus = NULL,
+  dist.fun = NULL, omega = NULL, lineages = list(), shrink = TRUE,
+  extend = "y", reweight = TRUE, drop.multi = TRUE, thresh = 0.001,
+  maxit = 15, stretch = 2, smoother = "smooth.spline",
   shrink.method = "cosine", allow.breaks = TRUE, ...)
 
-\S4method{slingshot}{data.frame,ANY}(reducedDim, clusterLabels,
+\S4method{slingshot}{data.frame,ANY}(data, clusterLabels, reducedDim = NULL,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 
-\S4method{slingshot}{matrix,numeric}(reducedDim, clusterLabels,
+\S4method{slingshot}{matrix,numeric}(data, clusterLabels, reducedDim = NULL,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 
-\S4method{slingshot}{matrix,factor}(reducedDim, clusterLabels,
+\S4method{slingshot}{matrix,factor}(data, clusterLabels, reducedDim = NULL,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
   lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 
-\S4method{slingshot}{matrix,ANY}(reducedDim, clusterLabels, start.clus = NULL,
-  end.clus = NULL, dist.fun = NULL, omega = NULL, lineages = list(),
-  shrink = TRUE, extend = "y", reweight = TRUE, drop.multi = TRUE,
-  thresh = 0.001, maxit = 15, stretch = 2, smoother = "smooth.spline",
-  shrink.method = "cosine", allow.breaks = TRUE, ...)
+\S4method{slingshot}{matrix,ANY}(data, clusterLabels, reducedDim = NULL,
+  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL,
+  lineages = list(), shrink = TRUE, extend = "y", reweight = TRUE,
+  drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
+  smoother = "smooth.spline", shrink.method = "cosine",
+  allow.breaks = TRUE, ...)
 }
 \arguments{
-\item{reducedDim}{numeric matrix or \code{SlingshotDataSet} object containing
-low- dimensional representation of single cells.}
+\item{data}{a data object containing the matrix of coordinates to be used for
+lineage inference. Supported types include \code{matrix}, 
+\code{\link{SingleCellExperiment}}, and \code{\link{SlingshotDataSet}}.}
 
 \item{clusterLabels}{character, a vector of length \code{n} denoting cluster
 labels, optionally including \code{-1}'s for "unclustered." If
@@ -65,6 +75,10 @@ taken from it.}
 
 \item{...}{Additional parameters to pass to scatter plot smoothing function, 
 \code{smoother}.}
+
+\item{reducedDim}{(optional) identifier to be used if \code{reducedDim(data)}
+contains multiple elements. Otherwise, the first element will be used by
+default.}
 
 \item{start.clus}{(optional) character, indicates the cluster(s) of origin.
 Lineages will be represented by paths coming out of this cluster.}
@@ -85,9 +99,9 @@ is parameterized such that this distance is \code{omega / 2}, making
 \code{omega} the maximum distance between two connected clusters. By
 default, \code{omega = Inf}.}
 
-\item{lineages}{list, denotes which lineages each cluster is a part of and 
-contains the \code{K x K} connectivity matrix constructed on the clusters
-by \code{\link{getLineages}}.}
+\item{lineages}{list generated by \code{\link{getLineages}}, denotes lineages
+as ordered sets of clusters and contains the \code{K x K} connectivity
+matrix constructed on the clusters by \code{\link{getLineages}}.}
 
 \item{shrink}{logical or numeric between 0 and 1, determines whether and how 
 much to shrink branching lineages toward their average prior to the split.}
@@ -136,22 +150,21 @@ An object of class \code{\link{SlingshotDataSet}} containing the
   in order.} 
   \item{\code{connectivity}}{ the inferred cluster connectivity 
   matrix.} 
-  \item{\code{lineageControl}}{Additional parameters used for
-  lineage inference or describing the process. This may include the elements
-  \code{start.given} and \code{end.given}, logical values indicating whether
-  the starting and ending clusters were specified a priori. Additionally,
-  this will always include \code{dist}, the pairwise cluster distance
-  matrix.} 
-  \item{curves}{A list of \code{\link{principal.curve}} objects.}
-  \item{curveControls}{Additional parameters used for fitting simultaneous
-  principal curves.}}
+  \item{\code{slingParams}}{Additional parameters used for lineage inference
+  or fitting simultaneous principal curves. This may include the elements 
+  \code{start.given} and \code{end.given}, logical values indicating whether 
+  the starting and ending clusters were specified a priori. Additionally, 
+  this will always include \code{dist}, the pairwise cluster distance 
+  matrix.}
+  \item{curves}{A list of \code{\link{principal.curve}} objects.}}
 }
 \description{
 Given a reduced-dimensional data matrix \code{n} by \code{p} and
-  a vector of cluster labels (potentially including \code{-1}'s for 
-  "unclustered"), this function performs lineage inference using a 
-  cluster-based minimum spanning tree and constructing simulatenous principal
-  curves for branching paths through the tree.
+  a vector of cluster labels (or matrix of soft cluster assignments,
+  potentially including a \code{-1} label for "unclustered"), this function
+  performs lineage inference using a cluster-based minimum spanning tree and
+  constructing simulatenous principal curves for branching paths through the
+  tree.
 
 This wrapper function performs lineage inference in two steps:
   (1) identify lineage structure with a cluster-based minimum spanning tree

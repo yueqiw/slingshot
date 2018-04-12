@@ -18,8 +18,6 @@
 \alias{[,SlingshotDataSet,ANY,ANY,ANY-method}
 \alias{pseudotime,SlingshotDataSet-method}
 \alias{curveWeights,SlingshotDataSet-method}
-\alias{combine,SingleCellExperiment,SlingshotDataSet-method}
-\alias{combine,SlingshotDataSet,SingleCellExperiment-method}
 \title{Class \code{SlingshotDataSet}}
 \usage{
 \S4method{show}{SlingshotDataSet}(object)
@@ -49,10 +47,6 @@
 \S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
 
 \S4method{curveWeights}{SlingshotDataSet}(x)
-
-\S4method{combine}{SingleCellExperiment,SlingshotDataSet}(x, y)
-
-\S4method{combine}{SlingshotDataSet,SingleCellExperiment}(x, y)
 }
 \arguments{
 \item{object}{a \code{SlingshotDataSet} object.}
@@ -146,12 +140,6 @@ labels.
 
 \item \code{curveWeights}: returns the matrix of cell weights along each
 lineage.
-
-\item \code{combine}: incpororates Slingshot output into a 
-\code{\link{SingleCellExperiment}} object.
-
-\item \code{combine}: incpororates Slingshot output into a 
-\code{\link{SingleCellExperiment}} object.
 }}
 
 \section{Slots}{

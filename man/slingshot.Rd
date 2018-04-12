@@ -10,6 +10,7 @@
 \alias{slingshot,matrix,numeric-method}
 \alias{slingshot,matrix,factor-method}
 \alias{slingshot,matrix,ANY-method}
+\alias{slingshot,SingleCellExperiment,ANY-method}
 \title{Perform lineage inference with Slingshot}
 \usage{
 slingshot(data, clusterLabels, ...)
@@ -62,6 +63,13 @@ slingshot(data, clusterLabels, ...)
   drop.multi = TRUE, thresh = 0.001, maxit = 15, stretch = 2,
   smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
+
+\S4method{slingshot}{SingleCellExperiment,ANY}(data, clusterLabels,
+  reducedDim = NULL, start.clus = NULL, end.clus = NULL,
+  dist.fun = NULL, omega = NULL, lineages = list(), shrink = TRUE,
+  extend = "y", reweight = TRUE, drop.multi = TRUE, thresh = 0.001,
+  maxit = 15, stretch = 2, smoother = "smooth.spline",
+  shrink.method = "cosine", allow.breaks = TRUE, ...)
 }
 \arguments{
 \item{data}{a data object containing the matrix of coordinates to be used for

@@ -93,7 +93,7 @@ setMethod(f = "getLineages",
                   stop('reducedDim has zero columns.')
               }
               if(nrow(X) != nrow(clusterLabels)){
-                  stop('nrow(reducedDim) must equal nrow(clusterLabels).')
+                  stop('nrow(data) must equal nrow(clusterLabels).')
               }
               if(any(is.na(X))){
                   stop('reducedDim cannot contain missing values.')
@@ -363,11 +363,10 @@ setMethod(f = "getLineages",
                   stop('reducedDim has zero columns.')
               }
               if(nrow(X) != length(clusterLabels)){
-                  stop('nrow(reducedDim) must equal length(clusterLabels).')
+                  stop('nrow(data) must equal length(clusterLabels).')
               }
               if(any(is.na(clusterLabels))){
-                  message("Cluster labels of 'NA' being treated as 
-                          unclustered.")
+                  message("Cluster labels of 'NA' being treated as unclustered.")
                   clusterLabels[is.na(clusterLabels)] <- '-1'
               }
 
@@ -391,8 +390,7 @@ setMethod(f = "getLineages",
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
               if(missing(clusterLabels)){
-                  message('No cluster labels detected. Continuing with one 
-                          cluster.')
+                  message('No cluster labels provided. Continuing with one cluster.')
                   clusterLabels <- rep('1', nrow(data))
               }
               return(getLineages(data = data, clusterLabels = clusterLabels,

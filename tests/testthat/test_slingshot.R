@@ -108,6 +108,88 @@ test_that("getCurves works as expected", {
   
 })
 
+test_that("slingshot works for different input types", {
+    reducedDim <- matrix(rnorm(100), ncol = 2)
+    clusterLabels <- rep(1:5, each = 10)
+    
+    # matrix / integer
+    mi <- slingshot(reducedDim, clusterLabels)
+    expect_is(mi, "SlingshotDataSet")
+    expect_equal(dim(adjacency(mi)), c(5,5))
+    # 1-column matrix / integer
+    m1i <- slingshot(reducedDim[,1,drop = FALSE], clusterLabels)
+    expect_is(mi, "SlingshotDataSet")
+    expect_equal(dim(adjacency(mi)), c(5,5))
+    # matrix / character
+    mc <- slingshot(reducedDim, as.character(clusterLabels))
+    expect_is(mc, "SlingshotDataSet")
+    expect_equal(dim(adjacency(mc)), c(5,5))
+    # matrix / factor
+    mf <- slingshot(reducedDim, as.factor(clusterLabels))
+    expect_is(mf, "SlingshotDataSet")
+    expect_equal(dim(adjacency(mf)), c(5,5))
+    
+    df <- data.frame(reducedDim)
+    # data frame / integer
+    dfi <- slingshot(df, clusterLabels)
+    expect_is(dfi, "SlingshotDataSet")
+    expect_equal(dim(adjacency(dfi)), c(5,5))
+    # data frame / character
+    dfc <- slingshot(df, as.character(clusterLabels))
+    expect_is(dfc, "SlingshotDataSet")
+    expect_equal(dim(adjacency(dfc)), c(5,5))
+    # data frame / factor
+    dff <- slingshot(df, as.factor(clusterLabels))
+    expect_is(dff, "SlingshotDataSet")
+    expect_equal(dim(adjacency(dff)), c(5,5))
+    
+    sds <- newSlingshotDataSet(reducedDim, clusterLabels)
+    # SlingshotDataSet
+    s <- slingshot(sds)
+    expect_is(s, "SlingshotDataSet")
+    expect_equal(dim(adjacency(s)), c(5,5))
+    
+    # one cluster
+    clus1 <- rep(1,50)
+    c1 <- slingshot(reducedDim, clus1)
+    expect_is(c1, "SlingshotDataSet")
+    expect_equal(dim(adjacency(c1)), c(1,1))
+    
+    # no clusters (default = make one cluster)
+    c0 <- slingshot(reducedDim)
+    expect_is(c1, "SlingshotDataSet")
+    expect_equal(dim(adjacency(c1)), c(1,1))
+    
+    # invalid inputs
+    expect_error(slingshot(reducedDim[,-(seq_len(ncol(reducedDim)))], clusterLabels), 'has zero columns')
+    expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels), 'has zero rows')
+    expect_error(slingshot(reducedDim, clusterLabels[1:10]), 'must equal')
+    expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels[integer(0)]), 'has zero rows')
+    rdna <- reducedDim; rdna[1,1] <- NA
+    expect_error(slingshot(rdna, clusterLabels), 'cannot contain missing values')
+    rdc <- reducedDim; rdc[1,1] <- 'a'
+    expect_error(slingshot(rdc, clusterLabels), 'must only contain numeric values')
+    
+    # with SingleCellExperiment objects
+    u <- matrix(rpois(200*50, 5), ncol=50)
+    v <- log2(u + 1)
+    sce <- SingleCellExperiment(assays=list(counts=u, logcounts=v))
+    expect_error(slingshot(sce), 'No dimensionality reduction found')
+    
+    reducedDims(sce) <- SimpleList(PCA = reducedDim, tSNE = matrix(rnorm(50*2),ncol=2))
+    # implicit reducedDim
+    c0 <- slingshot(sce)
+    expect_equal(dim(metadata(c0)$slingshot$adjacency), c(1,1))
+    expect_equal()
+    # reducedDim provided by name
+    c0 <- slingshot(sce, reducedDim='tSNE')
+    expect_equal(dim(metadata(c0)$slingshot$adjacency), c(1,1))
+    # reducedDim provided as matrix
+    c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2))
+    expect_equal(dim(metadata(c0)$slingshot$adjacency), c(1,1))
+})
+
+
 # test helper functions and constructors
 
 # test_that("zinbFit works with genewise dispersion", {

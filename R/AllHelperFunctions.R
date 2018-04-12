@@ -337,69 +337,6 @@ setMethod(
     }
 )
 
-#' @describeIn SlingshotDataSet incpororates Slingshot output into a 
-#' \code{\link{SingleCellExperiment}} object.
-#' @export
-setMethod(
-    f = "combine",
-    signature = signature("SingleCellExperiment","SlingshotDataSet"),
-    definition = function(x, y){
-        sce <- x
-        sds <- y
-        # check if the reduced dimensional matrix is already present
-        rd.match <- sapply(reducedDims(sce), function(rd.sce){
-            if(all(dim(rd.sce) == dim(reducedDim(sds)))){
-                return(all(rd.sce == reducedDim(sds)))
-            }
-            return(FALSE)
-        })
-        if(any(rd.match)){
-            metadata(sce)$slingReducedDim <- 
-                names(reducedDims(sce))[which.max(rd.match)]
-        }else{ # otherwise, add it
-            metadata(sce)$slingReducedDim <- "slingReducedDim"
-            reducedDims(sce)$slingReducedDim <- reducedDim(sds)
-        }
-        metadata(sce)$slingClusterLabels <- clusterLabels(sds)
-        metadata(sce)$slingLineages <- lineages(sds)
-        metadata(sce)$slingAdjacency <- adjacency(sds)
-        metadata(sce)$slingCurves <- curves(sds)
-        metadata(sce)$slingParams <- slingParams(sds)
-        return(sce)
-    }
-)
-
-#' @describeIn SlingshotDataSet incpororates Slingshot output into a 
-#' \code{\link{SingleCellExperiment}} object.
-#' @export
-setMethod(
-    f = "combine",
-    signature = signature("SlingshotDataSet","SingleCellExperiment"),
-    definition = function(x, y){
-        sds <- x
-        sce <- y
-        # check if the reduced dimensional matrix is already present
-        rd.match <- sapply(reducedDims(sce), function(rd.sce){
-            if(all(dim(rd.sce) == dim(reducedDim(sds)))){
-                return(all(rd.sce == reducedDim(sds)))
-            }
-            return(FALSE)
-        })
-        if(any(rd.match)){
-            metadata(sce)$slingReducedDim <- 
-                names(reducedDims(sce))[which.max(rd.match)]
-        }else{ # otherwise, add it
-            metadata(sce)$slingReducedDim <- "slingReducedDim"
-            reducedDim(sce)$slingReducedDim <- reducedDim(sds)
-        }
-        metadata(sce)$slingClusterLabels <- clusterLabels(sds)
-        metadata(sce)$slingLineages <- lineages(sds)
-        metadata(sce)$slingAdjacency <- adjacency(sds)
-        metadata(sce)$slingCurves <- curves(sds)
-        metadata(sce)$slingParams <- slingParams(sds)
-        return(sce)
-    }
-)
 
 ##########################
 ### Internal functions ###

@@ -94,7 +94,7 @@ setMethod(
             X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
             clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
                                            drop = FALSE]
-            linC <- lineageControl(x)
+            linC <- slingParams(x)
         }
         
         if(!add){
@@ -520,7 +520,7 @@ pairs.SlingshotDataSet <-
                 return(apply(X, 2, weighted.mean, w = w))
             }))
             rownames(centers) <- clusters
-            linC <- lineageControl(sds)
+            linC <- slingParams(sds)
         }
         range.max <- max(apply(x,2,function(xi){
             r <- range(xi, na.rm = TRUE)

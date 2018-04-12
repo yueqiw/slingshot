@@ -11,23 +11,27 @@
 \alias{newSlingshotDataSet,matrix,matrix-method}
 \title{Initialize an object of class \code{SlingshotDataSet}}
 \usage{
-newSlingshotDataSet(data, clusterLabels, ...)
+newSlingshotDataSet(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{data.frame,ANY}(data, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{data.frame,ANY}(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,numeric}(data, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,numeric}(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,factor}(data, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,factor}(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,ANY}(data, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,ANY}(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,character}(data, clusterLabels, ...)
+\S4method{newSlingshotDataSet}{matrix,character}(reducedDim, clusterLabels, ...)
 
-\S4method{newSlingshotDataSet}{matrix,matrix}(data, clusterLabels,
+\S4method{newSlingshotDataSet}{matrix,matrix}(reducedDim, clusterLabels,
   lineages = list(), adjacency = matrix(NA, 0, 0), curves = list(),
   slingParams = list())
 }
 \arguments{
+\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data
+frame giving the coordinates of the cells in a reduced dimensionality
+space.}
+
 \item{clusterLabels}{character. A character vector of length \code{n}
 denoting each cell's cluster label.}
 
@@ -75,10 +79,6 @@ function (default is \code{"cosine"}), as well as \code{"tricube"} and
 \code{"density"}. See \code{\link{getCurves}} for details.} 
 \item{Other parameters specified by \code{\link{principal.curve}}}. }}
 
-\item{reducedDim}{matrix. An \code{n} by \code{p} numeric matrix or data
-frame giving the coordinates of the cells in a reduced dimensionality
-space.}
-
 \item{connectivity}{matrix. A binary matrix describing the connectivity 
 between clusters induced by the minimum spanning tree.}
 }
@@ -92,17 +92,17 @@ Constructs a \code{SlingshotDataSet} object. Additional helper
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data = data.frame,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = data.frame,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
 
-\item \code{data = matrix,clusterLabels = numeric}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = numeric}: returns a \code{SlingshotDataSet} object.
 
-\item \code{data = matrix,clusterLabels = factor}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = factor}: returns a \code{SlingshotDataSet} object.
 
-\item \code{data = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = ANY}: returns a \code{SlingshotDataSet} object.
 
-\item \code{data = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = character}: returns a \code{SlingshotDataSet} object.
 
-\item \code{data = matrix,clusterLabels = matrix}: returns a \code{SlingshotDataSet} object.
+\item \code{reducedDim = matrix,clusterLabels = matrix}: returns a \code{SlingshotDataSet} object.
 }}
 
 \examples{

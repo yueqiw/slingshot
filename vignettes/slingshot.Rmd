@@ -77,7 +77,7 @@ params <- splatEstimate(counts)
 params <- setParams(params, update = list(batchCells = 200, 
                                           path.nonlinearProb = .5, 
                                           de.prob = .6, de.facLoc = 1, 
-                                          de.facScale = 2, path.length=100))
+                                          de.facScale = 2))
 sim <- splatSimulate(params, method = "paths")
 dim(sim)
 ```

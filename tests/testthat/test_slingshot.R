@@ -171,6 +171,7 @@ test_that("slingshot works for different input types", {
     expect_error(slingshot(rdc, clusterLabels), 'must only contain numeric values')
     
     # with SingleCellExperiment objects
+    require(SingleCellExperiment)
     u <- matrix(rpois(200*50, 5), ncol=50)
     v <- log2(u + 1)
     sce <- SingleCellExperiment(assays=list(counts=u, logcounts=v))
@@ -180,12 +181,11 @@ test_that("slingshot works for different input types", {
     # implicit reducedDim
     c0 <- slingshot(sce)
     expect_equal(dim(metadata(c0)$slingshot$adjacency), c(1,1))
-    expect_equal()
     # reducedDim provided by name
     c0 <- slingshot(sce, reducedDim='tSNE')
     expect_equal(dim(metadata(c0)$slingshot$adjacency), c(1,1))
     # reducedDim provided as matrix
-    c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2))
+    c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2)) #
     expect_equal(dim(metadata(c0)$slingshot$adjacency), c(1,1))
 })
 

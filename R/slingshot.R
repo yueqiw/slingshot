@@ -370,6 +370,109 @@ setMethod(f = "slingshot",
           })
 
 
+#' @rdname slingshot
+#' @import clusterExperiment
+#' @export
+setMethod(f = "slingshot",
+          signature = signature(data = "ClusterExperiment"),
+          definition = function(data, clusterLabels = NULL, reducedDim = NULL,
+                                start.clus = NULL, end.clus = NULL,
+                                dist.fun = NULL, omega = NULL,
+                                lineages = list(),
+                                shrink = TRUE,
+                                extend = 'y',
+                                reweight = TRUE,
+                                drop.multi = TRUE,
+                                thresh = 0.001, maxit = 15, stretch = 2,
+                                smoother = 'smooth.spline',
+                                shrink.method = 'cosine', 
+                                allow.breaks = TRUE, ...){
+              # SETUP
+              sp <- list()
+              # determine the cluster labels and reducedDim matrix
+              if(is.null(reducedDim)){
+                  if(length(reducedDims(data))==0){
+                      stop('No dimensionality reduction found.')
+                  }else{
+                      message(paste0('Dimensionality reduction not explicitly chosen. Continuing with ', 
+                                     names(reducedDims(data))[1]))
+                      rd <- reducedDims(data)[[1]]
+                      sp$reducedDim <- names(reducedDims(data))[1]
+                  }
+              }
+              if(length(reducedDim)==1){
+                  if(reducedDim %in% names(reducedDims(data))){
+                      rd <- reducedDims(data)[[as.character(reducedDim)]]
+                      sp$reducedDim <- as.character(reducedDim)
+                  }else{
+                      stop(paste0(reducedDim,' not found in reducedDims(data).'))
+                  }
+              }else{
+                  if(!is.null(dim(reducedDim))){
+                      rd <- reducedDim
+                      reducedDims(data)$slingReducedDim <- reducedDim
+                      sp$reducedDim <- "slingReducedDim"
+                  }
+              }
+              if(is.null(clusterLabels)){
+                  cl <- primaryClusterNamed(data)
+                  if(is.null(cl)){
+                      message('No primary clustering found. Continuing with one cluster.')
+                      cl <- rep('1', nrow(rd))
+                  }
+                  colData(data)$slingClusters <- cl
+                  sp$clusterLabels <- 'slingClusters'
+              }else{
+                  if(length(clusterLabels)==1){
+                      if(clusterLabels %in% colnames(colData(data))){
+                          cl <- colData(data)[[as.character(clusterLabels)]]
+                          sp$clusterLabels <- as.character(clusterLabels)
+                      }else{
+                          if(clusterLabels %in% colnames(clusterMatrix(data))){
+                              cl <- clusterMatrix(data)[,as.character(clusterLabels)]
+                              sp$clusterLabels <- as.character(clusterLabels)
+                          }else{
+                              stop(paste0(clusterLabels,' not found in colData(data) or clusterMatrix(data).'))
+                          }
+                      }
+                  }
+                  if(length(clusterLabels)>1){
+                      if(!is.null(dim(cl)) && length(dim(cl)) > 1 && all(dim(cl) > 1)){
+                          cl <- as.matrix(cl)
+                          colnames(cl) <- paste0('sling_c',1:ncol(cl))
+                          colData(data) <- cbind(colData(data), cl)
+                          sp$clusterLabels <- paste0('sling_c',1:ncol(cl))
+                      }else{
+                          cl <- as.character(clusterLabels)
+                          colData(data)$slingClusters <- cl
+                          sp$clusterLabels <- 'slingClusters'
+                      }
+                  }
+              }
+              # run slingshot
+              sds <- slingshot(data = rd, clusterLabels = cl,
+                               reducedDim = NULL,
+                               start.clus = start.clus, end.clus = end.clus,
+                               dist.fun = dist.fun, omega = omega,
+                               shrink = shrink, extend = extend,
+                               reweight = reweight, drop.multi = drop.multi,
+                               thresh = thresh, maxit = maxit,
+                               stretch = stretch, smoother = smoother,
+                               shrink.method = shrink.method, 
+                               allow.breaks = allow.breaks, ...)
+              # combine slingshot output with SCE
+              sce <- data
+              sp$lineages <- lineages(sds)
+              sp$adjacency <- adjacency(sds)
+              sp$curves <- curves(sds)
+              pst <- pseudotime(sds)
+              colnames(pst) <- paste0('slingPseudotime_',1:ncol(pst))
+              colData(sce) <- cbind(colData(sce), pst)
+              metadata(sce)$slingshot <- sp
+              return(sce)
+          })
+
+
 
 #' @rdname slingshot
 #' @import SingleCellExperiment

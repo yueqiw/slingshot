@@ -153,7 +153,7 @@ setMethod(
     signature = "SlingshotDataSet",
     definition = function(x) x@reducedDim
 )
-#' @describeIn clusterLabels extracts cluster labels from a
+#' @describeIn SlingshotDataSet extracts cluster labels from a
 #'   \code{SlingshotDataSet} object.
 #' @description Extract cluster labels, either a character vector or matrix of 
 #'   weights.
@@ -169,18 +169,13 @@ setMethod(
 #' @export
 setMethod(
     f = "clusterLabels",
-    signature = "SlingshotDataSet",
+    signature = signature(x="SlingshotDataSet"),
     definition = function(x){
-        return(x@clusterLabels)
-    }
-)
-#' @describeIn clusterLabels extracts the cluster labels used by Slingshot from 
-#' a \code{\link{SingleCellExperiment}} object.
-setMethod(
-    f = "clusterLabels",
-    signature = "SingleCellExperiment",
-    definition = function(x){
-        return(metadata(x)$slingClusterLabels)
+        cl <- x@clusterLaabels
+        if(all(cl %in% 0:1) || all(cl %in% c(TRUE,FALSE))){
+            cl <- colnames(cl)[apply(cl,1,which.max)]
+        }
+        return(cl)
     }
 )
 
@@ -267,8 +262,8 @@ setReplaceMethod(
 #' @export
 setReplaceMethod(
     f = "clusterLabels", 
-    signature = "SlingshotDataSet",
-    definition = function(x, value) initialize(x, reducedDim = reducedDim(x),
+    signature = c(object = "SlingshotDataSet", value = "ANY"),
+    definition = function(object, value) initialize(x, reducedDim = reducedDim(x),
                                                clusterLabels = value))
 
 #' @describeIn SlingshotDataSet Subset dataset and cluster labels.
@@ -336,6 +331,40 @@ setMethod(
         return(weights)
     }
 )
+
+#' @describeIn SlingshotDataSet extracts a \code{SlingshotDataSet} object from a
+#' \code{SingleCellExperiment} object that contains \code{slingshot} results.
+#' @export
+setMethod(
+    f = "SlingshotDataSet",
+    signature = "SingleCellExperiment",
+    definition = function(data){
+        if(! "slingshot" %in% names(metadata(data))){
+            stop('No slingshot results found.')
+        }
+        slingout <- metadata(data)$slingshot
+        rd <- reducedDims(data)[[slingout$reducedDim]]
+        cl <- as.matrix(colData(data)[slingout$clusterLabels])
+        if(ncol(cl)==1){
+            clusters <- unique(cl[,1])
+            cl <- t(sapply(cl[,1],function(x){
+                as.numeric(clusters==x)
+            }))
+        }
+        sds <- newSlingshotDataSet(rd, cl,
+                                   lineages = slingout$lineages,
+                                   adjacency = slingout$adjacency,
+                                   curves = slingout$curves,
+                                   slingParams = slingout[! names(slingout) %in%
+                                                              c('reducedDim',
+                                                                'clusterLabels',
+                                                                'lineages',
+                                                                'curves')]
+                                   )
+        return(sds)
+    }
+)
+
 
 
 ##########################
@@ -415,7 +444,7 @@ setMethod(
     if(sum(w2>0)==1){
         s2 <-  diag(ncol(X))
     }else{
-        s2 <- diag(diag(cov.wt(X, wt = w2)))
+        s2 <- diag(diag(cov.wt(X, wt = w2)$cov))
     }
     return(as.numeric(t(diff) %*% solve(s1 + s2) %*% diff))
 }

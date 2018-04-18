@@ -73,6 +73,17 @@ setGeneric(
     }
 )
 
+#' @title Extract Slingshot output from SingleCellExperiment
+#' @name SlingshotDataSet
+#' @export
+setGeneric(
+    name = "SlingshotDataSet",
+    signature = c('data'),
+    def = function(data, ...) {
+        standardGeneric("SlingshotDataSet")
+    }
+)
+
 #' @title Infer Lineage Structure from Clustered Samples
 #' @name getLineages
 #' @export
@@ -109,23 +120,23 @@ setGeneric(
 )
 
 
-#' @title Returns the cluster labels
-#' @name clusterLabels
-#' 
-#' @description Extract cluster labels from a \code{SlingshotDataSet}.
-#'   
-#' @param x an object that describes a dataset or a model involving cluster
-#'   labels.
-#' @return the vector of cluster labels.
-#' @examples
-#' rd <- matrix(data=rnorm(100), ncol=2)
-#' cl <- sample(letters[1:5], 50, replace = TRUE)
-#' sds <- newSlingshotDataSet(rd, cl)
-#' clusterLabels(sds)
-#' @export
-setGeneric(name = "clusterLabels",
-           signature = "x",
-           def = function(x) standardGeneric("clusterLabels"))
+#' #' @title Returns the cluster labels
+#' #' @name clusterLabels
+#' #' 
+#' #' @description Extract cluster labels from a \code{SlingshotDataSet}.
+#' #'   
+#' #' @param x an object that describes a dataset or a model involving cluster
+#' #'   labels.
+#' #' @return the vector of cluster labels.
+#' #' @examples
+#' #' rd <- matrix(data=rnorm(100), ncol=2)
+#' #' cl <- sample(letters[1:5], 50, replace = TRUE)
+#' #' sds <- newSlingshotDataSet(rd, cl)
+#' #' clusterLabels(sds)
+#' #' @export
+#' setGeneric(name = "clusterLabels",
+#'            signature = "x",
+#'            def = function(x) standardGeneric("clusterLabels"))
 
 #' @title Returns the lineages
 #' 
@@ -199,12 +210,12 @@ setGeneric(name = "curves",
 
 # replacement functions
 
-#' @rdname clusterLabels 
-#' @return Updated object with new vector of cluster labels.
-#' @export
-setGeneric(name = "clusterLabels<-", 
-           signature = "x",
-           def = function(x, value) standardGeneric("clusterLabels<-"))
+#' #' @rdname clusterLabels 
+#' #' @return Updated object with new vector of cluster labels.
+#' #' @export
+#' setGeneric(name = "clusterLabels<-", 
+#'            signature = "x",
+#'            def = function(x, value) standardGeneric("clusterLabels<-"))
 
 #' @title Get Slingshot pseudotime values
 #' @name pseudotime

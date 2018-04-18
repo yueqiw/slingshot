@@ -15,6 +15,25 @@ the list of lineages, represented by ordered sets of clusters.
 \description{
 Extract lineages labels from a \code{SlingshotDataSet}.
 }
+\details{
+#' @title Returns the cluster labels
+#' @name clusterLabels
+#' 
+#' @description Extract cluster labels from a \code{SlingshotDataSet}.
+#'   
+#' @param x an object that describes a dataset or a model involving cluster
+#'   labels.
+#' @return the vector of cluster labels.
+#' @examples
+#' rd <- matrix(data=rnorm(100), ncol=2)
+#' cl <- sample(letters[1:5], 50, replace = TRUE)
+#' sds <- newSlingshotDataSet(rd, cl)
+#' clusterLabels(sds)
+#' @export
+setGeneric(name = "clusterLabels",
+           signature = "x",
+           def = function(x) standardGeneric("clusterLabels"))
+}
 \examples{
 data("slingshotExample")
 sds <- getLineages(rd, cl)

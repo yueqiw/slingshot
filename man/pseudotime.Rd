@@ -27,6 +27,14 @@ an \code{n} by \code{L} matrix of cell weights along
 Extract the matrix of pseudotime values or cells' weights along
   each lineage.
 }
+\details{
+#' @rdname clusterLabels 
+#' @return Updated object with new vector of cluster labels.
+#' @export
+setGeneric(name = "clusterLabels<-", 
+           signature = "x",
+           def = function(x, value) standardGeneric("clusterLabels<-"))
+}
 \examples{
 data("slingshotExample")
 sds <- slingshot(rd, cl)

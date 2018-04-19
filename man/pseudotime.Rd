@@ -12,9 +12,7 @@ curveWeights(x)
 \arguments{
 \item{x}{a \code{SlingshotDataSet} object.}
 
-\item{na}{logical. If \code{TRUE} (default), cells that are not assigned to a
-lineage will have a pseudotime value of \code{NA}. Otherwise, their
-arclength along the curve will be returned.}
+\item{...}{additional parameters to be passed to object-specific methods.}
 }
 \value{
 an \code{n} by \code{L} matrix representing each cell's pseudotime

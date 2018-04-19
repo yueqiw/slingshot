@@ -45,7 +45,7 @@
 
 \S4method{clusterLabels}{SlingshotDataSet,ANY}(object) <- value
 
-\S4method{[}{SlingshotDataSet,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{SlingshotDataSet,ANY,ANY,ANY}(x, i, j)
 
 \S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
 
@@ -66,9 +66,9 @@ matrix and cluster labels.}
 \item{j}{indices to be applied to the columns (dimensions) of the reduced
 dimensional matrix.}
 
-\item{na}{logical indicating whether a cell with zero weight along a 
-particular lineage should have a pseudotime of \code{NA} (the default) or
-a time corresponding to its index of projection.}
+\item{na}{logical. If \code{TRUE} (default), cells that are not assigned to a
+lineage will have a pseudotime value of \code{NA}. Otherwise, their
+arclength along the curve will be returned.}
 
 \item{x}{a \code{SlingshotDataSet} object.}
 

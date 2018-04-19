@@ -40,12 +40,13 @@ getLineages(data, clusterLabels, ...)
 \arguments{
 \item{data}{(optional) a data object, such as a 
 \code{\link{SingleCellExperiment}}, compatible with the 
-\code{\link{reducedDims}} and \code{\link{colData}} accessor functions. If 
-provided, the arguments \code{reducedDim} and \code{clusterLabels} should
-be characters that identify elements of \code{reducedDims(data)} (assumed
-to be a \code{list}) and \code{colData(data)} (assumed to be a
-\code{data.frame}), respectively. If provided as a
-\code{\link{SingleCellExperiment}}, \code{slingshot} results will be
+\code{\link{reducedDims}} and
+\code{\link[SummarizedExperiment:colData]{colData}} accessor functions. If 
+provided, the arguments \code{reducedDim} and \code{clusterLabels} should 
+be characters that identify elements of \code{reducedDims(data)} (assumed 
+to be a \code{list}) and \code{colData(data)} (assumed to be a 
+\code{data.frame}), respectively. If provided as a 
+\code{\link{SingleCellExperiment}}, \code{slingshot} results will be 
 returned as the same.}
 
 \item{clusterLabels}{character, a vector of length \code{n} denoting cluster

@@ -9,9 +9,11 @@ SlingshotDataSet(data, ...)
 \arguments{
 \item{data}{a \code{SingleCellExperiment} object produced by 
 \code{slingshot}.}
+
+\item{...}{additional arguments to pass to object-specific methods.}
 }
 \description{
 This is a convenience function to extract \code{slingshot} 
-outputs (in the form of a \code{SlingshotDataSet}) from a 
-\code{SingleCellExperiment} object produced by \code{slingshot}
+  outputs (in the form of a \code{SlingshotDataSet}) from a 
+  \code{SingleCellExperiment} object produced by \code{slingshot}
 }

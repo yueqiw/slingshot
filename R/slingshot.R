@@ -569,3 +569,5 @@ setMethod(f = "slingshot",
               metadata(sce)$slingshot <- sp
               return(sce)
           })
+
+

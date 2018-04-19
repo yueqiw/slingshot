@@ -76,10 +76,11 @@ setGeneric(
 #' @title Extract Slingshot output from SingleCellExperiment
 #' @name SlingshotDataSet
 #' @description This is a convenience function to extract \code{slingshot} 
-#' outputs (in the form of a \code{SlingshotDataSet}) from a 
-#' \code{SingleCellExperiment} object produced by \code{slingshot}
+#'   outputs (in the form of a \code{SlingshotDataSet}) from a 
+#'   \code{SingleCellExperiment} object produced by \code{slingshot}
 #' @param data a \code{SingleCellExperiment} object produced by 
-#' \code{slingshot}.
+#'   \code{slingshot}.
+#' @param ... additional arguments to pass to object-specific methods.
 #' @export
 setGeneric(
     name = "SlingshotDataSet",
@@ -229,9 +230,7 @@ setGeneric(name = "curves",
 #'   each lineage.
 #' 
 #' @param x a \code{SlingshotDataSet} object.
-#' @param na logical. If \code{TRUE} (default), cells that are not assigned to a
-#'   lineage will have a pseudotime value of \code{NA}. Otherwise, their
-#'   arclength along the curve will be returned.
+#' @param ... additional parameters to be passed to object-specific methods.
 #' @return an \code{n} by \code{L} matrix representing each cell's pseudotime
 #'   along each lineage.
 #' @examples

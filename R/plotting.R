@@ -548,7 +548,7 @@ pairs.SlingshotDataSet <-
             nclus <- nrow(forest)
             centers <- t(sapply(clusters,function(clID){
                 w <- clusterLabels[,clID]
-                return(apply(X, 2, weighted.mean, w = w))
+                return(apply(x, 2, weighted.mean, w = w))
             }))
             rownames(centers) <- clusters
             linC <- slingParams(sds)

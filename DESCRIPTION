@@ -23,7 +23,10 @@ Imports:
     SingleCellExperiment
 Suggests:
     BiocGenerics,
+    destiny,
+    gam,
     knitr,
+    mclust,
     RColorBrewer,
     rgl,
     rmarkdown,

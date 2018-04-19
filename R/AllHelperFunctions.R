@@ -93,12 +93,12 @@ setMethod(
             colnames(clusterLabels) <- 1:ncol(clusterLabels)
         }
         out <- new("SlingshotDataSet",
-                   reducedDim=reducedDim,
-                   clusterLabels=clusterLabels,
-                   lineages=lineages,
-                   adjacency=adjacency,
-                   curves=curves,
-                   slingParams=slingParams
+                   reducedDim = reducedDim,
+                   clusterLabels = clusterLabels,
+                   lineages = lineages,
+                   adjacency = adjacency,
+                   curves = curves,
+                   slingParams = slingParams
         )
         return(out)
     })
@@ -171,10 +171,10 @@ setMethod(
     f = "clusterLabels",
     signature = signature(x="SlingshotDataSet"),
     definition = function(x){
-        cl <- x@clusterLaabels
-        if(all(cl %in% 0:1) || all(cl %in% c(TRUE,FALSE))){
-            cl <- colnames(cl)[apply(cl,1,which.max)]
-        }
+        cl <- x@clusterLabels
+        # if(all(cl %in% 0:1) || all(cl %in% c(TRUE,FALSE))){
+        #     cl <- colnames(cl)[apply(cl,1,which.max)]
+        # }
         return(cl)
     }
 )

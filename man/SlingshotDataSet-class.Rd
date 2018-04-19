@@ -3,7 +3,6 @@
 \docType{class}
 \name{SlingshotDataSet-class}
 \alias{SlingshotDataSet-class}
-\alias{SlingshotDataSet}
 \alias{show,SlingshotDataSet-method}
 \alias{reducedDim,SlingshotDataSet-method}
 \alias{reducedDims,SlingshotDataSet-method}
@@ -19,6 +18,7 @@
 \alias{[,SlingshotDataSet,ANY,ANY,ANY-method}
 \alias{pseudotime,SlingshotDataSet-method}
 \alias{curveWeights,SlingshotDataSet-method}
+\alias{SlingshotDataSet,SingleCellExperiment-method}
 \title{Class \code{SlingshotDataSet}}
 \usage{
 \S4method{show}{SlingshotDataSet}(object)
@@ -50,6 +50,8 @@
 \S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
 
 \S4method{curveWeights}{SlingshotDataSet}(x)
+
+\S4method{SlingshotDataSet}{SingleCellExperiment}(data)
 }
 \arguments{
 \item{object}{a \code{SlingshotDataSet} object.}
@@ -82,7 +84,7 @@ The accessor functions \code{reducedDim}, \code{clusterLabels},
   \code{lineages}, \code{adjacency}, \code{curves},
   and \code{slingParams} return the corresponding elements of a 
   \code{SlingshotDataSet}. The functions \code{pseudotime} and 
-  \code{lineageWeights} extract useful output elements of a 
+  \code{curveWeights} extract useful output elements of a 
   \code{SlingshotDataSet}, provided that curves have already been fit with 
   either \code{slingshot} or \code{getCurves}.
 
@@ -155,6 +157,9 @@ labels.
 
 \item \code{curveWeights}: returns the matrix of cell weights along each
 lineage.
+
+\item \code{SlingshotDataSet}: extracts a \code{SlingshotDataSet} object from a
+\code{SingleCellExperiment} object that contains \code{slingshot} results.
 }}
 
 \section{Slots}{

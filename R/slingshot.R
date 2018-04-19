@@ -69,6 +69,8 @@
 #'   amount of shrinkage for a branching lineage. Accepted values are the same
 #'   as for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}),
 #'   as well as \code{"tricube"} and \code{"density"}. See 'Details' for more.
+#' @param allow.breaks logical, determines whether curves that branch very close
+#'   to the origin should be allowed to have different starting points.
 #' @param ... Additional parameters to pass to scatter plot smoothing function, 
 #'   \code{smoother}.
 #'   

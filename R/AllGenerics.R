@@ -75,6 +75,11 @@ setGeneric(
 
 #' @title Extract Slingshot output from SingleCellExperiment
 #' @name SlingshotDataSet
+#' @description This is a convenience function to extract \code{slingshot} 
+#' outputs (in the form of a \code{SlingshotDataSet}) from a 
+#' \code{SingleCellExperiment} object produced by \code{slingshot}
+#' @param data a \code{SingleCellExperiment} object produced by 
+#' \code{slingshot}.
 #' @export
 setGeneric(
     name = "SlingshotDataSet",

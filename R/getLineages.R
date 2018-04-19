@@ -375,6 +375,7 @@ setMethod(f = "getLineages",
               clusWeight <- sapply(clusters,function(clID){
                   as.numeric(clusterLabels == clID)
               })
+              colnames(clusWeight) <- clusters
               return(getLineages(data = data, clusterLabels = clusWeight,
                                  reducedDim = reducedDim,
                                  start.clus = start.clus, end.clus = end.clus,

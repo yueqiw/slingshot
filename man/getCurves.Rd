@@ -57,6 +57,9 @@ endpoints. Default is \code{2}, see \code{\link{principal.curve}}.}
 amount of shrinkage for a branching lineage. Accepted values are the same
 as for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}),
 as well as \code{"tricube"} and \code{"density"}. See 'Details' for more.}
+
+\item{allow.breaks}{logical, determines whether curves that branch very close
+to the origin should be allowed to have different starting points.}
 }
 \value{
 An updated \code{\link{SlingshotDataSet}} object containing the 

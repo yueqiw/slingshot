@@ -1,5 +1,5 @@
 #' @title Class \code{SlingshotDataSet}
-#' @aliases SlingshotDataSet SlingshotDataSet-class
+#' @aliases SlingshotDataSet-class
 #'   
 #' @description The \code{SlingshotDataSet} class holds data relevant for 
 #'   performing lineage inference with the \code{slingshot} package, primarily a
@@ -60,7 +60,7 @@
 #'   \code{lineages}, \code{adjacency}, \code{curves},
 #'   and \code{slingParams} return the corresponding elements of a 
 #'   \code{SlingshotDataSet}. The functions \code{pseudotime} and 
-#'   \code{lineageWeights} extract useful output elements of a 
+#'   \code{curveWeights} extract useful output elements of a 
 #'   \code{SlingshotDataSet}, provided that curves have already been fit with 
 #'   either \code{slingshot} or \code{getCurves}.
 #'   

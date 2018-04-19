@@ -1,5 +1,5 @@
 #' @title Plot Slingshot output
-#' @name SlingshotDataSet-plot
+#' @name plot-SlingshotDataSet
 #'   
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #'   
@@ -7,10 +7,15 @@
 #' @param type character, the type of output to be plotted, can be one of 
 #'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
 #'   Details for more.
+#' @param show.constraints logical, whether or not the user-specified initial
+#'   and terminal clusters should be specially denoted by green and red
+#'   connecting lines, respectively.
 #' @param add logical, indicates whether the output should be added to an
 #'   existing plot.
 #' @param dims numeric, which dimensions to plot (default is \code{1:2}).
 #' @param asp numeric, the y/x aspect ratio, see \code{\link{plot.window}}.
+#' @param cex numeric, amount by which points should be magnified, see \code{\link{par}}.
+#' @param lwd numeric, the line width, see \code{\link{par}}.
 #' @param ... additional parameters to be passed to \code{\link{lines}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
@@ -40,12 +45,12 @@ setMethod(
     signature = "SlingshotDataSet",
     definition = function(x,
                           type = NULL,
+                          show.constraints = FALSE,
                           add = FALSE,
                           dims = 1:2,
                           asp = 1,
                           cex = 2,
                           lwd = 2,
-                          show.constraints = FALSE,
                           ...) {
         curves <- FALSE
         lineages <- FALSE
@@ -150,7 +155,7 @@ setMethod(
     }
 )
 
-#' @rdname SlingshotDataSet-plot
+#' @rdname plot-SlingshotDataSet
 #' @export
 setMethod(
     f = "lines",
@@ -166,7 +171,11 @@ setMethod(
 
 ## Individual gene plots
 #' @rdname plotGenePseudotime
+#' @title Plot Gene Expression over Pseudotime
 #'
+#' @param gene character, the name of the gene to be plotted
+#' @param sds a SlingshotDataSet containing cell pseudotimes
+#' @param exprs the genes-by-samples matrix of expression values.
 #' @param loess logical, whether to include a loess fit in each plot (default is
 #' \code{TRUE}).
 #' @param loessCI logical, whether to include a confidence band around the loess
@@ -241,7 +250,7 @@ setMethod(
 
 ## plot3d
 #' @title Plot Slingshot output in 3D
-#' @name SlingshotDataSet-plot3d
+#' @name plot3d-SlingshotDataSet
 #' 
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #'   
@@ -435,8 +444,30 @@ plot3d.SlingshotDataSet <- function(x,
 #' @param type character, the type of output to be plotted, can be one of 
 #'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
 #'   Details for more.
+#' @param show.constraints logical, whether or not the user-specified initial 
+#'   and terminal clusters should be specially denoted by green and red 
+#'   connecting lines, respectively.
+#' @param col character, color vector for points.
+#' @param pch integer or character specifying the plotting symbol, see 
+#'   \code{\link{par}}.
+#' @param cex numeric, amount by which points should be magnified, see
+#'   \code{\link{par}}.
+#' @param lwd numeric, the line width, see \code{\link{par}}.
 #' @param ... additional parameters for \code{plot} or \code{axis}, see 
 #'   \code{\link{pairs}}.
+#' @param labels character, the names of the variables, see \code{\link{pairs}}.
+#' @param horInd see \code{\link{pairs}}.
+#' @param verInd see \code{\link{pairs}}.
+#' @param lower.panel see \code{\link{pairs}}.
+#' @param upper.panel see \code{\link{pairs}}.
+#' @param diag.panel see \code{\link{pairs}}.
+#' @param text.panel see \code{\link{pairs}}.
+#' @param label.pos see \code{\link{pairs}}.
+#' @param line.main see \code{\link{pairs}}.
+#' @param cex.labels see \code{\link{pairs}}.
+#' @param font.labels see \code{\link{pairs}}.
+#' @param row1attop see \code{\link{pairs}}.
+#' @param gap see \code{\link{pairs}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
 #'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
@@ -455,14 +486,14 @@ plot3d.SlingshotDataSet <- function(x,
 #' 
 #' @export
 pairs.SlingshotDataSet <-
-    function (x, labels, col = NULL, cex=1, lwd=2, ...,
-              horInd = 1:nc, verInd = 1:nc,
+    function (x, type = NULL, show.constraints = FALSE, col = NULL, 
+              pch = 16, cex=1, lwd=2, ...,
+              labels, horInd = 1:nc, verInd = 1:nc,
               lower.panel = FALSE, upper.panel = TRUE,
               diag.panel = NULL, text.panel = textPanel,
               label.pos = 0.5 + has.diag/3, line.main = 3,
               cex.labels = NULL, font.labels = 1,
-              row1attop = TRUE, gap = 1, show.constraints = FALSE,
-              type = NULL, pch =16)
+              row1attop = TRUE, gap = 1)
     {
         #####
         lp.sling <- lower.panel

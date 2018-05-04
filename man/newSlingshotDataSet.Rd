@@ -35,8 +35,14 @@ space.}
 \item{clusterLabels}{character. A character vector of length \code{n}
 denoting each cell's cluster label.}
 
+\item{...}{additional components of a \code{SlingshotDataSet} to specify.
+This may include any of the following:}
+
 \item{lineages}{list. A list with each element a character vector of cluster 
 names representing a lineage as an ordered set of clusters.}
+
+\item{adjacency}{matrix. A binary matrix describing the connectivity 
+between clusters induced by the minimum spanning tree.}
 
 \item{curves}{list. A list of \code{principal.curve} objects produced by 
 \code{\link{getCurves}}.}
@@ -78,9 +84,6 @@ Accepted values are the same as for \code{kernel} in  the \code{density}
 function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 \code{"density"}. See \code{\link{getCurves}} for details.} 
 \item{Other parameters specified by \code{\link{principal.curve}}}. }}
-
-\item{connectivity}{matrix. A binary matrix describing the connectivity 
-between clusters induced by the minimum spanning tree.}
 }
 \value{
 A \code{SlingshotDataSet} object with all specified values.

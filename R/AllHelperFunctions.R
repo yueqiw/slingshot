@@ -118,16 +118,16 @@ setMethod(
         df <- data.frame(Samples = nrow(reducedDim(object)), 
                          Dimensions = ncol(reducedDim(object)))
         print(df, row.names = FALSE)
-        cat('\nlineages:', length(lineages(object)), "\n")
-        for(i in seq_len(length(lineages(object)))){
-            cat('Lineage',i,": ", paste(lineages(object)[[i]],' '), "\n", 
+        cat('\nlineages:', length(slingLineages(object)), "\n")
+        for(i in seq_len(length(slingLineages(object)))){
+            cat('Lineage',i,": ", paste(slingLineages(object)[[i]],' '), "\n", 
                 sep='')
         }
-        cat('\ncurves:', length(curves(object)), "\n")
-        for(i in seq_len(length(curves(object)))){
+        cat('\ncurves:', length(slingCurves(object)), "\n")
+        for(i in seq_len(length(slingCurves(object)))){
             cat('Curve',i,": ", "Length: ", 
-                signif(max(curves(object)[[i]]$lambda), digits = 5), 
-                "\tSamples: ", round(sum(curves(object)[[i]]$w), digits = 2), 
+                signif(max(slingCurves(object)[[i]]$lambda), digits = 5), 
+                "\tSamples: ", round(sum(slingCurves(object)[[i]]$w), digits = 2), 
                 "\n", sep='')
         }
     }
@@ -145,7 +145,6 @@ setMethod(
 )
 #' @describeIn SlingshotDataSet returns the matrix representing the reduced
 #'   dimensional dataset.
-#' @param x a \code{SlingshotDataSet} object.
 #' @importFrom SingleCellExperiment reducedDims
 #' @export
 setMethod(
@@ -157,8 +156,6 @@ setMethod(
 #'   \code{SlingshotDataSet} object.
 #' @description Extract cluster labels, either a character vector or matrix of 
 #'   weights.
-#' @param x an object that describes a dataset or a model involving cluster
-#'   labels.
 #' @return A matrix of cluster weights for each cell or a vector of cluster
 #'   assignments.
 #' @examples
@@ -179,92 +176,120 @@ setMethod(
     }
 )
 
-#' @describeIn SlingshotDataSet returns the adjacency matrix between
-#'   clusters.
+#' @describeIn slingAdjacency returns the adjacency matrix between
+#'   clusters from a \code{\link{SlingshotDataSet}} object.
 #' @export
 setMethod(
-    f = "connectivity",
+    f = "slingAdjacency",
     signature = "SlingshotDataSet",
     definition = function(x) x@adjacency
 )
-#' @describeIn SlingshotDataSet returns the adjacency matrix between
-#'   clusters.
+#' @describeIn slingAdjacency returns the adjacency matrix between
+#'   clusters from a \code{\link{SingleCellExperiment}} object.
 #' @export
 setMethod(
-    f = "adjacency",
-    signature = "SlingshotDataSet",
-    definition = function(x) x@adjacency
+    f = "slingAdjacency",
+    signature = "SingleCellExperiment",
+    definition = function(x) x@int_metadata$slingshot@adjacency
 )
-#' @describeIn SlingshotDataSet returns the list of lineages, represented by
-#'   ordered sets of clusters.
+
+#' @describeIn slingLineages returns the list of lineages, represented by
+#'   ordered sets of clusters from a \code{\link{SlingshotDataSet}} object.
 #' @export
 setMethod(
-    f = "lineages",
+    f = "slingLineages",
     signature = "SlingshotDataSet",
     definition = function(x) x@lineages
 )
-#' @describeIn SlingshotDataSet returns the list of smooth lineage curves.
+#' @describeIn slingLineages returns the list of lineages, represented by 
+#'   ordered sets of clusters from a \code{\link{SingleCellExperiment}} object.
 #' @export
 setMethod(
-    f = "curves",
+    f = "slingLineages",
+    signature = "SingleCellExperiment",
+    definition = function(x) x@int_metadata$slingshot@lineages
+)
+
+#' @describeIn slingCurves returns the list of smooth lineage curves from a
+#'   \code{\link{SlingshotDataSet}} object.
+#' @export
+setMethod(
+    f = "slingCurves",
     signature = "SlingshotDataSet",
     definition = function(x) x@curves
 )
-#' @describeIn SlingshotDataSet returns the list of additional parameters used
-#' by Slingshot.
+#' @describeIn slingCurves returns the list of smooth lineage curves from a
+#'   \code{\link{SingleCellExperiment}} object.
+#' @export
+setMethod(
+    f = "slingCurves",
+    signature = "SingleCellExperiment",
+    definition = function(x) x@int_metadata$slingshot@curves
+)
+
+#' @describeIn slingParams returns the list of additional parameters used
+#' by Slingshot from a \code{\link{SlingshotDataSet}} object.
 #' @export
 setMethod(
     f = "slingParams",
     signature = "SlingshotDataSet",
     definition = function(x) x@slingParams
 )
+#' @describeIn slingParams returns the list of additional parameters used
+#' by Slingshot from a \code{\link{SingleCellExperiment}} object.
+#' @export
+setMethod(
+    f = "slingParams",
+    signature = "SingleCellExperiment",
+    definition = function(x) x@int_metadata$slingshot@slingParams
+)
 
 
 # replacement methods
-#' @describeIn SlingshotDataSet Updated object with new reduced dimensional
-#'   matrix.
-#' @param value matrix, the new reduced dimensional dataset.
+#' #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
+#' #'   matrix.
+#' #' @param value matrix, the new reduced dimensional dataset.
+#' #' 
+#' #' @details 
+#' #' Warning: this will remove any existing lineages or curves from the 
+#' #' \code{SlingshotDataSet} object.
+#' #' @importFrom SingleCellExperiment reducedDim<-
+#' #' @export
+#' setReplaceMethod(
+#'     f = "reducedDim", 
+#'     signature = "SlingshotDataSet",
+#'     definition = function(x, value) initialize(x, reducedDim = value,
+#'                                                clusterLabels = clusterLabels(x)))
 #' 
-#' @details 
-#' Warning: this will remove any existing lineages or curves from the 
-#' \code{SlingshotDataSet} object.
-#' @importFrom SingleCellExperiment reducedDim<-
-#' @export
-setReplaceMethod(
-    f = "reducedDim", 
-    signature = "SlingshotDataSet",
-    definition = function(x, value) initialize(x, reducedDim = value,
-                                               clusterLabels = clusterLabels(x)))
-
-# replacement methods
-#' @describeIn SlingshotDataSet Updated object with new reduced dimensional
-#'   matrix.
-#' @param value matrix, the new reduced dimensional dataset.
+#' # replacement methods
+#' #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
+#' #'   matrix.
+#' #' @param value matrix, the new reduced dimensional dataset.
+#' #' 
+#' #' @details 
+#' #' Warning: this will remove any existing lineages or curves from the 
+#' #' \code{SlingshotDataSet} object.
+#' #' @importFrom SingleCellExperiment reducedDims<-
+#' #' @export
+#' setReplaceMethod(
+#'     f = "reducedDims", 
+#'     signature = "SlingshotDataSet",
+#'     definition = function(x, value) initialize(x, reducedDim = value,
+#'                                                clusterLabels = clusterLabels(x)))
 #' 
-#' @details 
-#' Warning: this will remove any existing lineages or curves from the 
-#' \code{SlingshotDataSet} object.
-#' @importFrom SingleCellExperiment reducedDims<-
-#' @export
-setReplaceMethod(
-    f = "reducedDims", 
-    signature = "SlingshotDataSet",
-    definition = function(x, value) initialize(x, reducedDim = value,
-                                               clusterLabels = clusterLabels(x)))
-
-#' @describeIn SlingshotDataSet Updated object with new vector of cluster
-#'   labels.
-#' @param value character, the new vector of cluster labels.
-#' 
-#' @details 
-#' Warning: this will remove any existing lineages or curves from the 
-#' \code{SlingshotDataSet} object.
-#' @export
-setReplaceMethod(
-    f = "clusterLabels", 
-    signature = c(object = "SlingshotDataSet", value = "ANY"),
-    definition = function(object, value) initialize(x, reducedDim = reducedDim(x),
-                                               clusterLabels = value))
+#' #' @describeIn SlingshotDataSet Updated object with new vector of cluster
+#' #'   labels.
+#' #' @param value character, the new vector of cluster labels.
+#' #' 
+#' #' @details 
+#' #' Warning: this will remove any existing lineages or curves from the 
+#' #' \code{SlingshotDataSet} object.
+#' #' @export
+#' setReplaceMethod(
+#'     f = "clusterLabels", 
+#'     signature = c(object = "SlingshotDataSet", value = "ANY"),
+#'     definition = function(object, value) initialize(x, reducedDim = reducedDim(x),
+#'                                                clusterLabels = value))
 
 #' @describeIn SlingshotDataSet Subset dataset and cluster labels.
 #' @param i indices to be applied to rows (cells) of the reduced dimensional
@@ -290,19 +315,20 @@ setMethod(f = "[",
           })
 
 
-#' @describeIn SlingshotDataSet returns the matrix of pseudotime values.
+#' @describeIn slingPseudotime returns the matrix of pseudotime values from a
+#'   \code{\link{SlingshotDataSet}} object.
 #' @param na logical. If \code{TRUE} (default), cells that are not assigned to a
 #'   lineage will have a pseudotime value of \code{NA}. Otherwise, their
-#'   arclength along the curve will be returned.
+#'   arclength along each curve will be returned.
 #' @export
 setMethod(
-    f = "pseudotime",
+    f = "slingPseudotime",
     signature = "SlingshotDataSet",
     definition = function(x, na = TRUE){
-        if(length(curves(x))==0){
+        if(length(slingCurves(x))==0){
             stop('No curves detected.')
         }
-        pst <- sapply(curves(x), function(pc) {
+        pst <- sapply(slingCurves(x), function(pc) {
             t <- pc$lambda
             if(na){
                 t[pc$w == 0] <- NA
@@ -310,59 +336,59 @@ setMethod(
             return(t)
         })
         rownames(pst) <- rownames(reducedDim(x))
-        colnames(pst) <- names(curves(x))
+        colnames(pst) <- names(slingCurves(x))
         return(pst)
     }
 )
-
-#' @describeIn SlingshotDataSet returns the matrix of cell weights along each
-#'   lineage.
+#' @describeIn slingPseudotime returns the matrix of pseudotime values from a
+#'   \code{\link{SingleCellExperiment}} object.
 #' @export
 setMethod(
-    f = "curveWeights",
-    signature = "SlingshotDataSet",
-    definition = function(x){
-        if(length(curves(x))==0){
-            stop('No curves detected.')
-        }
-        weights <- sapply(curves(x), function(pc) { pc$w })
-        rownames(weights) <- rownames(reducedDim(x))
-        colnames(weights) <- names(curves(x))
-        return(weights)
+    f = "slingPseudotime",
+    signature = "SingleCellExperiment",
+    definition = function(x, na = TRUE){
+        return(slingPseudotime(x@int_metadata$slingshot))
     }
 )
 
-#' @describeIn SlingshotDataSet extracts a \code{SlingshotDataSet} object from a
-#'   \code{SingleCellExperiment} object that contains \code{slingshot} results.
+#' @describeIn slingPseudotime returns the matrix of cell weights along each
+#'   lineage from a \code{\link{SlingshotDataSet}} object.
+#' @export
+setMethod(
+    f = "slingCurveWeights",
+    signature = "SlingshotDataSet",
+    definition = function(x){
+        if(length(slingCurves(x))==0){
+            stop('No curves detected.')
+        }
+        weights <- sapply(slingCurves(x), function(pc) { pc$w })
+        rownames(weights) <- rownames(reducedDim(x))
+        colnames(weights) <- names(slingCurves(x))
+        return(weights)
+    }
+)
+#' @describeIn slingPseudotime returns the matrix of cell weights along each
+#'   lineage from a \code{\link{SingleCellExperiment}} object.
+#' @export
+setMethod(
+    f = "slingCurveWeights",
+    signature = "SingleCellExperiment",
+    definition = function(x){
+        return(slingCurveWeights(x@int_metadata$slingshot))
+    }
+)
+
+#' @rdname SlingshotDataSet
 #' @import SingleCellExperiment
 #' @export
 setMethod(
     f = "SlingshotDataSet",
     signature = "SingleCellExperiment",
     definition = function(data){
-        if(! "slingshot" %in% names(metadata(data))){
+        if(! "slingshot" %in% names(data@int_metadata)){
             stop('No slingshot results found.')
         }
-        slingout <- metadata(data)$slingshot
-        rd <- reducedDims(data)[[slingout$reducedDim]]
-        cl <- as.matrix(colData(data)[slingout$clusterLabels])
-        if(ncol(cl)==1){
-            clusters <- unique(cl[,1])
-            cl <- t(sapply(cl[,1],function(x){
-                as.numeric(clusters==x)
-            }))
-        }
-        sds <- newSlingshotDataSet(rd, cl,
-                                   lineages = slingout$lineages,
-                                   adjacency = slingout$adjacency,
-                                   curves = slingout$curves,
-                                   slingParams = slingout[! names(slingout) %in%
-                                                              c('reducedDim',
-                                                                'clusterLabels',
-                                                                'lineages',
-                                                                'curves')]
-                                   )
-        return(sds)
+        return(data@int_metadata$slingshot)
     }
 )
 
@@ -539,15 +565,18 @@ setMethod(
 #' @name splatterPath
 #' @aliases splatterPath sim
 #'
-#' @description A simulated single-cell RNA-Seq dataset produced by \code{\link[splatter:splatter]{splatter}}.
-#' It was produced by \code{\link[splatter:splatSimulate]{splatSimulatePaths}} to contain a single
-#' trajectory and filtered to remove some uninformative genes. Code for the
-#' complete data generation process can be found in the \code{slingshot}
-#' vignette.
-#'
-#' @format A \code{\link{SingleCellExperiment}} object with $10,120$ genes and $200$
-#'   cells.
-#' @source Simulated by \code{\link[splatter:splatter]{splatter}} with parameters learned from the
+#' @description A simulated single-cell RNA-Seq dataset produced by
+#'   \code{\link[splatter:splatter]{splatter}}. It was produced by
+#'   \code{\link[splatter:splatSimulate]{splatSimulatePaths}} to contain a
+#'   single trajectory and filtered to remove some uninformative genes. Code for
+#'   the complete data generation process can be found in the \code{slingshot} 
+#'   vignette. Note that this represents the version of this dataset after gene
+#'   filtering.
+#'   
+#' @format A \code{\link{SingleCellExperiment}} object with $14,608$ genes and
+#'   $200$ cells.
+#' @source Simulated by \code{\link[splatter:splatter]{splatter}} with
+#'   parameters learned from the 
 #'   \code{\link[HSMMSingleCell:HSMMSingleCell]{HSMMSingleCell}} dataset.
 "sim"
 
@@ -555,10 +584,13 @@ setMethod(
 #' @title Bifurcating lineages data
 #' @name slingshotExample
 #' @aliases slingshotExample rd cl
-#'
-#' @description A simulated low-dimensional representation of two bifurcating lineages (\code{rd}) and a vector of cluster labels generated by $k$-means with $K = 5$ (\code{cl}).
-#'
-#' @format A matrix of coordinates in two dimensions, representing $140$ cells, and a numeric vector $140$ corresponding cluster labels.
+#'   
+#' @description A simulated low-dimensional representation of two bifurcating
+#'   lineages (\code{rd}) and a vector of cluster labels generated by $k$-means
+#'   with $K = 5$ (\code{cl}).
+#'   
+#' @format A matrix of coordinates in two dimensions, representing $140$ cells,
+#'   and a numeric vector $140$ corresponding cluster labels.
 #' @source Simulated data provided with the \code{slingshot} package.
 "rd"
 

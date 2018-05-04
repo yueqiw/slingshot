@@ -11,9 +11,11 @@
 #'   space.
 #' @param clusterLabels character. A character vector of length \code{n}
 #'   denoting each cell's cluster label.
+#' @param ... additional components of a \code{SlingshotDataSet} to specify.
+#'   This may include any of the following:
 #' @param lineages list. A list with each element a character vector of cluster 
 #'   names representing a lineage as an ordered set of clusters.
-#' @param connectivity matrix. A binary matrix describing the connectivity 
+#' @param adjacency matrix. A binary matrix describing the connectivity 
 #'   between clusters induced by the minimum spanning tree.
 #' @param slingParams list. Additional parameters used by Slingshot. These may 
 #'   specify how the minimum spanning tree on clusters was constructed: 
@@ -73,13 +75,12 @@ setGeneric(
     }
 )
 
-#' @title Extract Slingshot output from SingleCellExperiment
+#' @title Extract Slingshot output
 #' @name SlingshotDataSet
-#' @description This is a convenience function to extract \code{slingshot} 
-#'   outputs (in the form of a \code{SlingshotDataSet}) from a 
-#'   \code{SingleCellExperiment} object produced by \code{slingshot}
-#' @param data a \code{SingleCellExperiment} object produced by 
-#'   \code{slingshot}.
+#' @description This is a convenience function to extract a
+#'   \code{SlingshotDataSet} from an object containing \code{\link{slingshot}}
+#'   output.
+#' @param data an object containing \code{\link{slingshot}} output.
 #' @param ... additional arguments to pass to object-specific methods.
 #' @export
 setGeneric(
@@ -92,6 +93,8 @@ setGeneric(
 
 #' @title Infer Lineage Structure from Clustered Samples
 #' @name getLineages
+#' @param ... Additional arguments to specify how lineages are constructed from
+#'   clusters.
 #' @export
 setGeneric(
     name = "getLineages",
@@ -126,68 +129,45 @@ setGeneric(
 )
 
 
-#' #' @title Returns the cluster labels
-#' #' @name clusterLabels
-#' #' 
-#' #' @description Extract cluster labels from a \code{SlingshotDataSet}.
-#' #'   
-#' #' @param x an object that describes a dataset or a model involving cluster
-#' #'   labels.
-#' #' @return the vector of cluster labels.
-#' #' @examples
-#' #' rd <- matrix(data=rnorm(100), ncol=2)
-#' #' cl <- sample(letters[1:5], 50, replace = TRUE)
-#' #' sds <- newSlingshotDataSet(rd, cl)
-#' #' clusterLabels(sds)
-#' #' @export
-#' setGeneric(name = "clusterLabels",
-#'            signature = "x",
-#'            def = function(x) standardGeneric("clusterLabels"))
-
-#' @title Returns the lineages
+#' @title Extract the Slingshot lineages
+#' @name slingLineages
 #' 
-#' @description Extract lineages labels from a \code{SlingshotDataSet}.
+#' @description Extract lineages (represented by ordered sets of clusters) from
+#'   a \code{SlingshotDataSet}.
 #'   
-#' @param x an object that describes a dataset or a model involving lineages
+#' @param x an object containing \code{\link{slingshot}} output.
 #' @return the list of lineages, represented by ordered sets of clusters.
 #' @examples
 #' data("slingshotExample")
 #' sds <- getLineages(rd, cl)
-#' lineages(sds)
+#' slingLineages(sds)
 #' @export
-setGeneric(name = "lineages",
+setGeneric(name = "slingLineages",
            signature = "x",
-           def = function(x) standardGeneric("lineages"))
+           def = function(x) standardGeneric("slingLineages"))
 
-#' @title Returns the adjacency matrix
-#' @aliases adjacency connectivity
-#' @description Extract the adjacency matrix from a \code{SlingshotDataSet}.
+#' @title Extract Slingshot adjacency matrix
+#' @name slingAdjacency
+#' @description Extract the adjacency matrix from an object containing
+#'   \code{\link{slingshot}} output.
 #' 
-#' @param x an object that describes a dataset or a model involving an
-#'   adjacency matrix.
+#' @param x an object containing \code{\link{slingshot}} output.
 #' @return the matrix of connections between clusters, inferred by the MST.
 #' @examples
 #' data("slingshotExample")
 #' sds <- getLineages(rd, cl)
-#' adjacency(sds)
+#' slingAdjacency(sds)
 #' @export
-setGeneric(name = "adjacency",
+setGeneric(name = "slingAdjacency",
            signature = "x",
-           def = function(x) standardGeneric("adjacency"))
-#' @rdname adjacency
-#' @return the matrix of connections between clusters, inferred by the MST.
-#' @export
-setGeneric(name = "connectivity",
-           signature = "x",
-           def = function(x) standardGeneric("connectivity"))
+           def = function(x) standardGeneric("slingAdjacency"))
 
 #' @title Methods for parameters used by Slingshot
-#' @aliases slingParams
+#' @name slingParams
 #' @description Extracts additional control parameters used by Slingshot in 
 #' lineage inference and fitting simultaneous principal curves.
 #'   
-#' @param x an object that includes output from Slingshot, either a 
-#' \code{SlingshotDataSet} or \code{SingleCellExperiment} object.
+#' @param x an object containing \code{\link{slingshot}} output.
 #' @return the list of additional parameters used by Slingshot.
 #' @examples
 #' data("slingshotExample")
@@ -197,62 +177,55 @@ setGeneric(name = "connectivity",
 setGeneric(name = "slingParams",
            signature = "x",
            def = function(x) standardGeneric("slingParams"))
-#' @title Returns the principal curves
+
+#' @title Extract simultaneous principal curves
+#' @name slingCurves
+#' @description Extract the simultaneous principal curves from an object
+#'   containing \code{\link{slingshot}} output.
 #'   
-#' @description Extract the simultaneous principal curves from a
-#'   \code{SlingshotDataSet}.
-#'   
-#' @param x an object that describes a dataset or a model involving a set of 
-#'   principal curves.
-#' @return the list of smooth lineage curves.
+#' @param x an object containing \code{\link{slingshot}} output.
+#' @return the list of smooth lineage curves, each of which is a
+#'   \code{\link{principal.curve}} object.
 #' @examples
 #' data("slingshotExample")
 #' sds <- slingshot(rd, cl)
-#' curves(sds)
+#' slingCurves(sds)
 #' @export
-setGeneric(name = "curves",
+setGeneric(name = "slingCurves",
            signature = "x",
-           def = function(x) standardGeneric("curves"))
+           def = function(x) standardGeneric("slingCurves"))
 
-# replacement functions
-
-#' #' @rdname clusterLabels 
-#' #' @return Updated object with new vector of cluster labels.
-#' #' @export
-#' setGeneric(name = "clusterLabels<-", 
-#'            signature = "x",
-#'            def = function(x, value) standardGeneric("clusterLabels<-"))
 
 #' @title Get Slingshot pseudotime values
-#' @name pseudotime
+#' @name slingPseudotime
 #' 
 #' @description Extract the matrix of pseudotime values or cells' weights along
 #'   each lineage.
 #' 
-#' @param x a \code{SlingshotDataSet} object.
+#' @param x an object containing \code{\link{slingshot}} output.
 #' @param ... additional parameters to be passed to object-specific methods.
 #' @return an \code{n} by \code{L} matrix representing each cell's pseudotime
 #'   along each lineage.
 #' @examples
 #' data("slingshotExample")
 #' sds <- slingshot(rd, cl)
-#' pseudotime(sds)
+#' slingPseudotime(sds)
 #' @export
-setGeneric(name = "pseudotime",
+setGeneric(name = "slingPseudotime",
            signature = "x",
-           def = function(x, ...) standardGeneric("pseudotime"))
+           def = function(x, ...) standardGeneric("slingPseudotime"))
 
-#' @rdname pseudotime 
+#' @rdname slingPseudotime 
 #' @return an \code{n} by \code{L} matrix of cell weights along
 #'   each lineage.
 #' @examples
 #' data("slingshotExample")
 #' sds <- slingshot(rd, cl)
-#' curveWeights(sds)
+#' slingCurveWeights(sds)
 #' @export
-setGeneric(name = "curveWeights",
+setGeneric(name = "slingCurveWeights",
            signature = "x",
-           def = function(x) standardGeneric("curveWeights"))
+           def = function(x) standardGeneric("slingCurveWeights"))
 
 
 # plotting
@@ -261,11 +234,6 @@ setGeneric(name = "curveWeights",
 #'   
 #' @description Show the gene expression pattern for an individual gene along
 #' lineages inferred by \code{\link{slingshot}}.
-#'   
-#' @param gene character, the name of the gene to be plotted.
-#' @param sds a \code{SlingshotDataSet} with curves fitted.
-#' @param exprs matrix of expression values (genes by samples). Must include a 
-#' row with a row name of \code{gene}.
 #' 
 #' @export
 setGeneric(
@@ -279,8 +247,8 @@ setGeneric(
     }
 )
 
-# plot3d generic, in case rgl is not loaded
-#' @export
-plot3d <- function(x, ...){
-    UseMethod('plot3d')
-}
+#' # plot3d generic, in case rgl is not loaded
+#' #' @export
+#' plot3d <- function(x, ...){
+#'     UseMethod('plot3d')
+#' }

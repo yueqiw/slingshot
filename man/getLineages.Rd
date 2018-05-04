@@ -38,24 +38,21 @@ getLineages(data, clusterLabels, ...)
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 }
 \arguments{
-\item{data}{(optional) a data object, such as a 
-\code{\link{SingleCellExperiment}}, compatible with the 
-\code{\link{reducedDims}} and
-\code{\link[SummarizedExperiment:colData]{colData}} accessor functions. If 
-provided, the arguments \code{reducedDim} and \code{clusterLabels} should 
-be characters that identify elements of \code{reducedDims(data)} (assumed 
-to be a \code{list}) and \code{colData(data)} (assumed to be a 
-\code{data.frame}), respectively. If provided as a 
-\code{\link{SingleCellExperiment}}, \code{slingshot} results will be 
-returned as the same.}
+\item{data}{a data object containing the matrix of coordinates to be used for
+lineage inference. Supported types include \code{matrix}, 
+\code{\link{SingleCellExperiment}}, and \code{\link{SlingshotDataSet}}.}
 
 \item{clusterLabels}{character, a vector of length \code{n} denoting cluster
 labels, optionally including \code{-1}'s for "unclustered." If
 \code{reducedDim} is a \code{SlingshotDataSet}, cluster labels will be
 taken from it.}
 
-\item{reducedDim}{numeric, the \code{n} by \code{p} matrix of samples in a
-reduced dimensionality space.}
+\item{...}{Additional arguments to specify how lineages are constructed from
+clusters.}
+
+\item{reducedDim}{(optional) identifier to be used if \code{reducedDim(data)}
+contains multiple elements. Otherwise, the first element will be used by
+default.}
 
 \item{start.clus}{(optional) character, indicates the cluster(s) *from* which
 lineages will be drawn.}

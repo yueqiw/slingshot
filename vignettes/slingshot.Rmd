@@ -66,8 +66,8 @@ demonstrate a full "start-to-finish" workflow. It can be loaded via the
 showing how the dataset was generated.
 
 ```{r data_splat, eval=FALSE}
-library(splatter)
-library(HSMMSingleCell)
+library(splatter, quietly = TRUE)
+library(HSMMSingleCell, quietly = TRUE)
 
 # load data
 data("HSMM_expr_matrix")
@@ -87,7 +87,7 @@ sim <- splatSimulate(params, method = "paths")
 ```
 
 ```{r load_data_splat, echo = FALSE}
-library(SingleCellExperiment)
+library(SingleCellExperiment, quietly = TRUE)
 data("splatterPath")
 ```
 
@@ -98,10 +98,11 @@ allow us to demonstrate some of the additional functionality offered by
 `slingshot`.
 
 ```{r data_sling}
+library(slingshot, quietly = FALSE)
 data("slingshotExample")
-rd2 <- rd; cl2 <- cl
-dim(rd2) # data representing cells in a reduced dimensional space
-length(cl2) # vector of cluster labels
+
+dim(rd) # data representing cells in a reduced dimensional space
+length(cl) # vector of cluster labels
 ```
 
 # Upstream Analysis
@@ -122,7 +123,7 @@ simulated count of at least 10 reads.
 ```{r genefilt, eval=FALSE}
 # filter genes down to potential cell-type markers
 # at least M (10) reads in at least N (10) cells
-geneFilter <- apply(assays(sim)[[1]],1,function(x){
+geneFilter <- apply(assays(sim)$counts,1,function(x){
     sum(x >= 10) >= 10
 })
 sim <- sim[geneFilter, ]
@@ -253,28 +254,34 @@ will use the combined method for the analysis of the `splatter` dataset, but
 demonstrate the usage of the individual functions later, on the `slingshot`
 dataset.
 
-## Running Slingshot
+The `slingshot` wrapper function performs both steps of lineage inference in a
+single call. The necessary inputs are a reduced dimensional matrix of
+coordinates and a set of cluster labels. These can be separate objects or, in
+the case of the `splatter` data, elements contained in a `SingleCellExperiment`
+object.
 
-The `slingshot` wrapper function performs both steps of lineage inference in a single call. The necessary inputs are a reduced dimensional matrix of coordinates and a set of cluster labels. These can be separate objects or, in the case of the `splatter` data, elements contained in a `SingleCellExperiment` object.
-
-To run `slingshot` with the dimensionality reduction produced by PCA and cluster labels identified by Gaussian mixutre modeling, we would do the following:
+To run `slingshot` with the dimensionality reduction produced by PCA and cluster
+labels identified by Gaussian mixutre modeling, we would do the following:
 
 ```{r sling_sce}
 sce <- slingshot(sim, clusterLabels = 'GMM', reducedDim = 'PCA')
 ```
 
-As noted above, if no clustering results are provided, it is assumed that all cells are part of the same cluster and a single curve will be constructed. If no dimensionality reduction is provided, `slingshot` will use the first element of the list returned by `reducedDims`.
+As noted above, if no clustering results are provided, it is assumed that all
+cells are part of the same cluster and a single curve will be constructed. If no
+dimensionality reduction is provided, `slingshot` will use the first element of
+the list returned by `reducedDims`.
 
-The curve produced by `slingshot` has now been added to the `metadata` slot of the `SingleCellExperiment` object:
+The output is a `SingleCellExperiment` object with `slingshot` results 
+incorporated. Most of the output is added to the metadata in the form of a list 
+and is accessible via `metadata(sce)$slingshot`. Additionally, all inferred 
+pseudotime variables (one per lineage) are added to the `colData`. To extract 
+all `slingshot` results in a single object, we can use the `SlingshotDataSet` 
+function. This can be useful for visualization, as several plotting methods for 
+`SlingshotDataSet` objects are included with the package. Below, we visuzalize 
+the inferred lineage for the `splatter` data with points colored by pseudotime.
+
 ```{r plot_curve_1}
-class(metadata(sce)$slingshot$curves[[1]])
-
-plot(reducedDims(sce)$PCA, col = brewer.pal(9,"Set1")[colData(sce)$GMM], pch=16, asp = 1)
-lines(SlingshotDataSet(sce), lwd=2)
-```
-
-Similarly, the pseudotime variable was added to the `colData` data frame of the `SingleCellExperiment` object:
-```{r plot_curve_2}
 summary(sce$slingPseudotime_1)
 
 colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
@@ -282,55 +289,108 @@ plot(reducedDims(sce)$PCA, col = colors[cut(sce$slingPseudotime_1,breaks=100)], 
 lines(SlingshotDataSet(sce), lwd=2)
 ```
 
+We can also see how the lineage structure was intially estimated by the
+cluster-based minimum spanning tree by using the `type` argument.
+
+```{r plot_curve_2}
+plot(reducedDims(sce)$PCA, col = brewer.pal(9,'Set1')[sce$GMM], pch=16, asp = 1)
+lines(SlingshotDataSet(sce), lwd=2, type = 'lineages')
+```
+
+# Downstream Analysis
+
+## Identifying temporally expressed genes
+
+After running `slingshot`, an interesting next step may be to find genes that
+change their expression over the course of development. We demonstrate one
+possible method for this type of analysis on the $1,000$ most variable genes.
+
+We will regress each gene on the pseudotime variable we have generated, using a
+general additive model (GAM). This allows us to detect non-linear patterns in
+gene expression.
+
+```{r fitgam, cache = TRUE}
+require(gam)
+t <- sce$slingPseudotime_1
+
+# for time, only look at the 1,000 most variable genes
+Y <- log1p(assays(sim)$norm)
+var1K <- names(sort(apply(Y,1,var),decreasing = TRUE))[1:1000]
+Y <- Y[var1K,]
+
+# fit a GAM with a loess term for pseudotime
+gam.pval <- apply(Y,1,function(z){
+  d <- data.frame(z=z, t=t)
+  tmp <- gam(z ~ lo(t), data=d)
+  p <- summary(tmp)[4][[1]][1,5]
+  p
+})
+```
+
+We can then pick out the top genes based on p-value and visualize their 
+expression over developmental time with a heatmap.
+
+```{r heatmaps}
+require(clusterExperiment)
+topgenes <- names(sort(gam.pval, decreasing = FALSE))[1:100]
+heatdata <- assays(sim)$norm[rownames(assays(sim)$norm) %in% topgenes, 
+                        order(t, na.last = NA)]
+heatclus <- sce$GMM[order(t, na.last = NA)]
+ce <- ClusterExperiment(heatdata, heatclus, transformation = log1p)
+plotHeatmap(ce, clusterSamplesData = "orderSamplesValue",visualizeData = 'transformed')
+```
+
+# Detailed Slingshot Functionality
+
+Here, we provide further details and highlight some additional functionality of 
+the `slingshot` package. We will use the included `slingshotExample` dataset for
+illustrative purposes. This dataset was designed to represent cells in a low
+dimensional space and comes with a set of cluster labels generated by $k$-means
+clustering.
 
 ## Identifying global lineage structure
 
 The `getLineages` function takes as input an `n \times p` matrix and a vector of
-clustering results of length `n`. It maps connections between adjacent clusters
-using a minimum spanning tree (MST) and identifies paths through these
+clustering results of length `n`. It maps connections between adjacent clusters 
+using a minimum spanning tree (MST) and identifies paths through these 
 connections that represent lineages.
 
-This analysis can be performed in an entirely unsupervised manner or in a
-semi-supervised manner by specifying known beginning and end point clusters. For
-our simulated data, we get a single lineage and because we did not specify an
-initial cluster, one of the endpoints will be chosen arbitrarily as the
-beginning.
+This analysis can be performed in an entirely unsupervised manner or in a 
+semi-supervised manner by specifying known initial and terminal point clusters.
+If we do not specify a starting point, `slingshot` selects one based on
+parsimony, maximizing the number of clusters shared between lineages before a
+split. If there are no splits or multiple clusters produce the same parsimony
+score, the starting cluster is chosen arbitrarily.
 
-```{r splat_lines_unsup}
-lin1 <- getLineages(rd1, cl1)
+In the case of our simulated data, `slingshot` selects Cluster 1 as the starting
+cluster. However, we generally recommend the specification of an initial cluster
+based on prior knowledge (either time of sample collection or established gene
+markers). This specification will have no effect on how the MST is constructed,
+but it will impact how branching curves are constructed.
+
+```{r sling_lines_unsup}
+lin1 <- getLineages(rd, cl, start.clus = '1')
 lin1
-plot(rd1, col = brewer.pal(9,"Set1")[cl1], asp = 1, pch = 16)
+plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
 lines(lin1, lwd = 3)
-```
-
-We generally recommend the specification of a root cluster. This will have no
-effect on how the MST is constructed, but it will allow for nicer curves in
-datasets with a branching structure. When no initial cluster is specified and
-branching is present, `slingshot` will select an endpoint that maximizes the
-number of shared clusters (ie. the cluster at the end of the longest branch) as
-the beginning. For the second dataset, this means that the cluster on the left
-will be chosen as the origin.
-
-```{r lines_unsup}
-lin2 <- getLineages(rd2, cl2)
-lin2
-plot(rd2, col = brewer.pal(9,"Set1")[cl2], asp = 1, pch = 16)
-lines(lin2, lwd = 3)
 ```
 
 At this step, `slingshot` also allows for the specification of known endpoints.
 Clusters which are specified as terminal cell states will be constrained to have
 only one connection when the MST is constructed (ie., they must be leaf nodes).
 This constraint could potentially impact how other parts of the tree are drawn,
-as shown in the next example where we specified the middle cluster in the branch
-as an endpoint.
+as shown in the next example where we specify Cluster 3 as an endpoint.
 
 ```{r lines_sup_end}
-lin3 <- getLineages(rd2, cl2, end.clus = '3')
-lin3
-plot(rd2, col = brewer.pal(9,"Set1")[cl2], asp = 1, pch = 16)
-lines(lin3, lwd = 3, show.constraints = TRUE)
+lin2 <- getLineages(rd, cl, start.clus= '1', end.clus = '3')
+
+plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
+lines(lin2, lwd = 3, show.constraints = TRUE)
 ```
+
+This type of supervision can be useful for ensuring that results are consistent
+with prior biological knowledge. Specifically, it can prevent known terminal
+cell fates from being categorized as transitory states.
 
 There are a few additional arguments we could have passed to `getLineages` for
 more greater control:
@@ -344,9 +404,9 @@ clusters which are not a part of any lineage.
 After constructing the MST, `getLineages` identifies paths through the tree to
 designate as lineages. At this stage, a lineage will consist of an ordered set
 of cluster names, starting with the root cluster and ending with a leaf. The
-output of `getLineages` is a `slingshotDataSet` which holds all of the inputs as
+output of `getLineages` is a `SlingshotDataSet` which holds all of the inputs as
 well as a list of lineages and some additional information on how they were
-constructed.
+constructed. This object is then used as the input to the `getCurves` function.
 
 ## Constructing smooth curves and ordering cells
 
@@ -373,70 +433,36 @@ algorithm and produces smooth branching lineages.
 ```{r curves}
 crv1 <- getCurves(lin1)
 crv1
-plot(rd1, col = brewer.pal(9,"Set1")[cl1], asp = 1, pch = 16)
+plot(rd, col = brewer.pal(9,"Set1")[cl], asp = 1, pch = 16)
 lines(crv1, lwd = 3)
 ```
 
-The output of `getCurves` is an updated `slingshotDataSet` which now contains
-the simultaneous principal curves and additional information on how they were
-fit. The simultaneous principal curves can be accessed using the `curves`
-function, which will return a list of `principal.curve` objects. These objects
-consist of the following slots:
+The output of `getCurves` is an updated `slingshotDataSet` which now contains 
+the simultaneous principal curves and additional information on how they were 
+fit. The `pseudotime` function extracts a cells-by-lineages matrix of pseudotime
+values for each cell along each lineage, with `NA` values for cells that were
+not assigned to a particular lineage. The `curveWeights` function extracts a
+similar matrix of weights assigning each cell to one or more lineages.
 
-* `s`: the matrix of points that make up the curve. These correspond to the
-orthogonal projections of the data points. * `tag`: indices which can be used to
-put the cells along a curve in order based their projections. * `lambda`:
-arclengths along the curve from the beginning to each cell's projection. *
-`dist`: the squared distances between data points and their projections onto the
-curve. * `w`: the vector of weights along this lineage. Cells that were
-unambiguously assigned to this lineage will have a weight of `1`, while cells
-assigned to other lineages will have a weight of `0`. It is possible for cells
-to have weights of `1` (or very close to 1) for multiple lineages, if they are
+The curves objects can be accessed using the `curves` function, which will
+return a list of `principal.curve` objects. These objects consist of the
+following slots:
+
+* `s`: the matrix of points that make up the curve. These correspond to the 
+orthogonal projections of the data points. 
+* `tag`: indices which can be used to
+put the cells along a curve in order based their projections. 
+* `lambda`: 
+arclengths along the curve from the beginning to each cell's projection. 
+* `dist`: the squared distances between data points and their projections onto
+the curve.
+* `w`: the vector of weights along this lineage. Cells that were 
+unambiguously assigned to this lineage will have a weight of `1`, while cells 
+assigned to other lineages will have a weight of `0`. It is possible for cells 
+to have weights of `1` (or very close to 1) for multiple lineages, if they are 
 positioned before a branching event.
 
-# Downstream Analysis
 
-## Identifying temporally expressed genes
-
-Typically, the next step will be to find genes that change their expression as a
-function of developmental time. This can be done using the full genes-by-samples
-data matrix, but we will use the subset consisting of the 1,000 most variable
-genes.
-
-For a quick analysis, we will regress each gene on the two pseudotime vectors we
-have generated, using a general additive model (GAM). This allows us to detect
-non-linear patterns in gene expression over developmental time.
-
-```{r fitgam, cache = TRUE}
-require(gam)
-t <- pseudotime(crv1)
-
-# for time, only look at the 1,000 most variable genes
-y <- log1p(assays(sim)$norm)
-var1K <- names(sort(apply(y,1,var),decreasing = TRUE))[1:1000]
-y <- y[var1K,]
-
-# fit a GAM with a loess term for pseudotime
-gam.pval <- apply(y,1,function(z){
-  d <- data.frame(z=z, t=t)
-  tmp <- gam(z ~ lo(t), data=d)
-  p <- summary(tmp)[4][[1]][1,5]
-  p
-})
-```
-
-We can then pick out the top genes for each lineage and visualize their
-expression over developmental time with a heatmap.
-
-```{r heatmaps}
-require(clusterExperiment)
-topgenes1 <- names(sort(gam.pval, decreasing = FALSE))[1:100]
-heatdata1 <- assays(sim)$norm[rownames(assays(sim)$norm) %in% topgenes1, 
-                        order(t, na.last = NA)]
-heatclus1 <- cl1[order(t, na.last = NA)]
-ce1 <- clusterExperiment(heatdata1, heatclus1, transformation = log1p)
-plotHeatmap(ce1, clusterSamplesData = "orderSamplesValue",visualizeData = 'transformed')
-```
 
 # Session Info
 

@@ -4,6 +4,7 @@
 \name{plotGenePseudotime}
 \alias{plotGenePseudotime}
 \alias{plotGenePseudotime,character,SlingshotDataSet,matrix-method}
+\alias{plotGenePseudotime}
 \title{Plot Gene Expression by Pseudotime}
 \usage{
 plotGenePseudotime(gene, sds, exprs, ...)
@@ -12,12 +13,11 @@ plotGenePseudotime(gene, sds, exprs, ...)
   exprs, loess = TRUE, loessCI = TRUE, ...)
 }
 \arguments{
-\item{gene}{character, the name of the gene to be plotted.}
+\item{gene}{character, the name of the gene to be plotted}
 
-\item{sds}{a \code{SlingshotDataSet} with curves fitted.}
+\item{sds}{a SlingshotDataSet containing cell pseudotimes}
 
-\item{exprs}{matrix of expression values (genes by samples). Must include a 
-row with a row name of \code{gene}.}
+\item{exprs}{the genes-by-samples matrix of expression values.}
 
 \item{...}{additional parameters to be passed to \code{\link{plot}}.}
 
@@ -26,12 +26,6 @@ row with a row name of \code{gene}.}
 
 \item{loessCI}{logical, whether to include a confidence band around the loess
 curve (default is \code{TRUE}).}
-
-\item{gene}{character, the name of the gene to be plotted}
-
-\item{sds}{a SlingshotDataSet containing cell pseudotimes}
-
-\item{exprs}{the genes-by-samples matrix of expression values.}
 }
 \value{
 returns \code{NULL}.

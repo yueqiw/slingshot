@@ -7,18 +7,7 @@
 \alias{reducedDim,SlingshotDataSet-method}
 \alias{reducedDims,SlingshotDataSet-method}
 \alias{clusterLabels,SlingshotDataSet-method}
-\alias{connectivity,SlingshotDataSet-method}
-\alias{adjacency,SlingshotDataSet-method}
-\alias{lineages,SlingshotDataSet-method}
-\alias{curves,SlingshotDataSet-method}
-\alias{slingParams,SlingshotDataSet-method}
-\alias{reducedDim<-,SlingshotDataSet-method}
-\alias{reducedDims<-,SlingshotDataSet-method}
-\alias{clusterLabels<-,SlingshotDataSet,ANY-method}
 \alias{[,SlingshotDataSet,ANY,ANY,ANY-method}
-\alias{pseudotime,SlingshotDataSet-method}
-\alias{curveWeights,SlingshotDataSet-method}
-\alias{SlingshotDataSet,SingleCellExperiment-method}
 \title{Class \code{SlingshotDataSet}}
 \usage{
 \S4method{show}{SlingshotDataSet}(object)
@@ -29,55 +18,18 @@
 
 \S4method{clusterLabels}{SlingshotDataSet}(x)
 
-\S4method{connectivity}{SlingshotDataSet}(x)
-
-\S4method{adjacency}{SlingshotDataSet}(x)
-
-\S4method{lineages}{SlingshotDataSet}(x)
-
-\S4method{curves}{SlingshotDataSet}(x)
-
-\S4method{slingParams}{SlingshotDataSet}(x)
-
-\S4method{reducedDim}{SlingshotDataSet}(x) <- value
-
-\S4method{reducedDims}{SlingshotDataSet}(x) <- value
-
-\S4method{clusterLabels}{SlingshotDataSet,ANY}(object) <- value
-
 \S4method{[}{SlingshotDataSet,ANY,ANY,ANY}(x, i, j)
-
-\S4method{pseudotime}{SlingshotDataSet}(x, na = TRUE)
-
-\S4method{curveWeights}{SlingshotDataSet}(x)
-
-\S4method{SlingshotDataSet}{SingleCellExperiment}(data)
 }
 \arguments{
 \item{object}{a \code{SlingshotDataSet} object.}
 
 \item{x}{a \code{SlingshotDataSet} object.}
 
-\item{value}{matrix, the new reduced dimensional dataset.}
-
 \item{i}{indices to be applied to rows (cells) of the reduced dimensional
 matrix and cluster labels.}
 
 \item{j}{indices to be applied to the columns (dimensions) of the reduced
 dimensional matrix.}
-
-\item{na}{logical. If \code{TRUE} (default), cells that are not assigned to a
-lineage will have a pseudotime value of \code{NA}. Otherwise, their
-arclength along the curve will be returned.}
-
-\item{x}{a \code{SlingshotDataSet} object.}
-
-\item{x}{an object that describes a dataset or a model involving cluster
-labels.}
-
-\item{value}{matrix, the new reduced dimensional dataset.}
-
-\item{value}{character, the new vector of cluster labels.}
 }
 \value{
 The accessor functions \code{reducedDim}, \code{clusterLabels}, 
@@ -100,16 +52,38 @@ The \code{SlingshotDataSet} class holds data relevant for
 
 Extract cluster labels, either a character vector or matrix of 
   weights.
+
+# replacement methods
+#' @describeIn SlingshotDataSet Updated object with new reduced dimensional
+#'   matrix.
+#' @param value matrix, the new reduced dimensional dataset.
+#' 
+#' @details 
+#' Warning: this will remove any existing lineages or curves from the 
+#' \code{SlingshotDataSet} object.
+#' @importFrom SingleCellExperiment reducedDims<-
+#' @export
+setReplaceMethod(
+    f = "reducedDims", 
+    signature = "SlingshotDataSet",
+    definition = function(x, value) initialize(x, reducedDim = value,
+                                               clusterLabels = clusterLabels(x)))
 }
 \details{
-Warning: this will remove any existing lineages or curves from the 
-\code{SlingshotDataSet} object.
+#' @describeIn SlingshotDataSet Updated object with new vector of cluster
+#'   labels.
+#' @param value character, the new vector of cluster labels.
+#' 
+#' @details 
+#' Warning: this will remove any existing lineages or curves from the 
+#' \code{SlingshotDataSet} object.
+#' @export
+setReplaceMethod(
+    f = "clusterLabels", 
+    signature = c(object = "SlingshotDataSet", value = "ANY"),
+    definition = function(object, value) initialize(x, reducedDim = reducedDim(x),
+                                               clusterLabels = value))
 
-Warning: this will remove any existing lineages or curves from the 
-\code{SlingshotDataSet} object.
-
-Warning: this will remove any existing lineages or curves from the 
-\code{SlingshotDataSet} object.
 
 Warning: this will remove any existing lineages or curves from the 
 \code{SlingshotDataSet} object.
@@ -128,38 +102,7 @@ dimensional dataset.
 \item \code{clusterLabels}: extracts cluster labels from a
 \code{SlingshotDataSet} object.
 
-\item \code{connectivity}: returns the adjacency matrix between
-clusters.
-
-\item \code{adjacency}: returns the adjacency matrix between
-clusters.
-
-\item \code{lineages}: returns the list of lineages, represented by
-ordered sets of clusters.
-
-\item \code{curves}: returns the list of smooth lineage curves.
-
-\item \code{slingParams}: returns the list of additional parameters used
-by Slingshot.
-
-\item \code{reducedDim<-}: Updated object with new reduced dimensional
-matrix.
-
-\item \code{reducedDims<-}: Updated object with new reduced dimensional
-matrix.
-
-\item \code{clusterLabels<-}: Updated object with new vector of cluster
-labels.
-
 \item \code{[}: Subset dataset and cluster labels.
-
-\item \code{pseudotime}: returns the matrix of pseudotime values.
-
-\item \code{curveWeights}: returns the matrix of cell weights along each
-lineage.
-
-\item \code{SlingshotDataSet}: extracts a \code{SlingshotDataSet} object from a
-\code{SingleCellExperiment} object that contains \code{slingshot} results.
 }}
 
 \section{Slots}{

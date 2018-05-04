@@ -111,7 +111,7 @@ setMethod(f = "getCurves",
               
               X <- reducedDim(sds)
               clusterLabels <- clusterLabels(sds)
-              lineages <- lineages(sds)
+              lineages <- slingLineages(sds)
               
               sds@slingParams$shrink <- shrink
               sds@slingParams$extend <- extend

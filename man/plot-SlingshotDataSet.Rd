@@ -16,12 +16,12 @@
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}
 
 \item{type}{character, the type of output to be plotted, can be one of 
-\code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
-Details for more.}
+\code{"lineages"}, \code{"curves"}, or \code{"both"} (by partial matching),
+see Details for more.}
 
-\item{show.constraints}{logical, whether or not the user-specified initial
-and terminal clusters should be specially denoted by green and red
-connecting lines, respectively.}
+\item{show.constraints}{logical, whether or not the user-specified initial 
+and terminal clusters should be specially denoted by green and red dots,
+respectively.}
 
 \item{add}{logical, indicates whether the output should be added to an
 existing plot.}
@@ -30,7 +30,8 @@ existing plot.}
 
 \item{asp}{numeric, the y/x aspect ratio, see \code{\link{plot.window}}.}
 
-\item{cex}{numeric, amount by which points should be magnified, see \code{\link{par}}.}
+\item{cex}{numeric, amount by which points should be magnified, see
+\code{\link{par}}.}
 
 \item{lwd}{numeric, the line width, see \code{\link{par}}.}
 

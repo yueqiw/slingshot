@@ -5,20 +5,23 @@
 \alias{splatterPath}
 \alias{sim}
 \title{Single-lineage simulated data}
-\format{A \code{\link{SingleCellExperiment}} object with $10,120$ genes and $200$
-  cells.}
+\format{A \code{\link{SingleCellExperiment}} object with $14,608$ genes and
+  $200$ cells.}
 \source{
-Simulated by \code{\link[splatter:splatter]{splatter}} with parameters learned from the
+Simulated by \code{\link[splatter:splatter]{splatter}} with
+  parameters learned from the 
   \code{\link[HSMMSingleCell:HSMMSingleCell]{HSMMSingleCell}} dataset.
 }
 \usage{
 sim
 }
 \description{
-A simulated single-cell RNA-Seq dataset produced by \code{\link[splatter:splatter]{splatter}}.
-It was produced by \code{\link[splatter:splatSimulate]{splatSimulatePaths}} to contain a single
-trajectory and filtered to remove some uninformative genes. Code for the
-complete data generation process can be found in the \code{slingshot}
-vignette.
+A simulated single-cell RNA-Seq dataset produced by
+  \code{\link[splatter:splatter]{splatter}}. It was produced by
+  \code{\link[splatter:splatSimulate]{splatSimulatePaths}} to contain a
+  single trajectory and filtered to remove some uninformative genes. Code for
+  the complete data generation process can be found in the \code{slingshot} 
+  vignette. Note that this represents the version of this dataset after gene
+  filtering.
 }
 \keyword{datasets}

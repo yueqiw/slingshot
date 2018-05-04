@@ -5,12 +5,16 @@
 #'   "unclustered"), this function infers a forest structure on the clusters and
 #'   returns paths through the forest that can be interpreted as lineages.
 #'   
-#' @param reducedDim numeric, the \code{n} by \code{p} matrix of samples in a
-#'   reduced dimensionality space.
+#' @param data a data object containing the matrix of coordinates to be used for
+#'   lineage inference. Supported types include \code{matrix}, 
+#'   \code{\link{SingleCellExperiment}}, and \code{\link{SlingshotDataSet}}.
 #' @param clusterLabels character, a vector of length \code{n} denoting cluster
 #'   labels, optionally including \code{-1}'s for "unclustered." If
 #'   \code{reducedDim} is a \code{SlingshotDataSet}, cluster labels will be
 #'   taken from it.
+#' @param reducedDim (optional) identifier to be used if \code{reducedDim(data)}
+#'   contains multiple elements. Otherwise, the first element will be used by
+#'   default.
 #' @param start.clus (optional) character, indicates the cluster(s) *from* which
 #'   lineages will be drawn.
 #' @param end.clus (optional) character, indicates the cluster(s) which will be 
@@ -26,16 +30,6 @@
 #'   is parameterized such that this distance is \code{omega / 2}, making 
 #'   \code{omega} the maximum distance between two connected clusters. By 
 #'   default, \code{omega = Inf}.
-#' @param data (optional) a data object, such as a 
-#'   \code{\link{SingleCellExperiment}}, compatible with the 
-#'   \code{\link{reducedDims}} and
-#'   \code{\link[SummarizedExperiment:colData]{colData}} accessor functions. If 
-#'   provided, the arguments \code{reducedDim} and \code{clusterLabels} should 
-#'   be characters that identify elements of \code{reducedDims(data)} (assumed 
-#'   to be a \code{list}) and \code{colData(data)} (assumed to be a 
-#'   \code{data.frame}), respectively. If provided as a 
-#'   \code{\link{SingleCellExperiment}}, \code{slingshot} results will be 
-#'   returned as the same.
 #'   
 #' @details The \code{connectivity} matrix is learned by fitting a (possibly
 #'   constrained) minimum-spanning tree on the clusters and the artificial 

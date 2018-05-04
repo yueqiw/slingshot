@@ -20,8 +20,8 @@
 Details for more.}
 
 \item{show.constraints}{logical, whether or not the user-specified initial 
-and terminal clusters should be specially denoted by green and red 
-connecting lines, respectively.}
+and terminal clusters should be specially denoted by green and red dots,
+respectively.}
 
 \item{col}{character, color vector for points.}
 

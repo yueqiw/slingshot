@@ -110,21 +110,21 @@ setValidity("SlingshotDataSet", function(object) {
     }
     
     # if lineages present
-    if(length(lineages(object)) > 0){
-        L <- length(lineages(object))
+    if(length(slingLineages(object)) > 0){
+        L <- length(slingLineages(object))
         clus.names <- colnames(clusterLabels(object))
         K <- length(clus.names)
-        if(any(sapply(lineages(object),class) != 'character')){
+        if(any(sapply(slingLineages(object),class) != 'character')){
             return("lineages must be a list of character vectors.")
         }
-        if(!all(sapply(lineages(object), 
+        if(!all(sapply(slingLineages(object), 
                        function(lin){all(lin %in% clus.names)}))){
             return("lineages must be a list of character vectors composed of cluster names.")
         }
-        if(!is.numeric(adjacency(object))) {
+        if(!is.numeric(slingAdjacency(object))) {
             return("adjacency matrix must be numeric or logical.")
         }
-        if(any(dim(adjacency(object)) != K)){
+        if(any(dim(slingAdjacency(object)) != K)){
             return("adjacency matrix must be square with number of dimensions
                    equal to number of clusters")
         }
@@ -153,15 +153,15 @@ setValidity("SlingshotDataSet", function(object) {
     }
     
     # if curves present
-    if(length(curves(object)) > 0){
-        if(length(lineages(object)) > 0){
-            L <- length(lineages(object))
-            if(length(curves(object)) != L){
+    if(length(slingCurves(object)) > 0){
+        if(length(slingLineages(object)) > 0){
+            L <- length(slingLineages(object))
+            if(length(slingCurves(object)) != L){
                 return("Number of curves does not match number of lineages")
             }
         }
-        L <- length(curves(object))
-        if(any(sapply(curves(object),class) != 'principal.curve')){
+        L <- length(slingCurves(object))
+        if(any(sapply(slingCurves(object),class) != 'principal.curve')){
             return("curves must be a list of principal.curve objects.")
         }
         if(!is.null(slingParams(object)$shrink)){

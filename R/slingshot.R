@@ -390,7 +390,6 @@ setMethod(f = "slingshot",
                                 shrink.method = 'cosine', 
                                 allow.breaks = TRUE, ...){
               # SETUP
-              sp <- list()
               # determine the cluster labels and reducedDim matrix
               if(is.null(reducedDim)){
                   if(length(reducedDims(data))==0){
@@ -399,13 +398,11 @@ setMethod(f = "slingshot",
                       message(paste0('Dimensionality reduction not explicitly chosen. Continuing with ', 
                                      names(reducedDims(data))[1]))
                       rd <- reducedDims(data)[[1]]
-                      sp$reducedDim <- names(reducedDims(data))[1]
                   }
               }
               if(length(reducedDim)==1){
                   if(reducedDim %in% names(reducedDims(data))){
                       rd <- reducedDims(data)[[as.character(reducedDim)]]
-                      sp$reducedDim <- as.character(reducedDim)
                   }else{
                       stop(paste0(reducedDim,' not found in reducedDims(data).'))
                   }
@@ -413,7 +410,6 @@ setMethod(f = "slingshot",
                   if(!is.null(dim(reducedDim))){
                       rd <- reducedDim
                       reducedDims(data)$slingReducedDim <- reducedDim
-                      sp$reducedDim <- "slingReducedDim"
                   }
               }
               if(is.null(clusterLabels)){
@@ -423,16 +419,13 @@ setMethod(f = "slingshot",
                       cl <- rep('1', nrow(rd))
                   }
                   colData(data)$slingClusters <- cl
-                  sp$clusterLabels <- 'slingClusters'
               }else{
                   if(length(clusterLabels)==1){
                       if(clusterLabels %in% colnames(colData(data))){
                           cl <- colData(data)[[as.character(clusterLabels)]]
-                          sp$clusterLabels <- as.character(clusterLabels)
                       }else{
                           if(clusterLabels %in% colnames(clusterMatrix(data))){
                               cl <- clusterMatrix(data)[,as.character(clusterLabels)]
-                              sp$clusterLabels <- as.character(clusterLabels)
                           }else{
                               stop(paste0(clusterLabels,' not found in colData(data) or clusterMatrix(data).'))
                           }
@@ -443,11 +436,9 @@ setMethod(f = "slingshot",
                           cl <- as.matrix(cl)
                           colnames(cl) <- paste0('sling_c',1:ncol(cl))
                           colData(data) <- cbind(colData(data), cl)
-                          sp$clusterLabels <- paste0('sling_c',1:ncol(cl))
                       }else{
                           cl <- as.character(clusterLabels)
                           colData(data)$slingClusters <- cl
-                          sp$clusterLabels <- 'slingClusters'
                       }
                   }
               }
@@ -464,13 +455,10 @@ setMethod(f = "slingshot",
                                allow.breaks = allow.breaks, ...)
               # combine slingshot output with SCE
               sce <- data
-              sp$lineages <- lineages(sds)
-              sp$adjacency <- adjacency(sds)
-              sp$curves <- curves(sds)
-              pst <- pseudotime(sds)
+              sce@int_metadata$slingshot <- sds
+              pst <- slingPseudotime(sds)
               colnames(pst) <- paste0('slingPseudotime_',1:ncol(pst))
               colData(sce) <- cbind(colData(sce), pst)
-              metadata(sce)$slingshot <- sp
               return(sce)
           })
 
@@ -494,7 +482,6 @@ setMethod(f = "slingshot",
                                 shrink.method = 'cosine', 
                                 allow.breaks = TRUE, ...){
               # SETUP
-              sp <- list()
               # determine the cluster labels and reducedDim matrix
               if(is.null(reducedDim)){
                   if(length(reducedDims(data))==0){
@@ -503,13 +490,11 @@ setMethod(f = "slingshot",
                       message(paste0('Dimensionality reduction not explicitly chosen. Continuing with ', 
                                      names(reducedDims(data))[1]))
                       rd <- reducedDims(data)[[1]]
-                      sp$reducedDim <- names(reducedDims(data))[1]
                   }
               }
               if(length(reducedDim)==1){
                   if(reducedDim %in% names(reducedDims(data))){
                       rd <- reducedDims(data)[[as.character(reducedDim)]]
-                      sp$reducedDim <- as.character(reducedDim)
                   }else{
                       stop(paste0(reducedDim,' not found in reducedDims(data).'))
                   }
@@ -517,19 +502,16 @@ setMethod(f = "slingshot",
                   if(!is.null(dim(reducedDim))){
                       rd <- reducedDim
                       reducedDims(data)$slingReducedDim <- reducedDim
-                      sp$reducedDim <- "slingReducedDim"
                   }
               }
               if(missing(clusterLabels)){
                   message('No cluster labels provided. Continuing with one cluster.')
                   cl <- rep('1', nrow(rd))
                   colData(data)$slingClusters <- cl
-                  sp$clusterLabels <- 'slingClusters'
               }else{
                   if(length(clusterLabels)==1){
                       if(clusterLabels %in% colnames(colData(data))){
                           cl <- colData(data)[[as.character(clusterLabels)]]
-                          sp$clusterLabels <- as.character(clusterLabels)
                       }else{
                           stop(paste0(clusterLabels,' not found in colData(data).'))
                       }
@@ -539,11 +521,9 @@ setMethod(f = "slingshot",
                           cl <- as.matrix(cl)
                           colnames(cl) <- paste0('sling_c',1:ncol(cl))
                           colData(data) <- cbind(colData(data), cl)
-                          sp$clusterLabels <- paste0('sling_c',1:ncol(cl))
                       }else{
                           cl <- as.character(clusterLabels)
                           colData(data)$slingClusters <- cl
-                          sp$clusterLabels <- 'slingClusters'
                       }
                   }
               }
@@ -560,13 +540,10 @@ setMethod(f = "slingshot",
                                allow.breaks = allow.breaks, ...)
               # combine slingshot output with SCE
               sce <- data
-              sp$lineages <- lineages(sds)
-              sp$adjacency <- adjacency(sds)
-              sp$curves <- curves(sds)
-              pst <- pseudotime(sds)
+              sce@int_metadata$slingshot <- sds
+              pst <- slingPseudotime(sds)
               colnames(pst) <- paste0('slingPseudotime_',1:ncol(pst))
               colData(sce) <- cbind(colData(sce), pst)
-              metadata(sce)$slingshot <- sp
               return(sce)
           })
 

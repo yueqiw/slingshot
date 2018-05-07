@@ -356,7 +356,8 @@ setMethod(f = "slingshot",
                                 shrink.method = 'cosine', 
                                 allow.breaks = TRUE, ...){
             if(missing(clusterLabels)){
-              message('No cluster labels provided. Continuing with one cluster.')
+              message(paste0('No cluster labels provided. ',
+                             'Continuing with one cluster.'))
               clusterLabels <- rep('1', nrow(data))
             }
             return(slingshot(data = data, clusterLabels = clusterLabels,
@@ -395,7 +396,8 @@ setMethod(f = "slingshot",
                   if(length(reducedDims(data))==0){
                       stop('No dimensionality reduction found.')
                   }else{
-                      message(paste0('Dimensionality reduction not explicitly chosen. Continuing with ', 
+                      message(paste0('Dimensionality reduction not explicitly ',
+                                     'chosen. Continuing with ', 
                                      names(reducedDims(data))[1]))
                       rd <- reducedDims(data)[[1]]
                   }
@@ -404,7 +406,8 @@ setMethod(f = "slingshot",
                   if(reducedDim %in% names(reducedDims(data))){
                       rd <- reducedDims(data)[[as.character(reducedDim)]]
                   }else{
-                      stop(paste0(reducedDim,' not found in reducedDims(data).'))
+                      stop(paste0(reducedDim,' not found in ',
+                                  'reducedDims(data).'))
                   }
               }else{
                   if(!is.null(dim(reducedDim))){
@@ -419,7 +422,8 @@ setMethod(f = "slingshot",
               if(is.null(clusterLabels)){
                   cl <- primaryClusterNamed(data)
                   if(is.null(cl)){
-                      message('No primary clustering found. Continuing with one cluster.')
+                      message(paste0('No primary clustering found. Continuing ',
+                                     'with one cluster.'))
                       cl <- rep('1', nrow(rd))
                   }
                   colData(data)$slingClusters <- cl
@@ -429,14 +433,18 @@ setMethod(f = "slingshot",
                           cl <- colData(data)[[as.character(clusterLabels)]]
                       }else{
                           if(clusterLabels %in% colnames(clusterMatrix(data))){
-                              cl <- clusterMatrix(data)[,as.character(clusterLabels)]
+                              cl <- clusterMatrix(data)[,
+                                                    as.character(clusterLabels)]
                           }else{
-                              stop(paste0(clusterLabels,' not found in colData(data) or clusterMatrix(data).'))
+                              stop(paste0(clusterLabels,' not found in ',
+                                          'colData(data) or ',
+                                          'clusterMatrix(data).'))
                           }
                       }
                   }
                   if(length(clusterLabels)>1){
-                      if(!is.null(dim(cl)) && length(dim(cl)) > 1 && all(dim(cl) > 1)){
+                      if(!is.null(dim(cl)) && length(dim(cl)) > 1 && 
+                         all(dim(cl) > 1)){
                           cl <- as.matrix(cl)
                           colnames(cl) <- paste0('sling_c',seq_len(ncol(cl)))
                           colData(data) <- cbind(colData(data), cl)
@@ -491,7 +499,8 @@ setMethod(f = "slingshot",
                   if(length(reducedDims(data))==0){
                       stop('No dimensionality reduction found.')
                   }else{
-                      message(paste0('Dimensionality reduction not explicitly chosen. Continuing with ', 
+                      message(paste0('Dimensionality reduction not explicitly ',
+                                     'chosen. Continuing with ', 
                                      names(reducedDims(data))[1]))
                       rd <- reducedDims(data)[[1]]
                   }
@@ -500,7 +509,8 @@ setMethod(f = "slingshot",
                   if(reducedDim %in% names(reducedDims(data))){
                       rd <- reducedDims(data)[[as.character(reducedDim)]]
                   }else{
-                      stop(paste0(reducedDim,' not found in reducedDims(data).'))
+                      stop(paste0(reducedDim,' not found in ',
+                                  'reducedDims(data).'))
                   }
               }else{
                   if(!is.null(dim(reducedDim))){
@@ -513,7 +523,8 @@ setMethod(f = "slingshot",
               }
               
               if(missing(clusterLabels)){
-                  message('No cluster labels provided. Continuing with one cluster.')
+                  message('No cluster labels provided. Continuing with one ',
+                          'cluster.')
                   cl <- rep('1', nrow(rd))
                   colData(data)$slingClusters <- cl
               }else{
@@ -521,11 +532,13 @@ setMethod(f = "slingshot",
                       if(clusterLabels %in% colnames(colData(data))){
                           cl <- colData(data)[[as.character(clusterLabels)]]
                       }else{
-                          stop(paste0(clusterLabels,' not found in colData(data).'))
+                          stop(paste0(clusterLabels,' not found in ',
+                                      'colData(data).'))
                       }
                   }
                   if(length(clusterLabels)>1){
-                      if(!is.null(dim(cl)) && length(dim(cl)) > 1 && all(dim(cl) > 1)){
+                      if(!is.null(dim(cl)) && length(dim(cl)) > 1 &&
+                         all(dim(cl) > 1)){
                           cl <- as.matrix(cl)
                           colnames(cl) <- paste0('sling_c',seq_len(ncol(cl)))
                           colData(data) <- cbind(colData(data), cl)

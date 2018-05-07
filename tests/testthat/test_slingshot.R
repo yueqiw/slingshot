@@ -58,27 +58,36 @@ test_that("getLineages works for different input types", {
   expect_equal(dim(slingAdjacency(c1)), c(1,1))
   
   # invalid inputs
-  expect_error(getLineages(reducedDim[,-(seq_len(ncol(reducedDim)))], clusterLabels), 'has zero columns')
-  expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels), 'has zero rows')
+  expect_error(getLineages(reducedDim[,-(seq_len(ncol(reducedDim)))], 
+                           clusterLabels), 'has zero columns')
+  expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], 
+                           clusterLabels), 'has zero rows')
   expect_error(getLineages(reducedDim, clusterLabels[1:10]), 'must equal')
-  expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels[integer(0)]), 'has zero rows')
+  expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], 
+                           clusterLabels[integer(0)]), 'has zero rows')
   rdna <- reducedDim; rdna[1,1] <- NA
-  expect_error(getLineages(rdna, clusterLabels), 'cannot contain missing values')
+  expect_error(getLineages(rdna, clusterLabels), 
+               'cannot contain missing values')
   rdc <- reducedDim; rdc[1,1] <- 'a'
-  expect_error(getLineages(rdc, clusterLabels), 'must only contain numeric values')
+  expect_error(getLineages(rdc, clusterLabels), 
+               'must only contain numeric values')
 })
 
 test_that("getLineages works as expected", {
   sds0 <- getLineages(rd, cl)
-  expect_true(all(slingLineages(sds0)$Lineage1 == as.character(c(1,2,3,4))) || all(slingLineages(sds0)$Lineage1 == as.character(c(1,2,3,5))))
-  expect_true(all(slingLineages(sds0)$Lineage2 == as.character(c(1,2,3,4))) || all(slingLineages(sds0)$Lineage2 == as.character(c(1,2,3,5))))
-  expect_false(all(slingLineages(sds0)$Lineage1 == slingLineages(sds0)$Lineage2))
+  expect_true(all(slingLineages(sds0)$Lineage1 == as.character(c(1,2,3,4))) || 
+                  all(slingLineages(sds0)$Lineage1 == as.character(c(1,2,3,5))))
+  expect_true(all(slingLineages(sds0)$Lineage2 == as.character(c(1,2,3,4))) || 
+                  all(slingLineages(sds0)$Lineage2 == as.character(c(1,2,3,5))))
+  expect_false(all(slingLineages(sds0)$Lineage1 == 
+                       slingLineages(sds0)$Lineage2))
   # set start cluster
   sds1 <- getLineages(rd, cl, start.clus = 1)
   expect_true(all(sapply(slingLineages(sds1),function(l){ l[1] == '1' })))
   # set end cluster
   sds2 <- getLineages(rd,cl, start.clus = 1, end.clus = 3)
-  expect_true(any(sapply(slingLineages(sds2),function(l){ (l[1] == '1') && (l[length(l)] == '3') })))
+  expect_true(any(sapply(slingLineages(sds2),function(l){ (l[1] == '1') && 
+          (l[length(l)] == '3') })))
 })
 
 test_that("getCurves works as expected", {
@@ -90,11 +99,14 @@ test_that("getCurves works as expected", {
   # one dimension
   m1i <- getLineages(rd[,1,drop = FALSE], cl)
   m1i <- getCurves(m1i)
-  expect_true(abs(abs(cor(reducedDim(m1i)[,1], slingPseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
+  expect_true(abs(abs(cor(reducedDim(m1i)[,1], slingPseudotime(m1i)[,1], 
+                          use='complete.obs'))-1) < .001)
   m1i <- getCurves(m1i, extend = 'n')
-  expect_true(abs(abs(cor(reducedDim(m1i)[,1], slingPseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
+  expect_true(abs(abs(cor(reducedDim(m1i)[,1], slingPseudotime(m1i)[,1], 
+                          use='complete.obs'))-1) < .001)
   m1i <- getCurves(m1i, extend = 'pc1')
-  expect_true(abs(abs(cor(reducedDim(m1i)[,1], slingPseudotime(m1i)[,1], use='complete.obs'))-1) < .001)
+  expect_true(abs(abs(cor(reducedDim(m1i)[,1], slingPseudotime(m1i)[,1], 
+                          use='complete.obs'))-1) < .001)
   
   # one cluster
   clus1 <- cl; clus1[] <- 1
@@ -161,14 +173,19 @@ test_that("slingshot works for different input types", {
     expect_equal(dim(slingAdjacency(c1)), c(1,1))
     
     # invalid inputs
-    expect_error(slingshot(reducedDim[,-(seq_len(ncol(reducedDim)))], clusterLabels), 'has zero columns')
-    expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels), 'has zero rows')
+    expect_error(slingshot(reducedDim[,-(seq_len(ncol(reducedDim)))], 
+                           clusterLabels), 'has zero columns')
+    expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], 
+                           clusterLabels), 'has zero rows')
     expect_error(slingshot(reducedDim, clusterLabels[1:10]), 'must equal')
-    expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], clusterLabels[integer(0)]), 'has zero rows')
+    expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], 
+                           clusterLabels[integer(0)]), 'has zero rows')
     rdna <- reducedDim; rdna[1,1] <- NA
-    expect_error(slingshot(rdna, clusterLabels), 'cannot contain missing values')
+    expect_error(slingshot(rdna, clusterLabels), 
+                 'cannot contain missing values')
     rdc <- reducedDim; rdc[1,1] <- 'a'
-    expect_error(slingshot(rdc, clusterLabels), 'must only contain numeric values')
+    expect_error(slingshot(rdc, clusterLabels), 
+                 'must only contain numeric values')
     
     # with SingleCellExperiment objects
     require(SingleCellExperiment)
@@ -177,7 +194,8 @@ test_that("slingshot works for different input types", {
     sce <- SingleCellExperiment(assays=list(counts=u, logcounts=v))
     expect_error(slingshot(sce), 'No dimensionality reduction found')
     
-    reducedDims(sce) <- SimpleList(PCA = reducedDim, tSNE = matrix(rnorm(50*2),ncol=2))
+    reducedDims(sce) <- SimpleList(PCA = reducedDim, 
+                                   tSNE = matrix(rnorm(50*2),ncol=2))
     # implicit reducedDim
     c0 <- slingshot(sce)
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
@@ -185,127 +203,7 @@ test_that("slingshot works for different input types", {
     c0 <- slingshot(sce, reducedDim='tSNE')
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
     # reducedDim provided as matrix
-    c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2)) #
+    c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2))
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
 })
 
-
-# test helper functions and constructors
-
-# test_that("zinbFit works with genewise dispersion", {
-#   bio <- gl(2, 3)
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   m <- zinbFit(counts, X=model.matrix(~bio), commondispersion = TRUE)
-#   m <- zinbFit(counts, X=model.matrix(~bio), commondispersion = FALSE)
-#   
-#   m <- zinbFit(counts, X=model.matrix(~bio), verbose = TRUE)
-# })
-# 
-# test_that("zinbFit stops if one gene has only 0 counts", {
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   counts <- rbind(counts, rep(0, ncol(counts)))
-#   expect_error(zinbFit(counts), "only 0 counts")
-# })
-# 
-# test_that("zinbFit stops if one sample has only 0 counts", {
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   counts <- cbind(counts, rep(0, nrow(counts)))
-#   expect_error(zinbFit(counts), "only 0 counts")
-# })
-# 
-# test_that("zinbFit works without X and V", {
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   m1 <- zinbFit(counts, X = matrix(0, ncol=1, nrow=ncol(counts)))
-#   m2 <- zinbFit(counts, V = matrix(0, ncol=1, nrow=nrow(counts)))
-#   m3 <- zinbFit(counts, X = matrix(0, ncol=1, nrow=ncol(counts)),
-#                 V = matrix(0, ncol=1, nrow=nrow(counts)))
-#   
-#   expect_equal(sum(as.vector(m1@beta_mu)), 0)
-#   expect_equal(sum(as.vector(m1@beta_pi)), 0)
-#   expect_equal(sum(as.vector(m2@gamma_mu)), 0)
-#   expect_equal(sum(as.vector(m2@gamma_pi)), 0)
-#   expect_equal(sum(as.vector(m3@beta_mu)), 0)
-#   expect_equal(sum(as.vector(m3@beta_pi)), 0)
-#   expect_equal(sum(as.vector(m3@gamma_mu)), 0)
-#   expect_equal(sum(as.vector(m3@gamma_pi)), 0)
-#   
-# })
-# 
-# test_that("zinbFit gives the same results with matrix and SE", {
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   se <- SummarizedExperiment(counts)
-#   
-#   m1 <- zinbFit(counts)
-#   m2 <- zinbFit(se)
-#   expect_equal(m1, m2)
-# })
-# 
-# test_that("zinbFit works with K>0", {
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   m <- zinbFit(counts, K = 2)
-#   expect_equal(dim(getW(m)), c(nSamples(m), nFactors(m)))
-# })
-# 
-# test_that("zinbSim works", {
-#   a <- zinbModel(n=5, J=10)
-#   zinbSim(a)
-# })
-# 
-# test_that("getMu and getPi have the right dimensions", {
-#   bio <- gl(2, 3)
-#   counts <- matrix(rpois(60, lambda=5), nrow=10, ncol=6)
-#   m <- zinbFit(counts, X=model.matrix(~bio), commondispersion = TRUE)
-#   
-#   expect_equal(dim(getMu(m)), c(nSamples(m), nFeatures(m)))
-#   expect_equal(dim(getLogMu(m)), c(nSamples(m), nFeatures(m)))
-#   expect_equal(dim(getPi(m)), c(nSamples(m), nFeatures(m)))
-#   expect_equal(dim(getLogitPi(m)), c(nSamples(m), nFeatures(m)))
-#   expect_equal(dim(getW(m)), c(nSamples(m), nFactors(m)))
-#   expect_equal(length(getPhi(m)), nFeatures(m))
-#   expect_equal(length(getTheta(m)), nFeatures(m))
-#   expect_equal(length(getZeta(m)), nFeatures(m))
-# })
-# 
-# test_that("Initialization works", {
-#   
-#   ## no arguments specified
-#   zinbModel()
-#   
-#   ## specify W
-#   mat <- matrix(rnorm(10), ncol=2)
-#   m <- zinbModel(W = mat)
-#   expect_equal(nSamples(m), nrow(mat))
-#   
-#   ## specify X
-#   m <- zinbModel(X = mat)
-#   expect_equal(nSamples(m), nrow(mat))
-#   
-#   ## specify V
-#   m <- zinbModel(V = mat)
-#   expect_equal(nFeatures(m), nrow(mat))
-#   
-#   ## specify different X, V for pi and mu
-#   m <- zinbModel(X = mat, which_X_mu=1L, which_X_pi=2L,
-#                  V = mat, which_V_mu=2L, which_V_pi=1L)
-#   expect_equal(nFeatures(m), nrow(mat))
-#   expect_equal(nSamples(m), nrow(mat))
-#   
-#   ## specify O_mu
-#   m <- zinbModel(O_mu = mat)
-#   expect_equal(nSamples(m), nrow(mat))
-#   expect_equal(nFeatures(m), ncol(mat))
-#   
-#   ## specify O_pi
-#   m <- zinbModel(O_pi = mat)
-#   expect_equal(nSamples(m), nrow(mat))
-#   expect_equal(nFeatures(m), ncol(mat))
-#   
-#   ## check that "new" gives the same object
-#   m1 <- zinbModel()
-#   m2 <- new("ZinbModel")
-#   expect_equal(m1, m2)
-#   show(m1)
-#   show(m2)
-#   
-#   
-# })

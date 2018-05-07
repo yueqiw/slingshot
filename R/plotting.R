@@ -754,9 +754,10 @@ pairs.SlingshotDataSet <-
                                        cex = 2*cex)
                             }
                             if(curves){
-                                for(c in slingCurves(sds)){ lines(c$s[c$tag,c(j,i)],
-                                                             lwd = lwd, 
-                                                             col=1, ...) }
+                                for(c in slingCurves(sds)){ 
+                                    lines(c$s[c$tag,c(j,i)],lwd = lwd, 
+                                          col=1, ...) 
+                                }
                             }
                         }
                     }

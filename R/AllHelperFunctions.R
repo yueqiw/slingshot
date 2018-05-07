@@ -127,7 +127,8 @@ setMethod(
         for(i in seq_len(length(slingCurves(object)))){
             cat('Curve',i,": ", "Length: ", 
                 signif(max(slingCurves(object)[[i]]$lambda), digits = 5), 
-                "\tSamples: ", round(sum(slingCurves(object)[[i]]$w), digits = 2), 
+                "\tSamples: ", round(sum(slingCurves(object)[[i]]$w), 
+                                     digits = 2), 
                 "\n", sep='')
         }
     }
@@ -259,7 +260,7 @@ setMethod(
 #'     f = "reducedDim", 
 #'     signature = "SlingshotDataSet",
 #'     definition = function(x, value) initialize(x, reducedDim = value,
-#'                                                clusterLabels = clusterLabels(x)))
+#'                                          clusterLabels = clusterLabels(x)))
 #' 
 #' # replacement methods
 #' #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
@@ -275,7 +276,7 @@ setMethod(
 #'     f = "reducedDims", 
 #'     signature = "SlingshotDataSet",
 #'     definition = function(x, value) initialize(x, reducedDim = value,
-#'                                                clusterLabels = clusterLabels(x)))
+#'                                          clusterLabels = clusterLabels(x)))
 #' 
 #' #' @describeIn SlingshotDataSet Updated object with new vector of cluster
 #' #'   labels.
@@ -288,7 +289,8 @@ setMethod(
 #' setReplaceMethod(
 #'     f = "clusterLabels", 
 #'     signature = c(object = "SlingshotDataSet", value = "ANY"),
-#'     definition = function(object, value) initialize(x, reducedDim = reducedDim(x),
+#'     definition = function(object, value) initialize(x, 
+#'                                                reducedDim = reducedDim(x),
 #'                                                clusterLabels = value))
 
 #' @describeIn SlingshotDataSet Subset dataset and cluster labels.

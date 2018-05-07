@@ -119,7 +119,8 @@ setValidity("SlingshotDataSet", function(object) {
         }
         if(!all(sapply(slingLineages(object), 
                        function(lin){all(lin %in% clus.names)}))){
-            return("lineages must be a list of character vectors composed of cluster names.")
+            return(paste0("lineages must be a list of character vectors ",
+                          "composed of cluster names."))
         }
         if(!is.numeric(slingAdjacency(object))) {
             return("adjacency matrix must be numeric or logical.")
@@ -135,7 +136,8 @@ setValidity("SlingshotDataSet", function(object) {
         }
         if(! is.null(slingParams(object)$end.clus)){
             if(!all(slingParams(object)$end.clus %in% clus.names)){
-                return("Specified terminal cluster(s) not found in cluster labels")
+                return(paste0("Specified terminal cluster(s) not found in ",
+                              "cluster labels"))
             }
         }
         if(! is.null(slingParams(object)$dist.fun)){

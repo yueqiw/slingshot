@@ -219,7 +219,8 @@ setMethod(f = "getLineages",
               }else{
                   forest <- mstree
               }
-              forest <- forest[seq_len(nclus), seq_len(nclus), drop = FALSE] # remove OMEGA
+              # remove OMEGA
+              forest <- forest[seq_len(nclus), seq_len(nclus), drop = FALSE] 
               rownames(forest) <- clusters
               colnames(forest) <- clusters
               
@@ -326,7 +327,8 @@ setMethod(f = "getLineages",
               lineageControl$start.given <- start.given
               lineageControl$end.given <- end.given
               
-              lineageControl$dist <- D[seq_len(nclus),seq_len(nclus), drop = FALSE]
+              lineageControl$dist <- D[seq_len(nclus),seq_len(nclus), 
+                                       drop = FALSE]
               
               out <- newSlingshotDataSet(reducedDim = X, 
                                          clusterLabels = clusterLabels, 
@@ -361,7 +363,8 @@ setMethod(f = "getLineages",
                   stop('nrow(data) must equal length(clusterLabels).')
               }
               if(any(is.na(clusterLabels))){
-                  message("Cluster labels of 'NA' being treated as unclustered.")
+                  message(paste0("Cluster labels of 'NA' being treated as ",
+                                 "unclustered."))
                   clusterLabels[is.na(clusterLabels)] <- '-1'
               }
 
@@ -386,7 +389,8 @@ setMethod(f = "getLineages",
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL){
               if(missing(clusterLabels)){
-                  message('No cluster labels provided. Continuing with one cluster.')
+                  message(paste0('No cluster labels provided. Continuing with ',
+                                 'one cluster.'))
                   clusterLabels <- rep('1', nrow(data))
               }
               return(getLineages(data = data, clusterLabels = clusterLabels,

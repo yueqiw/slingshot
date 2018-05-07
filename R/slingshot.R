@@ -438,7 +438,7 @@ setMethod(f = "slingshot",
                   if(length(clusterLabels)>1){
                       if(!is.null(dim(cl)) && length(dim(cl)) > 1 && all(dim(cl) > 1)){
                           cl <- as.matrix(cl)
-                          colnames(cl) <- paste0('sling_c',1:ncol(cl))
+                          colnames(cl) <- paste0('sling_c',seq_len(ncol(cl)))
                           colData(data) <- cbind(colData(data), cl)
                       }else{
                           cl <- as.character(clusterLabels)
@@ -461,7 +461,7 @@ setMethod(f = "slingshot",
               sce <- data
               sce@int_metadata$slingshot <- sds
               pst <- slingPseudotime(sds)
-              colnames(pst) <- paste0('slingPseudotime_',1:ncol(pst))
+              colnames(pst) <- paste0('slingPseudotime_',seq_len(ncol(pst)))
               colData(sce) <- cbind(colData(sce), pst)
               return(sce)
           })
@@ -527,7 +527,7 @@ setMethod(f = "slingshot",
                   if(length(clusterLabels)>1){
                       if(!is.null(dim(cl)) && length(dim(cl)) > 1 && all(dim(cl) > 1)){
                           cl <- as.matrix(cl)
-                          colnames(cl) <- paste0('sling_c',1:ncol(cl))
+                          colnames(cl) <- paste0('sling_c',seq_len(ncol(cl)))
                           colData(data) <- cbind(colData(data), cl)
                       }else{
                           cl <- as.character(clusterLabels)
@@ -550,7 +550,7 @@ setMethod(f = "slingshot",
               sce <- data
               sce@int_metadata$slingshot <- sds
               pst <- slingPseudotime(sds)
-              colnames(pst) <- paste0('slingPseudotime_',1:ncol(pst))
+              colnames(pst) <- paste0('slingPseudotime_',seq_len(ncol(pst)))
               colData(sce) <- cbind(colData(sce), pst)
               return(sce)
           })

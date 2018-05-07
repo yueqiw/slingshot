@@ -515,7 +515,7 @@ setMethod(f = "getCurves",
               for(l in seq_len(L)){
                   class(pcurves[[l]]) <- 'principal.curve'
               }
-              names(pcurves) <- paste('curve',1:length(pcurves),sep='')
+              names(pcurves) <- paste('curve',seq_along(pcurves),sep='')
               
               for(l in seq_len(L)){
                   pcurve$pseudotime <- pcurve$lambda

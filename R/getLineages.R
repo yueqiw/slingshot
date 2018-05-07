@@ -219,7 +219,7 @@ setMethod(f = "getLineages",
               }else{
                   forest <- mstree
               }
-              forest <- forest[1:nclus, 1:nclus, drop = FALSE] # remove OMEGA
+              forest <- forest[seq_len(nclus), seq_len(nclus), drop = FALSE] # remove OMEGA
               rownames(forest) <- clusters
               colnames(forest) <- clusters
               
@@ -312,7 +312,7 @@ setMethod(f = "getLineages",
               # sort by number of clusters included
               lineages <- lineages[order(sapply(lineages, length), 
                                          decreasing = TRUE)]
-              names(lineages) <- paste('Lineage',1:length(lineages),sep='')
+              names(lineages) <- paste('Lineage',seq_along(lineages),sep='')
               
               lineageControl <- list()
               first <- unique(sapply(lineages,function(l){ l[1] }))
@@ -326,7 +326,7 @@ setMethod(f = "getLineages",
               lineageControl$start.given <- start.given
               lineageControl$end.given <- end.given
               
-              lineageControl$dist <- D[1:nclus,1:nclus, drop = FALSE]
+              lineageControl$dist <- D[seq_len(nclus),seq_len(nclus), drop = FALSE]
               
               out <- newSlingshotDataSet(reducedDim = X, 
                                          clusterLabels = clusterLabels, 

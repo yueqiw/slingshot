@@ -90,7 +90,7 @@ setMethod(
             rownames(clusterLabels) <- rownames(reducedDim)
         }
         if(is.null(colnames(clusterLabels))){
-            colnames(clusterLabels) <- 1:ncol(clusterLabels)
+            colnames(clusterLabels) <- seq_len(ncol(clusterLabels))
         }
         out <- new("SlingshotDataSet",
                    reducedDim = reducedDim,
@@ -432,7 +432,7 @@ setMethod(
         })
     })
     avg <- sapply(seq_len(p),function(jj){
-        dim.all <- sapply(1:length(pcurves.dense),function(i){
+        dim.all <- sapply(seq_along(pcurves.dense),function(i){
             pcurves.dense[[i]][,jj]
         })
         return(rowMeans(dim.all))
@@ -523,7 +523,7 @@ setMethod(
 .shrink_to_avg <- function(pcurve, avg.curve, pct, X, stretch = 2){
     p <- ncol(pcurve$s)
     lam <- pcurve$lambda
-    s <- sapply(1:p,function(jj){
+    s <- sapply(seq_len(p),function(jj){
         orig.jj <- pcurve$s[,jj]
         avg.jj <- approx(x = avg.curve$lambda, y = avg.curve$s[,jj], xout = lam,
                          rule = 2)$y

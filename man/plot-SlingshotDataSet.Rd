@@ -3,6 +3,7 @@
 \docType{methods}
 \name{plot-SlingshotDataSet}
 \alias{plot-SlingshotDataSet}
+\alias{plot,SlingshotDataSet,ANY-method}
 \alias{lines,SlingshotDataSet-method}
 \title{Plot Slingshot output}
 \usage{

@@ -20,6 +20,7 @@ Imports:
     grDevices,
     igraph,
     methods,
+    rgl,
     SingleCellExperiment
 Suggests:
     BiocGenerics,
@@ -28,7 +29,6 @@ Suggests:
     knitr,
     mclust,
     RColorBrewer,
-    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: knitr

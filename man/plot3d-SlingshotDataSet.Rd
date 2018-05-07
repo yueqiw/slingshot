@@ -42,6 +42,7 @@ When \code{type} is not specified, the function will first check the
 }
 \examples{
 \dontrun{
+library(rgl)
 data("slingshotExample")
 rd <- cbind(rd, rnorm(nrow(rd)))
 sds <- slingshot(rd, cl, start.clus = "1")
@@ -51,5 +52,4 @@ plot3d(sds, type = 'b')
 plot3d(rd, col = 'grey50', aspect = 'iso')
 plot3d(sds, lwd = 3, add = TRUE)
 }
-
 }

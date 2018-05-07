@@ -1,6 +1,6 @@
 #' @name plot-SlingshotDataSet
-#' @aliases plot-SlingshotDataSet
 #' @title Plot Slingshot output
+#' @aliases plot-SlingshotDataSet plot,SlingshotDataSet,ANY-method
 #'   
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #'   
@@ -288,7 +288,7 @@ setMethod(
 #' plot3d(rd, col = 'grey50', aspect = 'iso')
 #' plot3d(sds, lwd = 3, add = TRUE)
 #' }
-#' 
+#' @importFrom rgl plot3d
 #' @export
 plot3d.SlingshotDataSet <- function(x,
                                     type = NULL,

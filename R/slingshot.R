@@ -122,7 +122,7 @@
 #'   most cases.
 #'   
 #' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves."
-#'   \emph{Journal of the American Statistical Association}, 84:502–516.
+#'   \emph{Journal of the American Statistical Association}, 84:502-516.
 #'   
 #' @return An object of class \code{\link{SlingshotDataSet}} containing the 
 #'   arguments provided to \code{slingshot} as well as the following output: 
@@ -412,6 +412,10 @@ setMethod(f = "slingshot",
                       reducedDims(data)$slingReducedDim <- reducedDim
                   }
               }
+              if(!is.matrix(rd)) {
+                  stop("Slingshot currently works only with base matrices.")
+              }
+              
               if(is.null(clusterLabels)){
                   cl <- primaryClusterNamed(data)
                   if(is.null(cl)){
@@ -504,6 +508,10 @@ setMethod(f = "slingshot",
                       reducedDims(data)$slingReducedDim <- reducedDim
                   }
               }
+              if(!is.matrix(rd)) {
+                  stop("Slingshot currently works only with base matrices.")
+              }
+              
               if(missing(clusterLabels)){
                   message('No cluster labels provided. Continuing with one cluster.')
                   cl <- rep('1', nrow(rd))

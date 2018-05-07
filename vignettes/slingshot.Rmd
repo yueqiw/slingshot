@@ -66,8 +66,8 @@ demonstrate a full "start-to-finish" workflow. It can be loaded via the
 showing how the dataset was generated.
 
 ```{r data_splat, eval=FALSE}
-library(splatter, quietly = TRUE)
 library(HSMMSingleCell, quietly = TRUE)
+library(splatter, quietly = TRUE)
 
 # load data
 data("HSMM_expr_matrix")
@@ -122,9 +122,9 @@ simulated count of at least 10 reads.
 
 ```{r genefilt, eval=FALSE}
 # filter genes down to potential cell-type markers
-# at least M (10) reads in at least N (10) cells
+# at least M (15) reads in at least N (15) cells
 geneFilter <- apply(assays(sim)$counts,1,function(x){
-    sum(x >= 10) >= 10
+    sum(x >= 15) >= 15
 })
 sim <- sim[geneFilter, ]
 ```

@@ -15,15 +15,20 @@ Depends:
     stats
 Imports:
     ape,
+    clusterExperiment,
     graphics,
     grDevices,
     igraph,
-    methods
+    methods,
+    rgl,
+    SingleCellExperiment
 Suggests:
     BiocGenerics,
+    destiny,
+    gam,
     knitr,
+    mclust,
     RColorBrewer,
-    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: knitr

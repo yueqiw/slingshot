@@ -39,6 +39,8 @@
 #'   amount of shrinkage for a branching lineage. Accepted values are the same
 #'   as for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}),
 #'   as well as \code{"tricube"} and \code{"density"}. See 'Details' for more.
+#' @param allow.breaks logical, determines whether curves that branch very close
+#'   to the origin should be allowed to have different starting points.
 #' @param ... Additional parameters to pass to scatter plot smoothing function, 
 #'   \code{smoother}.
 #'   
@@ -77,11 +79,11 @@
 #' @return An updated \code{\link{SlingshotDataSet}} object containing the 
 #'   oringinal input, arguments provided to \code{getCurves} as well as the 
 #'   following new elements: \itemize{ \item{curves}{A list of
-#'   \code{\link{principal.curve}} objects.} \item{curveControls}{Additional
+#'   \code{\link{principal.curve}} objects.} \item{slingParams}{Additional
 #'   parameters used for fitting simultaneous principal curves.}}
 #'   
 #' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves."
-#'   \emph{Journal of the American Statistical Association}, 84:502–516.
+#'   \emph{Journal of the American Statistical Association}, 84:502-516.
 #'   
 #' @seealso \code{\link{slingshot}}
 #'   
@@ -98,8 +100,6 @@
 setMethod(f = "getCurves",
           signature = signature(sds = "SlingshotDataSet"),
           definition = function(sds,
-                                clusterLabels = sds@clusterLabels,
-                                lineages = sds@lineages,
                                 shrink = TRUE, 
                                 extend = 'y', 
                                 reweight = TRUE,
@@ -109,21 +109,32 @@ setMethod(f = "getCurves",
                                 shrink.method = 'cosine',
                                 allow.breaks = TRUE, ...){
               
-              sds@curveControl$shrink <- shrink
-              sds@curveControl$extend <- extend
-              sds@curveControl$reweight <- reweight
-              sds@curveControl$drop.multi <- drop.multi
-              sds@curveControl$shrink.method <- shrink.method
-              
-              # CHECKS
               X <- reducedDim(sds)
               clusterLabels <- clusterLabels(sds)
+              lineages <- slingLineages(sds)
+              
+              sds@slingParams$shrink <- shrink
+              sds@slingParams$extend <- extend
+              sds@slingParams$reweight <- reweight
+              sds@slingParams$drop.multi <- drop.multi
+              sds@slingParams$shrink.method <- shrink.method
+              
               shrink <- as.numeric(shrink)
+              
+              # CHECKS
               if(shrink < 0 | shrink > 1){
-                  stop("shrink must be logical or numeric between 0 and 1")
+                  stop("'shrink' parameter must be logical or numeric between 0 
+                       and 1")
               }
-              if(nrow(X) != length(clusterLabels)){
-                  stop('nrow(X) must equal length(clusterLabels)')
+              
+              if(nrow(X)==0){
+                  stop('reducedDim has zero rows.')
+              }
+              if(ncol(X)==0){
+                  stop('reducedDim has zero columns.')
+              }
+              if(nrow(X) != nrow(clusterLabels)){
+                  stop('nrow(reducedDim) must equal nrow(clusterLabels).')
               }
               if(any(is.na(X))){
                   stop('reducedDim cannot contain missing values.')
@@ -131,11 +142,17 @@ setMethod(f = "getCurves",
               if(!all(apply(X,2,is.numeric))){
                   stop('reducedDim must only contain numeric values.')
               }
-              if(is.null(rownames(X))){
-                  rownames(X) <- paste('Cell',seq_len(nrow(X)),sep='-')
+              if (is.null(rownames(X)) &
+                  is.null(rownames(clusterLabels))) {
+                  rownames(X) <- paste('Cell', seq_len(nrow(X)), sep = '-')
+                  rownames(clusterLabels) <-
+                      paste('Cell', seq_len(nrow(X)), sep = '-')
               }
               if(is.null(colnames(X))){
                   colnames(X) <- paste('Dim',seq_len(ncol(X)),sep='-')
+              }
+              if(is.null(colnames(clusterLabels))) {
+                  colnames(clusterLabels) <- seq_len(ncol(clusterLabels))
               }
               if(any(rownames(X)=='')){
                   miss.ind <- which(rownames(X) == '')
@@ -145,6 +162,24 @@ setMethod(f = "getCurves",
                   miss.ind <- which(colnames(X) == '')
                   colnames(X)[miss.ind] <- paste('Dim',miss.ind,sep='-')
               }
+              if(is.null(rownames(clusterLabels)) & 
+                 !is.null(rownames(X))){
+                  rownames(clusterLabels) <- rownames(X)
+              }
+              if(is.null(rownames(X)) & 
+                 !is.null(rownames(clusterLabels))){
+                  rownames(X) <- rownames(clusterLabels)
+              }
+              if(any(rowSums(clusterLabels)>1)){
+                  rs <- matrix(rowSums(clusterLabels), 
+                               ncol = ncol(clusterLabels))
+                  clusterLabels <- clusterLabels / rs
+              }
+              if(any(colSums(clusterLabels)==0)){
+                  clusterLabels <- clusterLabels[, colSums(clusterLabels)!=0, 
+                                                 drop = FALSE]
+              }
+              
               # DEFINE SMOOTHER FUNCTION
               smootherFcn <- switch(smoother, loess = function(lambda, xj, 
                                                                w = NULL, ...){
@@ -166,23 +201,23 @@ setMethod(f = "getCurves",
               # remove unclustered cells
               X.original <- X
               clusterLabels.original <- clusterLabels
-              X <- X[clusterLabels != -1, ,drop = FALSE]
-              clusterLabels <- clusterLabels[clusterLabels != -1]
+              clusterLabels <- clusterLabels[, colnames(clusterLabels) != -1,
+                                             drop = FALSE]
               # SETUP
               L <- length(grep("Lineage",names(lineages))) # number of lineages
-              clusters <- unique(clusterLabels)
+              clusters <- colnames(clusterLabels)
               d <- dim(X); n <- d[1]; p <- d[2]
               nclus <- length(clusters)
               centers <- t(sapply(clusters,function(clID){
-                  x.sub <- X[clusterLabels == clID, ,drop = FALSE]
-                  return(colMeans(x.sub))
+                  w <- clusterLabels[, clID, drop = FALSE]
+                  return(apply(X, 2, weighted.mean, w = w))
               }))
               if(p == 1){
                   centers <- t(centers)
               }
               rownames(centers) <- clusters
               W <- sapply(seq_len(L),function(l){
-                  as.numeric(clusterLabels %in% lineages[[l]])
+                  rowSums(clusterLabels[, lineages[[l]], drop = FALSE])
               }) # weighting matrix
               rownames(W) <- rownames(X)
               colnames(W) <- names(lineages)[seq_len(L)]
@@ -212,7 +247,6 @@ setMethod(f = "getCurves",
               pcurves <- list()
               for(l in seq_len(L)){
                   idx <- W[,l] > 0
-                  clus.sub <- clusterLabels[idx]
                   line.initial <- centers[clusters %in% lineages[[l]], , 
                                           drop = FALSE]
                   line.initial <- line.initial[match(lineages[[l]],
@@ -255,7 +289,9 @@ setMethod(f = "getCurves",
                       curve$dist <- abs(curve$dist)
                   }
                   if(extend == 'pc1'){
-                      pc1.1 <- prcomp(X[clusterLabels == lineages[[l]][1],])
+                      cl1.idx <- clusterLabels[ , lineages[[l]][1] , 
+                                                drop = FALSE] > 0
+                      pc1.1 <- prcomp(X[cl1.idx, ])
                       pc1.1 <- pc1.1$rotation[,1] * pc1.1$sdev[1]^2
                       leg1 <- line.initial[2,] - line.initial[1,]
                       # pick the direction most "in line with" the first branch
@@ -263,7 +299,9 @@ setMethod(f = "getCurves",
                       if(sum(pc1.1*leg1) > 0){ 
                           pc1.1 <- -pc1.1 
                       }
-                      pc1.2 <- prcomp(X[clusterLabels == lineages[[l]][K],])
+                      cl2.idx <- clusterLabels[ , lineages[[l]][K] , 
+                                                drop = FALSE] > 0
+                      pc1.2 <- prcomp(X[cl2.idx, ])
                       pc1.2 <- pc1.2$rotation[,1] * pc1.2$sdev[1]^2
                       leg2 <- line.initial[K-1,] - line.initial[K,]
                       # dot prod < 0 => cos(theta) < 0 => larger angle
@@ -391,12 +429,15 @@ setMethod(f = "getCurves",
                               if(any(all.zero)){
                                   if(allow.breaks){
                                       new.avg.order[[i]] <- NULL
-                                      message('Curves for', ns[1], 'and', ns[2],
-                                              'appear to be going in opposite 
-                                              directions. No longer forcing them
-                                              to share an initial point. To 
-                                              manually override this, set 
-                                              allow.breaks = FALSE.')
+                                      message(paste0('Curves for ', ns[1],
+                                                     ' and ', ns[2], ' appear ',
+                                                     'to be going in opposite ', 
+                                                     'directions. No longer ',
+                                                     'forcing them to share an',
+                                                     ' initial point. To ',
+                                                     'manually override this, ',
+                                                     'set allow.breaks = ',
+                                                     'FALSE.'))
                                   }
                                   pct.shrink[[i]] <- lapply(pct.shrink[[i]], 
                                                             function(pij){
@@ -477,7 +518,7 @@ setMethod(f = "getCurves",
               for(l in seq_len(L)){
                   class(pcurves[[l]]) <- 'principal.curve'
               }
-              names(pcurves) <- paste('curve',1:length(pcurves),sep='')
+              names(pcurves) <- paste('curve',seq_along(pcurves),sep='')
               
               for(l in seq_len(L)){
                   pcurve$pseudotime <- pcurve$lambda

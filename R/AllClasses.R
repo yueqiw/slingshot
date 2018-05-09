@@ -1,5 +1,5 @@
 #' @title Class \code{SlingshotDataSet}
-#' @aliases SlingshotDataSet SlingshotDataSet-class
+#' @aliases SlingshotDataSet-class
 #'   
 #' @description The \code{SlingshotDataSet} class holds data relevant for 
 #'   performing lineage inference with the \code{slingshot} package, primarily a
@@ -9,48 +9,56 @@
 #'   
 #' @slot reducedDim matrix. An \code{n} by \code{p} numeric matrix or data frame
 #'   giving the coordinates of the cells in a reduced dimensionality space.
-#' @slot clusterLabels character. A character vector of length \code{n} denoting
-#'   each cell's cluster label.
+#' @slot clusterLabels matrix or character. An \code{n} by \code{K} matrix of 
+#'   weights indicating each cell's cluster assignment or a character vector of
+#'   cluster assignments, which will be converted into a binary matrix.
 #' @slot lineages list. A list with each element a character vector of cluster 
 #'   names representing a lineage as an ordered set of clusters.
-#' @slot connectivity matrix. A binary matrix describing the connectivity 
+#' @slot adjacency matrix. A binary matrix describing the adjacency 
 #'   between clusters induced by the minimum spanning tree.
-#' @slot lineageControl list. Additional parameters specifying how the minimum 
-#'   spanning tree on clusters was constructed. \itemize{ 
-#'   \item{\code{start.clus}}{character. The label of the root cluster.} 
-#'   \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
-#'   terminal clusters.} \item{\code{start.given}}{logical. A logical value 
-#'   indicating whether the initial state was pre-specified.} 
-#'   \item{\code{end.given}}{logical. A vector of logical values indicating 
-#'   whether each terminal state was pre-specified} \item{\code{dist}}{matrix. A
-#'   numeric matrix of pairwise cluster distances.} }
 #' @slot curves list. A list of \code{principal.curve} objects produced by 
 #'   \code{\link{getCurves}}.
-#' @slot curveControl list. Additional parameters specifying how the 
-#'   simultaneous principal curves were constructed. \itemize{ 
+#' @slot slingParams list. Additional parameters used by Slingshot. These may 
+#'   specify how the minimum spanning tree on clusters was constructed: 
+#'   \itemize{ 
+#'   \item{\code{start.clus}}{character. The label of the root cluster.} 
+#'   \item{\code{end.clus}}{character. Vector of cluster labels indicating the 
+#'   terminal clusters.}
+#'   \item{\code{start.given}}{logical. A logical value 
+#'   indicating whether the initial state was pre-specified.} 
+#'   \item{\code{end.given}}{logical. A vector of logical values indicating 
+#'   whether each terminal state was pre-specified}
+#'   \item{\code{dist}}{matrix. A
+#'   numeric matrix of pairwise cluster distances.} }
+#'   They may also specify how simultaneous principal curves were constructed:
+#'   \itemize{ 
 #'   \item{\code{shrink}}{logical or numeric between 0 and 1. Determines whether
 #'   and how much to shrink branching lineages toward their shared average 
-#'   curve.} \item{\code{extend}}{character. Specifies the method for handling 
+#'   curve.} 
+#'   \item{\code{extend}}{character. Specifies the method for handling 
 #'   root and leaf clusters of lineages when constructing the initial, 
 #'   piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
-#'   See \code{\link{getCurves}} for details.} \item{\code{reweight}}{logical. 
+#'   See \code{\link{getCurves}} for details.} 
+#'   \item{\code{reweight}}{logical. 
 #'   Indicates whether to reweight cells shared by multiple lineages during 
 #'   curve-fitting. If \code{TRUE}, cells shared between lineages will have 
 #'   lineage-specific weights determined by the ratio: (distance to nearest 
-#'   curve) / (distance to specific curve).} \item{\code{drop.multi}}{logical. 
+#'   curve) / (distance to specific curve).} 
+#'   \item{\code{drop.multi}}{logical. 
 #'   Indicates whether to drop shared cells from lineages which do not fit them 
 #'   well. If \code{TRUE}, shared cells with a distance to one lineage above the
 #'   90th percentile and another lineage below the 50th percentile will be 
-#'   dropped from the farther lineage.} \item{\code{shrink.method}}{character. 
+#'   dropped from the farther lineage.} 
+#'   \item{\code{shrink.method}}{character. 
 #'   Denotes how to determine the amount of shrinkage for a branching lineage. 
 #'   Accepted values are the same as for \code{kernel} in  the \code{density} 
 #'   function (default is \code{"cosine"}), as well as \code{"tricube"} and 
-#'   \code{"density"}. See \code{\link{getCurves}} for details.} \item{Other 
-#'   parameters specified by \code{\link{principal.curve}}}. }
+#'   \code{"density"}. See \code{\link{getCurves}} for details.} 
+#'   \item{Other parameters specified by \code{\link{principal.curve}}}. }
 #'   
 #' @return The accessor functions \code{reducedDim}, \code{clusterLabels}, 
-#'   \code{lineages}, \code{connectivity}, \code{lineageControl}, \code{curves},
-#'   and \code{curveControl} return the corresponding elements of a 
+#'   \code{lineages}, \code{adjacency}, \code{curves},
+#'   and \code{slingParams} return the corresponding elements of a 
 #'   \code{SlingshotDataSet}. The functions \code{pseudotime} and 
 #'   \code{curveWeights} extract useful output elements of a 
 #'   \code{SlingshotDataSet}, provided that curves have already been fit with 
@@ -64,14 +72,11 @@ setClass(
     Class = "SlingshotDataSet",
     slots = list(
         reducedDim = "matrix",
-        clusterLabels = "character",
+        clusterLabels = "matrix",
         lineages = "list",
-        connectivity = "matrix",
-        lineageControl = "list",
+        adjacency = "matrix",
         curves = "list",
-        pseudotime = "matrix",
-        curveWeights = "matrix",
-        curveControl = "list"
+        slingParams = "list"
     )
 )
 
@@ -88,8 +93,9 @@ setValidity("SlingshotDataSet", function(object) {
     if(ncol(X)==0){
         return('reducedDim has zero columns.')
     }
-    if(length(clusterLabels(object)) != n){
-        return('nrow(reducedDim) must equal length(clusterLabels).')
+    if(nrow(clusterLabels(object)) != n){
+        return('Reduced dimensional coordinates and cluster labels contain 
+               different numbers of cells.')
     }
     # something requires row and column names. Princurve?
     if(is.null(rownames(reducedDim(object)))){
@@ -104,98 +110,84 @@ setValidity("SlingshotDataSet", function(object) {
     }
     
     # if lineages present
-    if(length(lineages(object)) > 0){
-        L <- length(lineages(object))
-        clus.names <- unique(clusterLabels(object))
+    if(length(slingLineages(object)) > 0){
+        L <- length(slingLineages(object))
+        clus.names <- colnames(clusterLabels(object))
         K <- length(clus.names)
-        if(any(sapply(lineages(object),class) != 'character')){
+        if(any(sapply(slingLineages(object),class) != 'character')){
             return("lineages must be a list of character vectors.")
         }
-        if(!all(sapply(lineages(object), 
+        if(!all(sapply(slingLineages(object), 
                        function(lin){all(lin %in% clus.names)}))){
-            return("lineages must be a list of character vectors composed of 
-                   cluster names.")
+            return(paste0("lineages must be a list of character vectors ",
+                          "composed of cluster names."))
         }
-        if(!is.numeric(connectivity(object))) {
-            return("Connectivity matrix must be numeric or logical.")
+        if(!is.numeric(slingAdjacency(object))) {
+            return("adjacency matrix must be numeric or logical.")
         }
-        if(any(dim(connectivity(object)) != K)){
-            return("Connectivity matrix must be square with number of dimensions
-                    equal to number of clusters")
+        if(any(dim(slingAdjacency(object)) != K)){
+            return("adjacency matrix must be square with number of dimensions
+                   equal to number of clusters")
         }
-        if(! is.null(lineageControl(object)$start.clus)){
-            if(!all(lineageControl(object)$start.clus %in% clus.names)){
+        if(! is.null(slingParams(object)$start.clus)){
+            if(!all(slingParams(object)$start.clus %in% clus.names)){
                 return("Specified starting cluster not found in cluster labels")
             }
         }
-        if(! is.null(lineageControl(object)$end.clus)){
-            if(!all(lineageControl(object)$end.clus %in% clus.names)){
-                return("Specified terminal cluster(s) not found in cluster 
-                       labels")
+        if(! is.null(slingParams(object)$end.clus)){
+            if(!all(slingParams(object)$end.clus %in% clus.names)){
+                return(paste0("Specified terminal cluster(s) not found in ",
+                              "cluster labels"))
             }
         }
-        if(! is.null(lineageControl(object)$dist.fun)){
-            if(!is.function(lineageControl(object)$dist.fun)){
+        if(! is.null(slingParams(object)$dist.fun)){
+            if(!is.function(slingParams(object)$dist.fun)){
                 return("Pairwise cluster distance function must be a function.")
             }
         }
-        if(! is.null(lineageControl(object)$omega)){
-            if(lineageControl(object)$omega < 0 | 
-               (lineageControl(object)$omega > 1 & 
-                lineageControl(object)$omega != Inf)){
+        if(! is.null(slingParams(object)$omega)){
+            if(slingParams(object)$omega < 0 | 
+               (slingParams(object)$omega > 1 & 
+                slingParams(object)$omega != Inf)){
                 return("Omega must be numeric element of [0,1] or Inf.")
             }
         }
     }
     
     # if curves present
-    if(length(curves(object)) > 0){
-        if(length(lineages(object)) > 0){
-            L <- length(lineages(object))
-            if(length(curves(object)) != L){
+    if(length(slingCurves(object)) > 0){
+        if(length(slingLineages(object)) > 0){
+            L <- length(slingLineages(object))
+            if(length(slingCurves(object)) != L){
                 return("Number of curves does not match number of lineages")
             }
         }
-        L <- length(curves(object))
-        if(any(sapply(curves(object),class) != 'principal.curve')){
+        L <- length(slingCurves(object))
+        if(any(sapply(slingCurves(object),class) != 'principal.curve')){
             return("curves must be a list of principal.curve objects.")
         }
-        if(dim(pseudotime(object))[1] > 0){
-            if(any(dim(pseudotime(object)) != c(n,L))){
-                return("Dimensions for pseudotime matrix are incorrect. Should 
-                       be n (number of cells) by L (number of lineages).")
-            }
-        }
-        if(dim(curveWeights(object))[1] > 0){
-            if(any(dim(curveWeights(object)) != c(n,L))){
-                return("Dimensions for curveWeights matrix are incorrect. 
-                       Should be n (number of cells) by L 
-                       (number of lineages).")
-            }
-        }
-        if(!is.null(curveControl(object)$shrink)){
-            if(curveControl(object)$shrink < 0 | 
-               curveControl(object)$shrink > 1){
+        if(!is.null(slingParams(object)$shrink)){
+            if(slingParams(object)$shrink < 0 | 
+               slingParams(object)$shrink > 1){
                 stop("shrink argument must be logical or numeric between 
                      0 and 1.")
             }
         }
-        if(!is.null(curveControl(object)$extend)){
-            if(! curveControl(object)$extend %in% c('y','n','pc1')){
+        if(!is.null(slingParams(object)$extend)){
+            if(! slingParams(object)$extend %in% c('y','n','pc1')){
                 stop("extend argument must be one of 'y', 'n', or 'pc1'.")
             }
         }
-        if(!is.null(curveControl(object)$reweight)){
-            if(!is.logical(curveControl(object)$reweight)){
+        if(!is.null(slingParams(object)$reweight)){
+            if(!is.logical(slingParams(object)$reweight)){
                 stop("reweight argument must be logical.")
             }
         }
-        if(!is.null(curveControl(object)$drop.multi)){
-            if(!is.logical(curveControl(object)$drop.multi)){
+        if(!is.null(slingParams(object)$drop.multi)){
+            if(!is.logical(slingParams(object)$drop.multi)){
                 stop("drop.multi argument must be logical.")
             }
         }
     }
     return(TRUE)
 })
-

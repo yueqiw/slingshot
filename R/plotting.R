@@ -1,16 +1,23 @@
+#' @name plot-SlingshotDataSet
 #' @title Plot Slingshot output
-#' @name SlingshotDataSet-plot
+#' @aliases plot-SlingshotDataSet plot,SlingshotDataSet,ANY-method
 #'   
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #'   
 #' @param x a \code{SlingshotDataSet} with results to be plotted.
 #' @param type character, the type of output to be plotted, can be one of 
-#'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
-#'   Details for more.
+#'   \code{"lineages"}, \code{"curves"}, or \code{"both"} (by partial matching),
+#'   see Details for more.
+#' @param show.constraints logical, whether or not the user-specified initial 
+#'   and terminal clusters should be specially denoted by green and red dots,
+#'   respectively.
 #' @param add logical, indicates whether the output should be added to an
 #'   existing plot.
 #' @param dims numeric, which dimensions to plot (default is \code{1:2}).
 #' @param asp numeric, the y/x aspect ratio, see \code{\link{plot.window}}.
+#' @param cex numeric, amount by which points should be magnified, see
+#'   \code{\link{par}}.
+#' @param lwd numeric, the line width, see \code{\link{par}}.
 #' @param ... additional parameters to be passed to \code{\link{lines}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
@@ -37,22 +44,21 @@
 #' @export
 setMethod(
     f = "plot",
-    signature = "SlingshotDataSet",
-    definition = function(x,
-                          type = NULL,
+    signature = signature(x = "SlingshotDataSet"),
+    definition = function(x, type = NULL,
+                          show.constraints = FALSE,
                           add = FALSE,
                           dims = 1:2,
                           asp = 1,
                           cex = 2,
                           lwd = 2,
-                          show.constraints = FALSE,
                           ...) {
         curves <- FALSE
         lineages <- FALSE
         if(is.null(type)){
-            if(length(x@curves) > 0){
+            if(length(slingCurves(x)) > 0){
                 type <- 'curves'
-            }else if(length(x@lineages) > 0){
+            }else if(length(slingLineages(x)) > 0){
                 type <- 'lineages'
             }else{
                 stop('No lineages or curves detected.')
@@ -73,27 +79,28 @@ setMethod(
             curves <- TRUE
         }
         
-        if(lineages & (length(x@lineages)==0)){
+        if(lineages & (length(slingLineages(x))==0)){
             stop('No lineages detected.')
         }
-        if(curves & (length(x@curves)==0)){
+        if(curves & (length(slingCurves(x))==0)){
             stop('No curves detected.')
         }
         
         if(lineages){
             X <- reducedDim(x)
             clusterLabels <- clusterLabels(x)
-            connectivity <- connectivity(x)
+            connectivity <- slingAdjacency(x)
             clusters <- rownames(connectivity)
             nclus <- nrow(connectivity)
             centers <- t(sapply(clusters,function(clID){
-                x.sub <- X[clusterLabels == clID,]
-                return(colMeans(x.sub))
+                w <- clusterLabels[,clID]
+                return(apply(X, 2, weighted.mean, w = w))
             }))
             rownames(centers) <- clusters
-            X <- X[clusterLabels %in% clusters,]
-            clusterLabels <- clusterLabels[clusterLabels %in% clusters]
-            linC <- lineageControl(x)
+            X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
+            clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
+                                           drop = FALSE]
+            linC <- slingParams(x)
         }
         
         if(!add){
@@ -104,15 +111,15 @@ setMethod(
                 ys <- c(ys, centers[,dims[2]])
             }
             if(curves){
-                xs <- c(xs, as.numeric(sapply(x@curves, 
+                xs <- c(xs, as.numeric(sapply(slingCurves(x), 
                                               function(c){ c$s[,dims[1]] })))
-                ys <- c(ys, as.numeric(sapply(x@curves, 
+                ys <- c(ys, as.numeric(sapply(slingCurves(x), 
                                               function(c){ c$s[,dims[2]] })))
             }
             plot(x = NULL, y = NULL, asp = asp,
                  xlim = range(xs), ylim = range(ys),
-                 xlab = colnames(x@reducedDim)[dims[1]],
-                 ylab = colnames(x@reducedDim)[dims[2]])
+                 xlab = colnames(reducedDim(x))[dims[1]],
+                 ylab = colnames(reducedDim(x))[dims[2]])
         }
         
         if(lineages){
@@ -141,7 +148,7 @@ setMethod(
             
         }
         if(curves){
-            for(c in x@curves){
+            for(c in slingCurves(x)){
                 lines(c$s[c$tag,dims], lwd = lwd, ...)
             }
         }
@@ -149,7 +156,7 @@ setMethod(
     }
 )
 
-#' @rdname SlingshotDataSet-plot
+#' @rdname plot-SlingshotDataSet
 #' @export
 setMethod(
     f = "lines",
@@ -165,7 +172,12 @@ setMethod(
 
 ## Individual gene plots
 #' @rdname plotGenePseudotime
+#' @aliases plotGenePseudotime
+#' @title Plot Gene Expression over Pseudotime
 #'
+#' @param gene character, the name of the gene to be plotted
+#' @param sds a SlingshotDataSet containing cell pseudotimes
+#' @param exprs the genes-by-samples matrix of expression values.
 #' @param loess logical, whether to include a loess fit in each plot (default is
 #' \code{TRUE}).
 #' @param loessCI logical, whether to include a confidence band around the loess
@@ -194,9 +206,9 @@ setMethod(
                           loessCI = TRUE,
                           ...) {
         y <- exprs[which.max(rownames(exprs)==gene),]
-        pst <- pseudotime(sds)
-        w <- curveWeights(sds)
-        if(length(lineages(sds))==1){
+        pst <- slingPseudotime(sds)
+        w <- slingCurveWeights(sds)
+        if(length(slingLineages(sds))==1){
             plot(pst, y, xlab = 'Pseudotime', ylab = 'Expression', 
                  main=paste(gene, ', Lineage 1'), ...)
             if(loess | loessCI){
@@ -213,8 +225,8 @@ setMethod(
                 lines(l$x[order(l$x)], l$fitted[order(l$x)], lwd=2)
             }
         }else{
-            par(mfrow = c(length(lineages(sds)),1))
-            for(l in 1:length(lineages(sds))){
+            par(mfrow = c(length(slingLineages(sds)),1))
+            for(l in 1:length(slingLineages(sds))){
                 plot(pst[,l], y, xlab = 'Pseudotime', ylab = 'Expression', 
                      main=paste(gene, ', Lineage ',l, sep=''), ...)
                 if(loess | loessCI){
@@ -238,9 +250,8 @@ setMethod(
 )
 
 
-## plot3d
+#' @name plot3d-SlingshotDataSet
 #' @title Plot Slingshot output in 3D
-#' @name SlingshotDataSet-plot3d
 #' 
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #'   
@@ -252,7 +263,7 @@ setMethod(
 #'   existing plot.
 #' @param dims numeric, which dimensions to plot (default is \code{1:3}).
 #' @param aspect either a logical indicating whether to adjust the aspect ratio 
-#'   or a new ratio, see \code{plot3d}.
+#'   or a new ratio, see \code{\link[rgl:plot3d]{plot3d}}.
 #' @param ... additional parameters to be passed to \code{lines3d}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
@@ -267,6 +278,7 @@ setMethod(
 #'   
 #' @examples
 #' \dontrun{
+#' library(rgl)
 #' data("slingshotExample")
 #' rd <- cbind(rd, rnorm(nrow(rd)))
 #' sds <- slingshot(rd, cl, start.clus = "1")
@@ -276,7 +288,7 @@ setMethod(
 #' plot3d(rd, col = 'grey50', aspect = 'iso')
 #' plot3d(sds, lwd = 3, add = TRUE)
 #' }
-#' 
+#' @importFrom rgl plot3d
 #' @export
 plot3d.SlingshotDataSet <- function(x,
                                     type = NULL,
@@ -291,9 +303,9 @@ plot3d.SlingshotDataSet <- function(x,
     curves <- FALSE
     lineages <- FALSE
     if(is.null(type)){
-        if(length(x@curves) > 0){
+        if(length(slingCurves(x)) > 0){
             type <- 'curves'
-        }else if(length(x@lineages) > 0){
+        }else if(length(slingLineages(x)) > 0){
             type <- 'lineages'
         }else{
             stop('No lineages or curves detected.')
@@ -313,26 +325,27 @@ plot3d.SlingshotDataSet <- function(x,
         curves <- TRUE
     }
     
-    if(lineages & (length(x@lineages)==0)){
+    if(lineages & (length(slingLineages(x))==0)){
         stop('No lineages detected.')
     }
-    if(curves & (length(x@curves)==0)){
+    if(curves & (length(slingCurves(x))==0)){
         stop('No curves detected.')
     }
     
     if(lineages){
-        X <- x@reducedDim
-        clusterLabels <- x@clusterLabels
-        connectivity <- x@connectivity
+        X <- reducedDim(x)
+        clusterLabels <- clusterLabels(x)
+        connectivity <- slingAdjacency(x)
         clusters <- rownames(connectivity)
         nclus <- nrow(connectivity)
         centers <- t(sapply(clusters,function(clID){
-            x.sub <- X[clusterLabels == clID,]
-            return(colMeans(x.sub))
+            w <- clusterLabels[,clID]
+            return(apply(X, 2, weighted.mean, w = w))
         }))
         rownames(centers) <- clusters
-        X <- X[clusterLabels %in% clusters,]
-        clusterLabels <- clusterLabels[clusterLabels %in% clusters]
+        X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
+        clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
+                                       drop = FALSE]
     }
     
     if(!add){
@@ -345,18 +358,18 @@ plot3d.SlingshotDataSet <- function(x,
             zs <- c(zs, centers[,dims[3]])
         }
         if(curves){
-            xs <- c(xs, as.numeric(sapply(x@curves, function(c){ 
+            xs <- c(xs, as.numeric(sapply(slingCurves(x), function(c){ 
                 c$s[,dims[1]] })))
-            ys <- c(ys, as.numeric(sapply(x@curves, function(c){ 
+            ys <- c(ys, as.numeric(sapply(slingCurves(x), function(c){ 
                 c$s[,dims[2]] })))
-            zs <- c(zs, as.numeric(sapply(x@curves, function(c){ 
+            zs <- c(zs, as.numeric(sapply(slingCurves(x), function(c){ 
                 c$s[,dims[3]] })))
         }
         rgl::plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
                     xlim = range(xs), ylim = range(ys), zlim = range(zs),
-                    xlab = colnames(x@reducedDim)[dims[1]],
-                    ylab = colnames(x@reducedDim)[dims[2]],
-                    zlab = colnames(x@reducedDim)[dims[3]])
+                    xlab = colnames(reducedDim(x))[dims[1]],
+                    ylab = colnames(reducedDim(x))[dims[2]],
+                    zlab = colnames(reducedDim(x))[dims[3]])
     }
     
     if(lineages){
@@ -371,7 +384,7 @@ plot3d.SlingshotDataSet <- function(x,
         }
     }
     if(curves){
-        for(c in x@curves){ rgl::lines3d(c$s[c$tag,dims], ...) }
+        for(c in slingCurves(x)){ rgl::lines3d(c$s[c$tag,dims], ...) }
     }
     invisible(NULL)
 }
@@ -433,8 +446,30 @@ plot3d.SlingshotDataSet <- function(x,
 #' @param type character, the type of output to be plotted, can be one of 
 #'   \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
 #'   Details for more.
+#' @param show.constraints logical, whether or not the user-specified initial 
+#'   and terminal clusters should be specially denoted by green and red dots,
+#'   respectively.
+#' @param col character, color vector for points.
+#' @param pch integer or character specifying the plotting symbol, see 
+#'   \code{\link{par}}.
+#' @param cex numeric, amount by which points should be magnified, see
+#'   \code{\link{par}}.
+#' @param lwd numeric, the line width, see \code{\link{par}}.
 #' @param ... additional parameters for \code{plot} or \code{axis}, see 
 #'   \code{\link{pairs}}.
+#' @param labels character, the names of the variables, see \code{\link{pairs}}.
+#' @param horInd see \code{\link{pairs}}.
+#' @param verInd see \code{\link{pairs}}.
+#' @param lower.panel see \code{\link{pairs}}.
+#' @param upper.panel see \code{\link{pairs}}.
+#' @param diag.panel see \code{\link{pairs}}.
+#' @param text.panel see \code{\link{pairs}}.
+#' @param label.pos see \code{\link{pairs}}.
+#' @param line.main see \code{\link{pairs}}.
+#' @param cex.labels see \code{\link{pairs}}.
+#' @param font.labels see \code{\link{pairs}}.
+#' @param row1attop see \code{\link{pairs}}.
+#' @param gap see \code{\link{pairs}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
 #'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
@@ -453,14 +488,14 @@ plot3d.SlingshotDataSet <- function(x,
 #' 
 #' @export
 pairs.SlingshotDataSet <-
-    function (x, labels, col = NULL, cex=1, lwd=2, ...,
-              horInd = 1:nc, verInd = 1:nc,
+    function (x, type = NULL, show.constraints = FALSE, col = NULL, 
+              pch = 16, cex=1, lwd=2, ...,
+              labels, horInd = 1:nc, verInd = 1:nc,
               lower.panel = FALSE, upper.panel = TRUE,
               diag.panel = NULL, text.panel = textPanel,
               label.pos = 0.5 + has.diag/3, line.main = 3,
               cex.labels = NULL, font.labels = 1,
-              row1attop = TRUE, gap = 1, show.constraints = FALSE,
-              type = NULL, pch =16)
+              row1attop = TRUE, gap = 1)
     {
         #####
         lp.sling <- lower.panel
@@ -482,9 +517,9 @@ pairs.SlingshotDataSet <-
         curves <- FALSE
         lineages <- FALSE
         if(is.null(type)){
-            if(length(curves(sds)) > 0){
+            if(length(slingCurves(sds)) > 0){
                 type <- 'curves'
-            }else if(length(lineages(sds)) > 0){
+            }else if(length(slingLineages(sds)) > 0){
                 type <- 'lineages'
             }else{
                 stop('No lineages or curves detected.')
@@ -503,22 +538,22 @@ pairs.SlingshotDataSet <-
         if(type %in% c('curves','both')){
             curves <- TRUE
         }
-        if(lineages & (length(lineages(sds))==0)){
+        if(lineages & (length(slingLineages(sds))==0)){
             stop('No lineages detected.')
         }
-        if(curves & (length(curves(sds))==0)){
+        if(curves & (length(slingCurves(sds))==0)){
             stop('No curves detected.')
         }
         if(lineages){
-            forest <- connectivity(sds)
+            forest <- slingAdjacency(sds)
             clusters <- rownames(forest)
             nclus <- nrow(forest)
             centers <- t(sapply(clusters,function(clID){
-                x.sub <- x[clusterLabels(sds) == clID,]
-                return(colMeans(x.sub))
+                w <- clusterLabels[,clID]
+                return(apply(x, 2, weighted.mean, w = w))
             }))
             rownames(centers) <- clusters
-            linC <- lineageControl(sds)
+            linC <- slingParams(sds)
         }
         range.max <- max(apply(x,2,function(xi){
             r <- range(xi, na.rm = TRUE)
@@ -537,7 +572,7 @@ pairs.SlingshotDataSet <-
             } else {
                 cc <- 1:100
             }
-            col <- cc[as.factor(clusterLabels(sds))]
+            col <- cc[apply(clusterLabels(sds),1,which.max)]
         }
         #####
         if(doText <- missing(text.panel) || is.function(text.panel))
@@ -679,7 +714,7 @@ pairs.SlingshotDataSet <-
                                 }
                             }
                             if(curves){
-                                for(c in curves(sds)){
+                                for(c in slingCurves(sds)){
                                     lines(c$s[c$tag,c(j,i)], lwd = lwd, 
                                           col=1, ...)
                                 }
@@ -719,9 +754,10 @@ pairs.SlingshotDataSet <-
                                        cex = 2*cex)
                             }
                             if(curves){
-                                for(c in curves(sds)){ lines(c$s[c$tag,c(j,i)],
-                                                             lwd = lwd, 
-                                                             col=1, ...) }
+                                for(c in slingCurves(sds)){ 
+                                    lines(c$s[c$tag,c(j,i)],lwd = lwd, 
+                                          col=1, ...) 
+                                }
                             }
                         }
                     }

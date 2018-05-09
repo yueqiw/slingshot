@@ -5,22 +5,62 @@
 \alias{pairs.SlingshotDataSet}
 \title{Pairs plot of Slingshot output}
 \usage{
-\method{pairs}{SlingshotDataSet}(x, labels, col = NULL, cex = 1, lwd = 2,
-  ..., horInd = 1:nc, verInd = 1:nc, lower.panel = FALSE,
-  upper.panel = TRUE, diag.panel = NULL, text.panel = textPanel,
-  label.pos = 0.5 + has.diag/3, line.main = 3, cex.labels = NULL,
-  font.labels = 1, row1attop = TRUE, gap = 1, show.constraints = FALSE,
-  type = NULL, pch = 16)
+\method{pairs}{SlingshotDataSet}(x, type = NULL, show.constraints = FALSE,
+  col = NULL, pch = 16, cex = 1, lwd = 2, ..., labels, horInd = 1:nc,
+  verInd = 1:nc, lower.panel = FALSE, upper.panel = TRUE,
+  diag.panel = NULL, text.panel = textPanel, label.pos = 0.5 + has.diag/3,
+  line.main = 3, cex.labels = NULL, font.labels = 1, row1attop = TRUE,
+  gap = 1)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}
 
-\item{...}{additional parameters for \code{plot} or \code{axis}, see 
-\code{\link{pairs}}.}
-
 \item{type}{character, the type of output to be plotted, can be one of 
 \code{"lineages"}, \code{curves}, or \code{both} (by partial matching), see
 Details for more.}
+
+\item{show.constraints}{logical, whether or not the user-specified initial 
+and terminal clusters should be specially denoted by green and red dots,
+respectively.}
+
+\item{col}{character, color vector for points.}
+
+\item{pch}{integer or character specifying the plotting symbol, see 
+\code{\link{par}}.}
+
+\item{cex}{numeric, amount by which points should be magnified, see
+\code{\link{par}}.}
+
+\item{lwd}{numeric, the line width, see \code{\link{par}}.}
+
+\item{...}{additional parameters for \code{plot} or \code{axis}, see 
+\code{\link{pairs}}.}
+
+\item{labels}{character, the names of the variables, see \code{\link{pairs}}.}
+
+\item{horInd}{see \code{\link{pairs}}.}
+
+\item{verInd}{see \code{\link{pairs}}.}
+
+\item{lower.panel}{see \code{\link{pairs}}.}
+
+\item{upper.panel}{see \code{\link{pairs}}.}
+
+\item{diag.panel}{see \code{\link{pairs}}.}
+
+\item{text.panel}{see \code{\link{pairs}}.}
+
+\item{label.pos}{see \code{\link{pairs}}.}
+
+\item{line.main}{see \code{\link{pairs}}.}
+
+\item{cex.labels}{see \code{\link{pairs}}.}
+
+\item{font.labels}{see \code{\link{pairs}}.}
+
+\item{row1attop}{see \code{\link{pairs}}.}
+
+\item{gap}{see \code{\link{pairs}}.}
 }
 \value{
 returns \code{NULL}.

@@ -356,8 +356,8 @@ setMethod(f = "slingshot",
                                 shrink.method = 'cosine', 
                                 allow.breaks = TRUE, ...){
             if(missing(clusterLabels)){
-              message(paste0('No cluster labels provided. ',
-                             'Continuing with one cluster.'))
+              message(paste0('No cluster labels provided.',
+                             ' Continuing with one cluster.'))
               clusterLabels <- rep('1', nrow(data))
             }
             return(slingshot(data = data, clusterLabels = clusterLabels,

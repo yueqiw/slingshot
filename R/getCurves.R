@@ -154,6 +154,10 @@ setMethod(f = "getCurves",
               if(is.null(colnames(clusterLabels))) {
                   colnames(clusterLabels) <- seq_len(ncol(clusterLabels))
               }
+              if(any(colnames(clusterLabels) == "")){
+                  colnames(clusterLabels)[colnames(clusterLabels)==""] <-
+                      which(colnames(clusterLabels)=="")
+              }
               if(any(rownames(X)=='')){
                   miss.ind <- which(rownames(X) == '')
                   rownames(X)[miss.ind] <- paste('Cell',miss.ind,sep='-')
@@ -171,8 +175,7 @@ setMethod(f = "getCurves",
                   rownames(X) <- rownames(clusterLabels)
               }
               if(any(rowSums(clusterLabels)>1)){
-                  rs <- matrix(rowSums(clusterLabels), 
-                               ncol = ncol(clusterLabels))
+                  rs <- rowSums(clusterLabels)
                   clusterLabels <- clusterLabels / rs
               }
               if(any(colSums(clusterLabels)==0)){

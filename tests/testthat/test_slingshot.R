@@ -25,6 +25,13 @@ test_that("getLineages works for different input types", {
   mf <- getLineages(reducedDim, as.factor(clusterLabels))
   expect_is(mf, "SlingshotDataSet")
   expect_equal(dim(slingAdjacency(mf)), c(5,5))
+  # matrix / matrix
+  cl.imb <- cbind(clusterLabels, sample(5,50, replace = TRUE))
+  mm <- getLineages(reducedDim, cl.imb)
+  expect_is(mm, "SlingshotDataSet")
+  expect_equal(dim(slingAdjacency(mm)), c(2,2))
+  
+  
   
   df <- data.frame(reducedDim)
   # data frame / integer
@@ -140,6 +147,12 @@ test_that("slingshot works for different input types", {
     mf <- slingshot(reducedDim, as.factor(clusterLabels))
     expect_is(mf, "SlingshotDataSet")
     expect_equal(dim(slingAdjacency(mf)), c(5,5))
+    # matrix / matrix
+    cl.imb <- cbind(clusterLabels, sample(5,50, replace = TRUE))
+    mm <- slingshot(reducedDim, cl.imb)
+    expect_is(mm, "SlingshotDataSet")
+    expect_equal(dim(slingAdjacency(mm)), c(2,2))
+    
     
     df <- data.frame(reducedDim)
     # data frame / integer

@@ -67,7 +67,7 @@ setReplaceMethod(
     f = "reducedDims", 
     signature = "SlingshotDataSet",
     definition = function(x, value) initialize(x, reducedDim = value,
-                                               clusterLabels = clusterLabels(x)))
+                                         clusterLabels = clusterLabels(x)))
 }
 \details{
 #' @describeIn SlingshotDataSet Updated object with new vector of cluster
@@ -81,7 +81,8 @@ setReplaceMethod(
 setReplaceMethod(
     f = "clusterLabels", 
     signature = c(object = "SlingshotDataSet", value = "ANY"),
-    definition = function(object, value) initialize(x, reducedDim = reducedDim(x),
+    definition = function(object, value) initialize(x, 
+                                               reducedDim = reducedDim(x),
                                                clusterLabels = value))
 
 

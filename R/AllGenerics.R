@@ -80,8 +80,10 @@ setGeneric(
 #' @description This is a convenience function to extract a
 #'   \code{SlingshotDataSet} from an object containing \code{\link{slingshot}}
 #'   output.
-#' @param data an object containing \code{\link{slingshot}} output.
+#' @param data an object containing \code{slingshot} output.
 #' @param ... additional arguments to pass to object-specific methods.
+#' @return A \code{SlingshotDataSet} object containing the output of 
+#' \code{slingshot}.
 #' @export
 setGeneric(
     name = "SlingshotDataSet",

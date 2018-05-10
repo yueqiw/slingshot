@@ -11,9 +11,13 @@ SlingshotDataSet(data, ...)
 \S4method{SlingshotDataSet}{SingleCellExperiment}(data)
 }
 \arguments{
-\item{data}{an object containing \code{\link{slingshot}} output.}
+\item{data}{an object containing \code{slingshot} output.}
 
 \item{...}{additional arguments to pass to object-specific methods.}
+}
+\value{
+A \code{SlingshotDataSet} object containing the output of 
+\code{slingshot}.
 }
 \description{
 This is a convenience function to extract a

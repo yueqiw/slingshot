@@ -125,8 +125,6 @@ setMethod(f = "getLineages",
                   rownames(X) <- rownames(clusterLabels)
               }
               if(any(rowSums(clusterLabels)>1)){
-                  rs <- matrix(rowSums(clusterLabels), 
-                               ncol = ncol(clusterLabels))
                   clusterLabels <- clusterLabels / rs
               }
               if(any(colSums(clusterLabels)==0)){

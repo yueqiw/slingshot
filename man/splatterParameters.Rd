@@ -5,8 +5,8 @@
 \alias{splatterParameters}
 \alias{params}
 \title{Parameters for simulating a single lineage}
-\format{A \code{\link{SplatParams}} object with some path-related parameters
-  set manually.}
+\format{A \code{\link[splatter:SplatParams]{SplatParams}} object with some
+  path-related parameters set manually.}
 \source{
 Most parameters were learned by
   \code{\link[splatter:splatEstimate]{splatEstimate}} and based on the

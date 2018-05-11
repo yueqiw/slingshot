@@ -576,7 +576,7 @@ setMethod(
 #'   path-related parameters set manually.
 #' @source Most parameters were learned by
 #'   \code{\link[splatter:splatEstimate]{splatEstimate}} and based on the
-#'   \code{\link[HSMMSingleCell:HSMMSingleCell]{HSMMSingleCell}} dataset.
+#'   \code{\link[HSMMSingleCell:HSMM]{HSMM}} dataset.
 "params"
 
 

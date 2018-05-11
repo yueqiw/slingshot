@@ -65,7 +65,7 @@ will be used to demonstrate a full "start-to-finish" workflow. It can be loaded
 via the `splatterPath` dataset, provided with `slingshot`. Below, we provide
 code showing how the dataset was generated.
 
-```{r data_splat, eval=FALSE}
+```{r dataSetup_splat, eval=FALSE}
 library(HSMMSingleCell, quietly = TRUE)
 library(splatter, quietly = TRUE)
 
@@ -81,14 +81,17 @@ params <- setParams(params, update = list(batchCells = 200,
                                           path.nonlinearProb = .5, 
                                           de.prob = .6, de.facLoc = 1, 
                                           de.facScale = 2))
-
-# simulate
-sim <- splatSimulate(params, method = "paths")
 ```
 
 ```{r load_data_splat, echo = FALSE}
-library(SingleCellExperiment, quietly = TRUE)
-data("splatterPath")
+library(HSMMSingleCell, quietly = TRUE)
+library(splatter, quietly = TRUE)
+data("splatterParameters")
+```
+
+```{r simulate_splat}
+# simulate
+sim <- splatSimulate(params, method = "paths")
 ```
 
 The second dataset consists of a $140$ cells $\times$ $2$ dimensions
@@ -120,7 +123,7 @@ cell-type marker genes. We set this minimum cluster
 size to 10 cells and define a gene as being "robustly expressed" if it has a
 simulated count of at least 10 reads.
 
-```{r genefilt, eval=FALSE}
+```{r genefilt}
 # filter genes down to potential cell-type markers
 # at least M (15) reads in at least N (15) cells
 geneFilter <- apply(assays(sim)$counts,1,function(x){

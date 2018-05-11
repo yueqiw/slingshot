@@ -563,24 +563,21 @@ setMethod(
 ### Datasets ###
 ################
 
-#' @title Single-lineage simulated data
-#' @name splatterPath
-#' @aliases splatterPath sim
+#' @title Parameters for simulating a single lineage
+#' @name splatterParameters
+#' @aliases splatterParameters params
 #'
-#' @description A simulated single-cell RNA-Seq dataset produced by
-#'   \code{\link[splatter:splatter]{splatter}}. It was produced by
-#'   \code{\link[splatter:splatSimulate]{splatSimulatePaths}} to contain a
-#'   single trajectory and filtered to remove some uninformative genes. Code for
-#'   the complete data generation process can be found in the \code{slingshot} 
-#'   vignette. Note that this represents the version of this dataset after gene
-#'   filtering.
+#' @description A \code{SplatParams} object containing the parameters
+#'   needed to perform the simulation shown in the Slingshot vignette. Values
+#'   are designed to produce a single, non-branching trajectory. Code for
+#'   producing these parameters can be found in the Slingshot vignette.
 #'   
-#' @format A \code{\link{SingleCellExperiment}} object with $14,608$ genes and
-#'   $200$ cells.
-#' @source Simulated by \code{\link[splatter:splatter]{splatter}} with
-#'   parameters learned from the 
+#' @format A \code{\link{SplatParams}} object with some path-related parameters
+#'   set manually.
+#' @source Most parameters were learned by
+#'   \code{\link[splatter:splatEstimate]{splatEstimate}} and based on the
 #'   \code{\link[HSMMSingleCell:HSMMSingleCell]{HSMMSingleCell}} dataset.
-"sim"
+"params"
 
 
 #' @title Bifurcating lineages data

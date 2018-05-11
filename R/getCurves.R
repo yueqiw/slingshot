@@ -434,7 +434,7 @@ setMethod(f = "getCurves",
                                       new.avg.order[[i]] <- NULL
                                       message(paste0('Curves for ', ns[1],
                                                      ' and ', ns[2], ' appear ',
-                                                     'to be going in opposite ', 
+                                                     'to be going in opposite ',
                                                      'directions. No longer ',
                                                      'forcing them to share an',
                                                      ' initial point. To ',

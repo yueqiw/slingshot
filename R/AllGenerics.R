@@ -233,18 +233,20 @@ setGeneric(name = "slingCurveWeights",
 # plotting
 #' @title Plot Gene Expression by Pseudotime
 #' @name plotGenePseudotime
-#'   
+#' @aliases plotGenePseudotime
+#' 
 #' @description Show the gene expression pattern for an individual gene along
 #' lineages inferred by \code{\link{slingshot}}.
+#' 
+#' @param data an object containing \code{\link{slingshot}} output, either a
+#'   \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}}
+#'   object.
 #' 
 #' @export
 setGeneric(
     name = "plotGenePseudotime",
-    signature = c('gene','sds','exprs'),
-    def = function(gene,
-                   sds,
-                   exprs,
-                   ...) {
+    signature = c('data'),
+    def = function(data, ...) {
         standardGeneric("plotGenePseudotime")
     }
 )

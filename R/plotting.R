@@ -172,12 +172,13 @@ setMethod(
 
 ## Individual gene plots
 #' @rdname plotGenePseudotime
-#' @aliases plotGenePseudotime
 #' @title Plot Gene Expression over Pseudotime
 #'
-#' @param gene character, the name of the gene to be plotted
-#' @param sds a SlingshotDataSet containing cell pseudotimes
-#' @param exprs the genes-by-samples matrix of expression values.
+#' @param gene the gene to be plotted. If \code{exprs} is provided, this may be
+#'   either the gene name or its row index in \code{exprs}. Otherwise, this is
+#'   assumed to be a vector of scaled expression values.
+#' @param exprs the genes-by-samples matrix of scaled expression values (log
+#'   counts or normalized log counts).
 #' @param loess logical, whether to include a loess fit in each plot (default is
 #' \code{TRUE}).
 #' @param loessCI logical, whether to include a confidence band around the loess
@@ -191,61 +192,66 @@ setMethod(
 #' sds <- slingshot(rd, cl, start.clus = "1")
 #' ex <- matrix(c(rchisq(100,1),rchisq(20,3),rchisq(20,6)),nrow=1)
 #' rownames(ex) <- 'Gene-1'
-#' plotGenePseudotime('Gene-1', sds, ex)
+#' plotGenePseudotime(sds, 'Gene-1', ex)
 #' 
 #' @export
 setMethod(
     f = "plotGenePseudotime",
-    signature = signature(gene = "character",
-                          sds = "SlingshotDataSet",
-                          exprs = "matrix"),
-    definition = function(gene,
-                          sds,
-                          exprs,
-                          loess = TRUE,
-                          loessCI = TRUE,
-                          ...) {
-        y <- exprs[which.max(rownames(exprs)==gene),]
-        pst <- slingPseudotime(sds)
-        w <- slingCurveWeights(sds)
-        if(length(slingLineages(sds))==1){
-            plot(pst, y, xlab = 'Pseudotime', ylab = 'Expression', 
-                 main=paste(gene, ', Lineage 1'), ...)
+    signature = signature(data = "SlingshotDataSet"),
+    definition = function(data, gene, exprs,
+        loess = TRUE, loessCI = TRUE, ...) {
+        if(length(gene) > 1 & is.numeric(gene)){
+            y <- gene
+        }
+        if(length(gene) == 1){
+            y <- exprs[gene, ,drop=FALSE][1,]
+        }
+        pst <- slingPseudotime(data)
+        w <- slingCurveWeights(data)
+        L <- length(slingLineages(data))
+        
+        par(mfrow = c(L,1))
+        for(l in seq_len(L)){
+            plot(pst[,l], y, xlab = 'Pseudotime', ylab = 'Expression', 
+                main=paste(gene, ', Lineage ',l, sep=''), ...)
             if(loess | loessCI){
-                l <- loess(y ~ pst)
+                l <- loess(y ~ pst[,l], weights = w[,l])
             }
             if(loessCI){
                 pl <- predict(l, se=TRUE)
                 polygon(c(l$x[order(l$x)],rev(l$x[order(l$x)])), 
-                        c((pl$fit+qt(0.975,pl$df)*pl$se)[order(l$x)], 
-                          rev((pl$fit-qt(0.975,pl$df)*pl$se)[order(l$x)])),
-                        border = NA, col = rgb(0,0,0,.3))
+                    c((pl$fit+qt(0.975,pl$df)*pl$se)[order(l$x)], 
+                        rev((pl$fit-qt(0.975,pl$df)*pl$se)[order(l$x)])),
+                    border = NA, col = rgb(0,0,0,.3))
             }
             if(loess){
                 lines(l$x[order(l$x)], l$fitted[order(l$x)], lwd=2)
             }
-        }else{
-            par(mfrow = c(length(slingLineages(sds)),1))
-            for(l in 1:length(slingLineages(sds))){
-                plot(pst[,l], y, xlab = 'Pseudotime', ylab = 'Expression', 
-                     main=paste(gene, ', Lineage ',l, sep=''), ...)
-                if(loess | loessCI){
-                    l <- loess(y ~ pst[,l])
-                }
-                if(loessCI){
-                    pl <- predict(l, se=TRUE)
-                    polygon(c(l$x[order(l$x)],rev(l$x[order(l$x)])), 
-                            c((pl$fit+qt(0.975,pl$df)*pl$se)[order(l$x)], 
-                              rev((pl$fit-qt(0.975,pl$df)*pl$se)[order(l$x)])),
-                            border = NA, col = rgb(0,0,0,.3))
-                }
-                if(loess){
-                    lines(l$x[order(l$x)], l$fitted[order(l$x)], lwd=2)
-                }
-            }
-            par(mfrow = c(1,1))
         }
+        par(mfrow = c(1,1))
         invisible(NULL)
+    }
+)
+
+#' @rdname plotGenePseudotime
+#' @importFrom SummarizedExperiment assays
+#' @export
+setMethod(
+    f = "plotGenePseudotime",
+    signature = signature(data = "SingleCellExperiment"),
+    definition = function(data, gene, exprs,
+        loess = TRUE, loessCI = TRUE, ...) {
+        if(missing(exprs)){
+            EX <- assays(data)[[1]]
+        }else{
+            if(length(exprs)==1){
+                EX <- assays(data)[[exprs]]
+            }else{
+                EX <- exprs
+            }
+        }
+        plotGenePseudotime(SlingshotDataSet(data), gene, exprs = EX,
+            loess = loess, loessCI = loessCI, ...)
     }
 )
 

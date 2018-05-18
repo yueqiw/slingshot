@@ -72,394 +72,398 @@
 #' @importFrom ape mst
 #'   
 setMethod(f = "getLineages",
-          signature = signature(data = "matrix", 
-                                clusterLabels = "matrix"),
-          definition = function(data, clusterLabels, reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              
-              X <- as.matrix(data)
-              clusterLabels <- as.matrix(clusterLabels)
-              # CHECKS
-              if(nrow(X)==0){
-                  stop('reducedDim has zero rows.')
-              }
-              if(ncol(X)==0){
-                  stop('reducedDim has zero columns.')
-              }
-              if(nrow(X) != nrow(clusterLabels)){
-                  stop('nrow(data) must equal nrow(clusterLabels).')
-              }
-              if(any(is.na(X))){
-                  stop('reducedDim cannot contain missing values.')
-              }
-              if(!all(apply(X,2,is.numeric))){
-                  stop('reducedDim must only contain numeric values.')
-              }
-              if (is.null(rownames(X)) &
-                  is.null(rownames(clusterLabels))) {
-                  rownames(X) <- paste('Cell', seq_len(nrow(X)), sep = '-')
-                  rownames(clusterLabels) <-
-                      paste('Cell', seq_len(nrow(X)), sep = '-')
-              }
-              if(is.null(colnames(X))){
-                  colnames(X) <- paste('Dim',seq_len(ncol(X)),sep='-')
-              }
-              if(is.null(colnames(clusterLabels))) {
-                  colnames(clusterLabels) <- seq_len(ncol(clusterLabels))
-              }
-              if(any(colnames(clusterLabels) == "")){
-                  colnames(clusterLabels)[colnames(clusterLabels)==""] <-
-                      which(colnames(clusterLabels)=="")
-              }
-              if(any(rownames(X)=='')){
-                  miss.ind <- which(rownames(X) == '')
-                  rownames(X)[miss.ind] <- paste('Cell',miss.ind,sep='-')
-              }
-              if(any(colnames(X)=='')){
-                  miss.ind <- which(colnames(X) == '')
-                  colnames(X)[miss.ind] <- paste('Dim',miss.ind,sep='-')
-              }
-              if(is.null(rownames(clusterLabels)) & 
-                 !is.null(rownames(X))){
-                  rownames(clusterLabels) <- rownames(X)
-              }
-              if(is.null(rownames(X)) & 
-                 !is.null(rownames(clusterLabels))){
-                  rownames(X) <- rownames(clusterLabels)
-              }
-              if(any(rowSums(clusterLabels)>1)){
-                  rs <- rowSums(clusterLabels)
-                  clusterLabels <- clusterLabels / rs
-              }
-              if(any(colSums(clusterLabels)==0)){
-                  clusterLabels <- clusterLabels[, colSums(clusterLabels)!=0, 
-                                                 drop = FALSE]
-              }
-              
-              # set up, remove unclustered cells (-1's)
-              X.original <- X
-              clusterLabels <- clusterLabels[, colnames(clusterLabels) != -1, 
-                                             drop = FALSE]
-              clusters <- colnames(clusterLabels)
-              nclus <- length(clusters)
-              if(!is.null(start.clus)){
-                  start.clus <- as.character(start.clus)
-              }
-              if(!is.null(end.clus)){
-                  end.clus <- as.character(end.clus)
-              }
-              
-              ### get the connectivity matrix
-              # get cluster centers
-              centers <- t(sapply(clusters,function(clID){
-                  w <- clusterLabels[,clID]
-                  return(apply(X, 2, weighted.mean, w = w))
-              }))
-              
-              # determine the distance function
-              if(is.null(dist.fun)){
-                  min.clus.size <- min(colSums(clusterLabels))
-                  if(min.clus.size <= ncol(X)){
-                      message('Using diagonal covariance matrix')
-                      dist.fun <- function(X,w1,w2) .dist_clusters_diag(X,w1,w2)
-                  }else{
-                      message('Using full covariance matrix')
-                      dist.fun <- function(X,w1,w2) .dist_clusters_full(X,w1,w2)
-                  }
-              }
-              
-              ### get pairwise cluster distance matrix
-              D <- as.matrix(sapply(clusters,function(clID1){
-                  sapply(clusters,function(clID2){
-                      w1 <- clusterLabels[,clID1]
-                      w2 <- clusterLabels[,clID2]
-                      return(dist.fun(X, w1, w2))
-                  })
-              }))
-              rownames(D) <- clusters
-              colnames(D) <- clusters
-              
-              # if infinite, set omega to largest distance + 1
-              if(is.null(omega)){
-                  omega <- max(D) + 1
-              }else{
-                  if(omega > 0){
-                      if(omega == Inf){
-                          omega <- max(D) + 1
-                      }else{
-                          omega <- omega / 2
-                      }
-                  }else{
-                      stop("omega must be a positive number.")
-                  }
-              }
-              D <- rbind(D, rep(omega, ncol(D)) )
-              D <- cbind(D, c(rep(omega, ncol(D)), 0) )
-              
-              # draw MST on cluster centers + OMEGA
-              # (possibly excluding endpoint clusters)
-              if(! is.null(end.clus)){
-                  end.idx <- which(clusters %in% end.clus)
-                  mstree <- ape::mst(D[-end.idx, -end.idx, drop = FALSE])
-              }else{
-                  mstree <- ape::mst(D)
-              }
-              # (add in endpoint clusters)
-              if(! is.null(end.clus)){
-                  forest <- D
-                  forest[forest != 0] <- 0
-                  forest[-end.idx, -end.idx] <- mstree
-                  for(clID in end.clus){
-                      cl.idx <- which(clusters == clID)
-                      dists <- D[! rownames(D) %in% end.clus, cl.idx]
-                      # get closest non-endpoint cluster
-                      closest <- names(dists)[which.min(dists)] 
-                      closest.idx <- which.max(clusters == closest)
-                      forest[cl.idx, closest.idx] <- 1
-                      forest[closest.idx, cl.idx] <- 1
-                  }
-              }else{
-                  forest <- mstree
-              }
-              # remove OMEGA
-              forest <- forest[seq_len(nclus), seq_len(nclus), drop = FALSE] 
-              rownames(forest) <- clusters
-              colnames(forest) <- clusters
-              
-              ###############################
-              ### use the "forest" to define lineages
-              ###############################
-              lineages <- list()
-              
-              # identify trees
-              unused <- rownames(forest)
-              trees <- list()
-              ntree <- 0
-              while(length(unused) > 0){
-                  ntree <- ntree + 1
-                  newtree <- .get_connections(unused[1], forest)
-                  trees[[ntree]] <- newtree
-                  unused <- unused[! unused %in% newtree]
-              }
-              trees <- trees[order(sapply(trees,length),decreasing = TRUE)]
-              
-              # identify lineages (paths through trees)
-              for(tree in trees){
-                  if(length(tree) == 1){
-                      lineages[[length(lineages)+1]] <- tree
-                      next
-                  }
-                  tree.ind <- rownames(forest) %in% tree
-                  tree.graph <- forest[tree.ind, tree.ind, drop = FALSE]
-                  degree <- rowSums(tree.graph)
-                  g <- graph.adjacency(tree.graph, mode="undirected")
-                  
-                  # if you have starting cluster(s) in this tree, draw lineages
-                  # to each leaf
-                  if(! is.null(start.clus)){
-                      if(sum(start.clus %in% tree) > 0){
-                          starts <- start.clus[start.clus %in% tree]
-                          ends <- rownames(tree.graph)[
-                              degree == 1 & ! rownames(tree.graph) %in% starts]
-                          for(st in starts){
-                              paths <- shortest_paths(g, from = st, to = ends, 
-                                                      mode = 'out', 
-                                                      output = 'vpath')$vpath
-                              for(p in paths){
-                                  lineages[[length(lineages)+1]] <- names(p)
-                              }
-                          }
-                      }else{
-                          # else, need a criteria for picking root
-                          # highest average length (~parsimony)
-                          leaves <- rownames(tree.graph)[degree == 1]
-                          avg.lineage.length <- sapply(leaves,function(l){
-                              ends <- leaves[leaves != l]
-                              paths <- shortest_paths(g, from = l, to = ends, 
-                                                      mode = 'out', 
-                                                      output = 'vpath')$vpath
-                              mean(sapply(paths, length))
-                          })
-                          st <- names(avg.lineage.length)[
-                              which.max(avg.lineage.length)]
-                          ends <- leaves[leaves != st]
-                          paths <- shortest_paths(g, from = st, to = ends, 
-                                                  mode = 'out',
-                                                  output = 'vpath')$vpath
-                          for(p in paths){
-                              lineages[[length(lineages)+1]] <- names(p)
-                          }
-                      }
-                  }else{
-                      # else, need a criteria for picking root
-                      # highest average length (~parsimony)
-                      leaves <- rownames(tree.graph)[degree == 1]
-                      avg.lineage.length <- sapply(leaves,function(l){
-                          ends <- leaves[leaves != l]
-                          paths <- shortest_paths(g, from = l, to = ends, 
-                                                  mode = 'out',
-                                                  output = 'vpath')$vpath
-                          mean(sapply(paths, length))
-                      })
-                      st <- names(avg.lineage.length)[
-                          which.max(avg.lineage.length)]
-                      ends <- leaves[leaves != st]
-                      paths <- shortest_paths(g, from = st, to = ends, 
-                                              mode = 'out',
-                                              output = 'vpath')$vpath
-                      for(p in paths){
-                          lineages[[length(lineages)+1]] <- names(p)
-                      }
-                  }
-              }
-              # sort by number of clusters included
-              lineages <- lineages[order(sapply(lineages, length), 
-                                         decreasing = TRUE)]
-              names(lineages) <- paste('Lineage',seq_along(lineages),sep='')
-              
-              lineageControl <- list()
-              first <- unique(sapply(lineages,function(l){ l[1] }))
-              last <- unique(sapply(lineages,function(l){ l[length(l)] }))
-              
-              lineageControl$start.clus <- first
-              lineageControl$end.clus <- last
-              
-              start.given <- first %in% start.clus
-              end.given <- last %in% end.clus
-              lineageControl$start.given <- start.given
-              lineageControl$end.given <- end.given
-              
-              lineageControl$dist <- D[seq_len(nclus),seq_len(nclus), 
-                                       drop = FALSE]
-              
-              out <- newSlingshotDataSet(reducedDim = X, 
-                                         clusterLabels = clusterLabels, 
-                                         lineages = lineages, 
-                                         adjacency = forest, 
-                                         slingParams = lineageControl)
-              
-              validObject(out)
-              return(out)
-          }
+    signature = signature(data = "matrix", 
+        clusterLabels = "matrix"),
+    definition = function(data, clusterLabels, reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        
+        X <- as.matrix(data)
+        clusterLabels <- as.matrix(clusterLabels)
+        # CHECKS
+        if(nrow(X)==0){
+            stop('reducedDim has zero rows.')
+        }
+        if(ncol(X)==0){
+            stop('reducedDim has zero columns.')
+        }
+        if(nrow(X) != nrow(clusterLabels)){
+            stop('nrow(data) must equal nrow(clusterLabels).')
+        }
+        if(any(is.na(X))){
+            stop('reducedDim cannot contain missing values.')
+        }
+        if(!all(apply(X,2,is.numeric))){
+            stop('reducedDim must only contain numeric values.')
+        }
+        if (is.null(rownames(X)) &
+                is.null(rownames(clusterLabels))) {
+            rownames(X) <- paste('Cell', seq_len(nrow(X)), sep = '-')
+            rownames(clusterLabels) <-
+                paste('Cell', seq_len(nrow(X)), sep = '-')
+        }
+        if(is.null(colnames(X))){
+            colnames(X) <- paste('Dim',seq_len(ncol(X)),sep='-')
+        }
+        if(is.null(colnames(clusterLabels))) {
+            colnames(clusterLabels) <- seq_len(ncol(clusterLabels))
+        }
+        if(any(colnames(clusterLabels) == "")){
+            colnames(clusterLabels)[colnames(clusterLabels)==""] <-
+                which(colnames(clusterLabels)=="")
+        }
+        if(any(rownames(X)=='')){
+            miss.ind <- which(rownames(X) == '')
+            rownames(X)[miss.ind] <- paste('Cell',miss.ind,sep='-')
+        }
+        if(any(colnames(X)=='')){
+            miss.ind <- which(colnames(X) == '')
+            colnames(X)[miss.ind] <- paste('Dim',miss.ind,sep='-')
+        }
+        if(is.null(rownames(clusterLabels)) & 
+                !is.null(rownames(X))){
+            rownames(clusterLabels) <- rownames(X)
+        }
+        if(is.null(rownames(X)) & 
+                !is.null(rownames(clusterLabels))){
+            rownames(X) <- rownames(clusterLabels)
+        }
+        if(any(rowSums(clusterLabels)>1)){
+            rs <- rowSums(clusterLabels)
+            clusterLabels <- clusterLabels / rs
+        }
+        if(any(colSums(clusterLabels)==0)){
+            clusterLabels <- clusterLabels[, colSums(clusterLabels)!=0, 
+                drop = FALSE]
+        }
+        
+        # set up, remove unclustered cells (-1's)
+        X.original <- X
+        clusterLabels <- clusterLabels[, colnames(clusterLabels) != -1, 
+            drop = FALSE]
+        clusters <- colnames(clusterLabels)
+        nclus <- length(clusters)
+        if(!is.null(start.clus)){
+            start.clus <- as.character(start.clus)
+        }
+        if(!is.null(end.clus)){
+            end.clus <- as.character(end.clus)
+        }
+        
+        ### get the connectivity matrix
+        # get cluster centers
+        centers <- t(sapply(clusters,function(clID){
+            w <- clusterLabels[,clID]
+            return(colWeightedMeans(X, w = w))
+        }))
+        
+        # determine the distance function
+        if(is.null(dist.fun)){
+            min.clus.size <- min(colSums(clusterLabels))
+            if(min.clus.size <= ncol(X)){
+                message('Using diagonal covariance matrix')
+                dist.fun <- function(X,w1,w2) .dist_clusters_diag(X,w1,w2)
+            }else{
+                message('Using full covariance matrix')
+                dist.fun <- function(X,w1,w2) .dist_clusters_full(X,w1,w2)
+            }
+        }
+        
+        ### get pairwise cluster distance matrix
+        D <- as.matrix(sapply(clusters,function(clID1){
+            sapply(clusters,function(clID2){
+                w1 <- clusterLabels[,clID1]
+                w2 <- clusterLabels[,clID2]
+                return(dist.fun(X, w1, w2))
+            })
+        }))
+        rownames(D) <- clusters
+        colnames(D) <- clusters
+        
+        # if infinite, set omega to largest distance + 1
+        if(is.null(omega)){
+            omega <- max(D) + 1
+        }else{
+            if(omega > 0){
+                if(omega == Inf){
+                    omega <- max(D) + 1
+                }else{
+                    omega <- omega / 2
+                }
+            }else{
+                stop("omega must be a positive number.")
+            }
+        }
+        D <- rbind(D, rep(omega, ncol(D)) )
+        D <- cbind(D, c(rep(omega, ncol(D)), 0) )
+        
+        # draw MST on cluster centers + OMEGA
+        # (possibly excluding endpoint clusters)
+        if(! is.null(end.clus)){
+            end.idx <- which(clusters %in% end.clus)
+            mstree <- ape::mst(D[-end.idx, -end.idx, drop = FALSE])
+        }else{
+            mstree <- ape::mst(D)
+        }
+        # (add in endpoint clusters)
+        if(! is.null(end.clus)){
+            forest <- D
+            forest[forest != 0] <- 0
+            forest[-end.idx, -end.idx] <- mstree
+            for(clID in end.clus){
+                cl.idx <- which(clusters == clID)
+                dists <- D[! rownames(D) %in% end.clus, cl.idx]
+                # get closest non-endpoint cluster
+                closest <- names(dists)[which.min(dists)] 
+                closest.idx <- which.max(clusters == closest)
+                forest[cl.idx, closest.idx] <- 1
+                forest[closest.idx, cl.idx] <- 1
+            }
+        }else{
+            forest <- mstree
+        }
+        # remove OMEGA
+        forest <- forest[seq_len(nclus), seq_len(nclus), drop = FALSE] 
+        rownames(forest) <- clusters
+        colnames(forest) <- clusters
+        
+        ###############################
+        ### use the "forest" to define lineages
+        ###############################
+        lineages <- list()
+        
+        # identify sub-trees
+        subtrees <- subtrees.update <- forest
+        diag(subtrees) <- 1
+        while(sum(subtrees.update) > 0){
+            subtrees.new <- apply(subtrees,2,function(col){
+                rowSums(subtrees[,as.logical(col), drop=FALSE]) > 0
+            })
+            subtrees.update <- subtrees.new - subtrees
+            subtrees <- subtrees.new
+        }
+        subtrees <- unique(subtrees)
+        trees <- lapply(seq_len(nrow(subtrees)),function(ri){
+            colnames(forest)[subtrees[ri,]]
+        })
+        trees <- trees[order(sapply(trees,length),decreasing = TRUE)]
+        ntree <- length(trees)
+        
+        # identify lineages (paths through trees)
+        for(tree in trees){
+            if(length(tree) == 1){
+                lineages[[length(lineages)+1]] <- tree
+                next
+            }
+            tree.ind <- rownames(forest) %in% tree
+            tree.graph <- forest[tree.ind, tree.ind, drop = FALSE]
+            degree <- rowSums(tree.graph)
+            g <- graph.adjacency(tree.graph, mode="undirected")
+            
+            # if you have starting cluster(s) in this tree, draw lineages
+            # to each leaf
+            if(! is.null(start.clus)){
+                if(sum(start.clus %in% tree) > 0){
+                    starts <- start.clus[start.clus %in% tree]
+                    ends <- rownames(tree.graph)[
+                        degree == 1 & ! rownames(tree.graph) %in% starts]
+                    for(st in starts){
+                        paths <- shortest_paths(g, from = st, to = ends, 
+                            mode = 'out', 
+                            output = 'vpath')$vpath
+                        for(p in paths){
+                            lineages[[length(lineages)+1]] <- names(p)
+                        }
+                    }
+                }else{
+                    # else, need a criteria for picking root
+                    # highest average length (~parsimony)
+                    leaves <- rownames(tree.graph)[degree == 1]
+                    avg.lineage.length <- sapply(leaves,function(l){
+                        ends <- leaves[leaves != l]
+                        paths <- shortest_paths(g, from = l, to = ends, 
+                            mode = 'out', 
+                            output = 'vpath')$vpath
+                        mean(sapply(paths, length))
+                    })
+                    st <- names(avg.lineage.length)[
+                        which.max(avg.lineage.length)]
+                    ends <- leaves[leaves != st]
+                    paths <- shortest_paths(g, from = st, to = ends, 
+                        mode = 'out',
+                        output = 'vpath')$vpath
+                    for(p in paths){
+                        lineages[[length(lineages)+1]] <- names(p)
+                    }
+                }
+            }else{
+                # else, need a criteria for picking root
+                # highest average length (~parsimony)
+                leaves <- rownames(tree.graph)[degree == 1]
+                avg.lineage.length <- sapply(leaves,function(l){
+                    ends <- leaves[leaves != l]
+                    paths <- shortest_paths(g, from = l, to = ends, 
+                        mode = 'out',
+                        output = 'vpath')$vpath
+                    mean(sapply(paths, length))
+                })
+                st <- names(avg.lineage.length)[
+                    which.max(avg.lineage.length)]
+                ends <- leaves[leaves != st]
+                paths <- shortest_paths(g, from = st, to = ends, 
+                    mode = 'out',
+                    output = 'vpath')$vpath
+                for(p in paths){
+                    lineages[[length(lineages)+1]] <- names(p)
+                }
+            }
+        }
+        # sort by number of clusters included
+        lineages <- lineages[order(sapply(lineages, length), 
+            decreasing = TRUE)]
+        names(lineages) <- paste('Lineage',seq_along(lineages),sep='')
+        
+        lineageControl <- list()
+        first <- unique(sapply(lineages,function(l){ l[1] }))
+        last <- unique(sapply(lineages,function(l){ l[length(l)] }))
+        
+        lineageControl$start.clus <- first
+        lineageControl$end.clus <- last
+        
+        start.given <- first %in% start.clus
+        end.given <- last %in% end.clus
+        lineageControl$start.given <- start.given
+        lineageControl$end.given <- end.given
+        
+        lineageControl$dist <- D[seq_len(nclus),seq_len(nclus), 
+            drop = FALSE]
+        
+        out <- newSlingshotDataSet(reducedDim = X, 
+            clusterLabels = clusterLabels, 
+            lineages = lineages, 
+            adjacency = forest, 
+            slingParams = lineageControl)
+        
+        validObject(out)
+        return(out)
+    }
 )
 
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(data = "matrix", 
-                                clusterLabels = "character"),
-          definition = function(data, clusterLabels, reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              
-              # CHECKS
-              clusterLabels <- as.character(clusterLabels)
-              X <- as.matrix(data)
-              if(nrow(X)==0){
-                  stop('reducedDim has zero rows.')
-              }
-              if(ncol(X)==0){
-                  stop('reducedDim has zero columns.')
-              }
-              if(nrow(X) != length(clusterLabels)){
-                  stop('nrow(data) must equal length(clusterLabels).')
-              }
-              if(any(is.na(clusterLabels))){
-                  message(paste0("Cluster labels of 'NA' being treated as ",
-                                 "unclustered."))
-                  clusterLabels[is.na(clusterLabels)] <- '-1'
-              }
-
-              # convert clusterLabels into cluster weights matrix
-              clusters <- unique(clusterLabels)
-              clusWeight <- sapply(clusters,function(clID){
-                  as.numeric(clusterLabels == clID)
-              })
-              colnames(clusWeight) <- clusters
-              return(getLineages(data = data, clusterLabels = clusWeight,
-                                 reducedDim = reducedDim,
-                                 start.clus = start.clus, end.clus = end.clus,
-                                 dist.fun = dist.fun, omega = omega))
-          }
+    signature = signature(data = "matrix", 
+        clusterLabels = "character"),
+    definition = function(data, clusterLabels, reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        
+        # CHECKS
+        clusterLabels <- as.character(clusterLabels)
+        X <- as.matrix(data)
+        if(nrow(X)==0){
+            stop('reducedDim has zero rows.')
+        }
+        if(ncol(X)==0){
+            stop('reducedDim has zero columns.')
+        }
+        if(nrow(X) != length(clusterLabels)){
+            stop('nrow(data) must equal length(clusterLabels).')
+        }
+        if(any(is.na(clusterLabels))){
+            message("Cluster labels of 'NA' being treated as unclustered.")
+            clusterLabels[is.na(clusterLabels)] <- '-1'
+        }
+        
+        # convert clusterLabels into cluster weights matrix
+        clusters <- unique(clusterLabels)
+        clusWeight <- sapply(clusters,function(clID){
+            as.numeric(clusterLabels == clID)
+        })
+        colnames(clusWeight) <- clusters
+        return(getLineages(data = data, clusterLabels = clusWeight,
+            reducedDim = reducedDim,
+            start.clus = start.clus, end.clus = end.clus,
+            dist.fun = dist.fun, omega = omega))
+    }
 )
 
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(data = "matrix", clusterLabels = "ANY"),
-          definition = function(data, clusterLabels, reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              if(missing(clusterLabels)){
-                  message(paste0('No cluster labels provided. Continuing with ',
-                                 'one cluster.'))
-                  clusterLabels <- rep('1', nrow(data))
-              }
-              return(getLineages(data = data, clusterLabels = clusterLabels,
-                                 reducedDim = reducedDim,
-                                 start.clus = start.clus, end.clus = end.clus,
-                                 dist.fun = dist.fun, omega = omega))
-          })
+    signature = signature(data = "matrix", clusterLabels = "ANY"),
+    definition = function(data, clusterLabels, reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        if(missing(clusterLabels)){
+            message('No cluster labels provided. Continuing with ',
+                'one cluster.')
+            clusterLabels <- rep('1', nrow(data))
+        }
+        return(getLineages(data = data, clusterLabels = clusterLabels,
+            reducedDim = reducedDim,
+            start.clus = start.clus, end.clus = end.clus,
+            dist.fun = dist.fun, omega = omega))
+    })
 
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(data = "SlingshotDataSet", 
-                                clusterLabels = "ANY"),
-          definition = function(data, clusterLabels = clusterLabels(data),
-                                reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              return(getLineages(data = reducedDim(data), 
-                                 clusterLabels = data@clusterLabels,
-                                 reducedDim = reducedDim,
-                                 start.clus = start.clus, end.clus = end.clus,
-                                 dist.fun = dist.fun, omega = omega))
-          })
+    signature = signature(data = "SlingshotDataSet", 
+        clusterLabels = "ANY"),
+    definition = function(data, clusterLabels,
+        reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        return(getLineages(data = reducedDim(data), 
+            clusterLabels = .getClusterLabels(data),
+            reducedDim = reducedDim,
+            start.clus = start.clus, end.clus = end.clus,
+            dist.fun = dist.fun, omega = omega))
+    })
 
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(data = "data.frame", 
-                                clusterLabels = "ANY"),
-          definition = function(data, clusterLabels, reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              RD <- as.matrix(data)
-              rownames(RD) <- rownames(data)
-              return(getLineages(data = RD, clusterLabels = clusterLabels,
-                                 reducedDim = reducedDim,
-                                 start.clus = start.clus, end.clus = end.clus,
-                                 dist.fun = dist.fun, omega = omega))
-          })
+    signature = signature(data = "data.frame", 
+        clusterLabels = "ANY"),
+    definition = function(data, clusterLabels, reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        RD <- as.matrix(data)
+        rownames(RD) <- rownames(data)
+        return(getLineages(data = RD, clusterLabels = clusterLabels,
+            reducedDim = reducedDim,
+            start.clus = start.clus, end.clus = end.clus,
+            dist.fun = dist.fun, omega = omega))
+    })
 
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(data = "matrix", 
-                                clusterLabels = "numeric"),
-          definition = function(data, clusterLabels, reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              return(getLineages(data = data, 
-                                 clusterLabels = as.character(clusterLabels),
-                                 reducedDim = reducedDim,
-                                 start.clus = start.clus, end.clus = end.clus,
-                                 dist.fun = dist.fun, omega = omega))
-          })
+    signature = signature(data = "matrix", 
+        clusterLabels = "numeric"),
+    definition = function(data, clusterLabels, reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        return(getLineages(data = data, 
+            clusterLabels = as.character(clusterLabels),
+            reducedDim = reducedDim,
+            start.clus = start.clus, end.clus = end.clus,
+            dist.fun = dist.fun, omega = omega))
+    })
 
 #' @rdname getLineages
 #' @export
 setMethod(f = "getLineages",
-          signature = signature(data = "matrix", 
-                                clusterLabels = "factor"),
-          definition = function(data, clusterLabels, reducedDim = NULL,
-                                start.clus = NULL, end.clus = NULL,
-                                dist.fun = NULL, omega = NULL){
-              return(getLineages(data = data, 
-                                 clusterLabels = as.character(clusterLabels), 
-                                 reducedDim = reducedDim,
-                                 start.clus = start.clus, end.clus = end.clus,
-                                 dist.fun = dist.fun, omega = omega))
-          })
+    signature = signature(data = "matrix", 
+        clusterLabels = "factor"),
+    definition = function(data, clusterLabels, reducedDim = NULL,
+        start.clus = NULL, end.clus = NULL,
+        dist.fun = NULL, omega = NULL){
+        return(getLineages(data = data, 
+            clusterLabels = as.character(clusterLabels), 
+            reducedDim = reducedDim,
+            start.clus = start.clus, end.clus = end.clus,
+            dist.fun = dist.fun, omega = omega))
+    })

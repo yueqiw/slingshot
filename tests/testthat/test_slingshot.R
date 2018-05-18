@@ -89,8 +89,8 @@ test_that("getLineages works as expected", {
   expect_false(all(slingLineages(sds0)$Lineage1 == 
                        slingLineages(sds0)$Lineage2))
   # set start cluster
-  sds1 <- getLineages(rd, cl, start.clus = 1)
-  expect_true(all(sapply(slingLineages(sds1),function(l){ l[1] == '1' })))
+  sds1 <- getLineages(rd, cl, start.clus = 2)
+  expect_true(all(sapply(slingLineages(sds1),function(l){ l[1] == '2' })))
   # set end cluster
   sds2 <- getLineages(rd,cl, start.clus = 1, end.clus = 3)
   expect_true(any(sapply(slingLineages(sds2),function(l){ (l[1] == '1') && 

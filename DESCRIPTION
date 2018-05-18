@@ -3,14 +3,11 @@ Title: Tools for ordering single-cell sequencing
 Version: 0.99.3
 Description: Provides functions for inferring continuous, branching 
     lineage structures in single-cell data.
-Authors@R: c(person("Kelly", "Street", email = "kstreet@berkeley.edu",
+Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
             role = c("aut", "cre", "cph")))
-Author: Kelly Street [aut, cre, cph]
-Maintainer: Kelly Street <street.kelly@gmail.com>
 License: Artistic-2.0
 Depends:
     R (>= 3.5),
-    Biobase,
     princurve,
     stats
 Imports:
@@ -19,9 +16,11 @@ Imports:
     graphics,
     grDevices,
     igraph,
+    matrixStats,
     methods,
     rgl,
-    SingleCellExperiment
+    SingleCellExperiment,
+    SummarizedExperiment
 Suggests:
     BiocGenerics,
     destiny,
@@ -30,6 +29,7 @@ Suggests:
     mclust,
     RColorBrewer,
     rmarkdown,
+    splatter,
     testthat
 VignetteBuilder: knitr
 LazyData: false

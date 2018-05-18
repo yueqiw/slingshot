@@ -249,8 +249,8 @@ setGeneric(
     }
 )
 
-#' # plot3d generic, in case rgl is not loaded
-#' #' @export
-#' plot3d <- function(x, ...){
-#'     UseMethod('plot3d')
-#' }
+# # plot3d generic, in case rgl is not loaded
+# #' @export
+# plot3d <- function(x, ...){
+#     UseMethod('plot3d')
+# }

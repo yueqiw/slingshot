@@ -84,7 +84,6 @@ params <- setParams(params, update = list(batchCells = 200,
 ```
 
 ```{r load_data_splat, echo = FALSE}
-library(HSMMSingleCell, quietly = TRUE)
 library(splatter, quietly = TRUE)
 data("splatterParameters")
 ```

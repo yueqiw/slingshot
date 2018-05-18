@@ -247,51 +247,51 @@ setMethod(
 
 
 # replacement methods
-#' #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
-#' #'   matrix.
-#' #' @param value matrix, the new reduced dimensional dataset.
-#' #' 
-#' #' @details 
-#' #' Warning: this will remove any existing lineages or curves from the 
-#' #' \code{SlingshotDataSet} object.
-#' #' @importFrom SingleCellExperiment reducedDim<-
-#' #' @export
-#' setReplaceMethod(
-#'     f = "reducedDim", 
-#'     signature = "SlingshotDataSet",
-#'     definition = function(x, value) initialize(x, reducedDim = value,
-#'                                          clusterLabels = clusterLabels(x)))
-#' 
+# #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
+# #'   matrix.
+# #' @param value matrix, the new reduced dimensional dataset.
+# #' 
+# #' @details 
+# #' Warning: this will remove any existing lineages or curves from the 
+# #' \code{SlingshotDataSet} object.
+# #' @importFrom SingleCellExperiment reducedDim<-
+# #' @export
+# setReplaceMethod(
+#     f = "reducedDim",
+#     signature = "SlingshotDataSet",
+#     definition = function(x, value) initialize(x, reducedDim = value,
+#                                          clusterLabels = clusterLabels(x)))
+# 
 #' # replacement methods
-#' #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
-#' #'   matrix.
-#' #' @param value matrix, the new reduced dimensional dataset.
-#' #' 
-#' #' @details 
-#' #' Warning: this will remove any existing lineages or curves from the 
-#' #' \code{SlingshotDataSet} object.
-#' #' @importFrom SingleCellExperiment reducedDims<-
-#' #' @export
-#' setReplaceMethod(
-#'     f = "reducedDims", 
-#'     signature = "SlingshotDataSet",
-#'     definition = function(x, value) initialize(x, reducedDim = value,
-#'                                          clusterLabels = clusterLabels(x)))
-#' 
-#' #' @describeIn SlingshotDataSet Updated object with new vector of cluster
-#' #'   labels.
-#' #' @param value character, the new vector of cluster labels.
-#' #' 
-#' #' @details 
-#' #' Warning: this will remove any existing lineages or curves from the 
-#' #' \code{SlingshotDataSet} object.
-#' #' @export
-#' setReplaceMethod(
-#'     f = "clusterLabels", 
-#'     signature = c(object = "SlingshotDataSet", value = "ANY"),
-#'     definition = function(object, value) initialize(x, 
-#'                                                reducedDim = reducedDim(x),
-#'                                                clusterLabels = value))
+# #' @describeIn SlingshotDataSet Updated object with new reduced dimensional
+# #'   matrix.
+# #' @param value matrix, the new reduced dimensional dataset.
+# #' 
+# #' @details 
+# #' Warning: this will remove any existing lineages or curves from the 
+# #' \code{SlingshotDataSet} object.
+# #' @importFrom SingleCellExperiment reducedDims<-
+# #' @export
+# setReplaceMethod(
+#     f = "reducedDims",
+#     signature = "SlingshotDataSet",
+#     definition = function(x, value) initialize(x, reducedDim = value,
+#                                          clusterLabels = clusterLabels(x)))
+# 
+# #' @describeIn SlingshotDataSet Updated object with new vector of cluster
+# #'   labels.
+# #' @param value character, the new vector of cluster labels.
+# #' 
+# #' @details 
+# #' Warning: this will remove any existing lineages or curves from the 
+# #' \code{SlingshotDataSet} object.
+# #' @export
+# setReplaceMethod(
+#     f = "clusterLabels",
+#     signature = c(object = "SlingshotDataSet", value = "ANY"),
+#     definition = function(object, value) initialize(x,
+#                                                reducedDim = reducedDim(x),
+#                                                clusterLabels = value))
 
 #' @describeIn SlingshotDataSet Subset dataset and cluster labels.
 #' @param i indices to be applied to rows (cells) of the reduced dimensional
@@ -401,22 +401,17 @@ setMethod(
 ##########################
 #' @import stats
 #' @import graphics
-.get_connections <- function(clus, forest, parent = NULL){
-    children.idx <- forest[,clus] == 1
-    children <- rownames(forest)[children.idx]
-    if(is.null(parent)){
-        out <- clus
-        for(child in children){
-            out <- c(out, Recall(child, forest, clus))
-        }
-    }else{
-        children <- children[children != parent]
-        out <- clus
-        for(child in children){
-            out <- c(out, Recall(child, forest, clus))
-        }
-    }
-    return(out)
+`.slingParams<-` <- function(x, value) {
+    x@slingParams <- value
+    x
+}
+`.slingCurves<-` <- function(x, value) {
+    x@curves <- value
+    x
+}
+# to avoid confusion between the clusterLabels argument and function
+.getClusterLabels <- function(x){
+    x@clusterLabels
 }
 .scaleAB <- function(x,a=0,b=1){
     ((x-min(x,na.rm=TRUE))/(max(x,na.rm=TRUE)-min(x,na.rm=TRUE)))*(b-a)+a
@@ -444,13 +439,14 @@ setMethod(
     return(avg.curve)
 }
 # export?
+#' @import matrixStats
 .dist_clusters_full <- function(X, w1, w2){
     if(length(w1) != nrow(X) | length(w2) != nrow(X)){
         stop("Reduced dimensional matrix and weights vector contain different
              numbers of points.")
     }
-    mu1 <- apply(X, 2, weighted.mean, w = w1)
-    mu2 <- apply(X, 2, weighted.mean, w = w2)
+    mu1 <- colWeightedMeans(X, w = w1)
+    mu2 <- colWeightedMeans(X, w = w2)
     diff <- mu1 - mu2
     s1 <- cov.wt(X, wt = w1)$cov
     s2 <- cov.wt(X, wt = w2)$cov
@@ -462,8 +458,8 @@ setMethod(
         stop("Reduced dimensional matrix and weights vector contain different
              numbers of points.")
     }
-    mu1 <- apply(X, 2, weighted.mean, w = w1)
-    mu2 <- apply(X, 2, weighted.mean, w = w2)
+    mu1 <- colWeightedMeans(X, w = w1)
+    mu2 <- colWeightedMeans(X, w = w2)
     diff <- mu1 - mu2
     if(sum(w1>0)==1){
         s1 <-  diag(ncol(X))

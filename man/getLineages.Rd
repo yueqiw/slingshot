@@ -24,9 +24,9 @@ getLineages(data, clusterLabels, ...)
 \S4method{getLineages}{matrix,ANY}(data, clusterLabels, reducedDim = NULL,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
 
-\S4method{getLineages}{SlingshotDataSet,ANY}(data,
-  clusterLabels = clusterLabels(data), reducedDim = NULL,
-  start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)
+\S4method{getLineages}{SlingshotDataSet,ANY}(data, clusterLabels,
+  reducedDim = NULL, start.clus = NULL, end.clus = NULL,
+  dist.fun = NULL, omega = NULL)
 
 \S4method{getLineages}{data.frame,ANY}(data, clusterLabels, reducedDim = NULL,
   start.clus = NULL, end.clus = NULL, dist.fun = NULL, omega = NULL)

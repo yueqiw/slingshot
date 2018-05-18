@@ -54,38 +54,8 @@ Extract cluster labels, either a character vector or matrix of
   weights.
 
 # replacement methods
-#' @describeIn SlingshotDataSet Updated object with new reduced dimensional
-#'   matrix.
-#' @param value matrix, the new reduced dimensional dataset.
-#' 
-#' @details 
-#' Warning: this will remove any existing lineages or curves from the 
-#' \code{SlingshotDataSet} object.
-#' @importFrom SingleCellExperiment reducedDims<-
-#' @export
-setReplaceMethod(
-    f = "reducedDims", 
-    signature = "SlingshotDataSet",
-    definition = function(x, value) initialize(x, reducedDim = value,
-                                         clusterLabels = clusterLabels(x)))
 }
 \details{
-#' @describeIn SlingshotDataSet Updated object with new vector of cluster
-#'   labels.
-#' @param value character, the new vector of cluster labels.
-#' 
-#' @details 
-#' Warning: this will remove any existing lineages or curves from the 
-#' \code{SlingshotDataSet} object.
-#' @export
-setReplaceMethod(
-    f = "clusterLabels", 
-    signature = c(object = "SlingshotDataSet", value = "ANY"),
-    definition = function(object, value) initialize(x, 
-                                               reducedDim = reducedDim(x),
-                                               clusterLabels = value))
-
-
 Warning: this will remove any existing lineages or curves from the 
 \code{SlingshotDataSet} object.
 }

@@ -114,11 +114,11 @@ setValidity("SlingshotDataSet", function(object) {
         L <- length(slingLineages(object))
         clus.names <- colnames(clusterLabels(object))
         K <- length(clus.names)
-        if(any(sapply(slingLineages(object),class) != 'character')){
+        if(any(vapply(slingLineages(object),class,'') != 'character')){
             return("lineages must be a list of character vectors.")
         }
-        if(!all(sapply(slingLineages(object), 
-                       function(lin){all(lin %in% clus.names)}))){
+        if(!all(vapply(slingLineages(object), 
+                       function(lin){all(lin %in% clus.names)}, TRUE))){
             return(paste0("lineages must be a list of character vectors ",
                           "composed of cluster names."))
         }
@@ -163,7 +163,7 @@ setValidity("SlingshotDataSet", function(object) {
             }
         }
         L <- length(slingCurves(object))
-        if(any(sapply(slingCurves(object),class) != 'principal.curve')){
+        if(any(vapply(slingCurves(object),class,'') != 'principal.curve')){
             return("curves must be a list of principal.curve objects.")
         }
         if(!is.null(slingParams(object)$shrink)){

@@ -330,13 +330,13 @@ setMethod(
         if(length(slingCurves(x))==0){
             stop('No curves detected.')
         }
-        pst <- sapply(slingCurves(x), function(pc) {
+        pst <- vapply(slingCurves(x), function(pc) {
             t <- pc$lambda
             if(na){
                 t[pc$w == 0] <- NA
             }
             return(t)
-        })
+        }, rep(0,nrow(reducedDim(x))))
         rownames(pst) <- rownames(reducedDim(x))
         colnames(pst) <- names(slingCurves(x))
         return(pst)
@@ -363,7 +363,8 @@ setMethod(
         if(length(slingCurves(x))==0){
             stop('No curves detected.')
         }
-        weights <- sapply(slingCurves(x), function(pc) { pc$w })
+        weights <- vapply(slingCurves(x), function(pc) { pc$w },
+            rep(0, nrow(reducedDim(x))))
         rownames(weights) <- rownames(reducedDim(x))
         colnames(weights) <- names(slingCurves(x))
         return(weights)
@@ -417,25 +418,26 @@ setMethod(
     ((x-min(x,na.rm=TRUE))/(max(x,na.rm=TRUE)-min(x,na.rm=TRUE)))*(b-a)+a
 }
 .avg_curves <- function(pcurves, X, stretch = 2){
+    n <- nrow(pcurves[[1]]$s)
     p <- ncol(pcurves[[1]]$s)
     lambdas.all <- lapply(pcurves, function(pcv){pcv$lambda})
     lambdas.all <- unique(unlist(lambdas.all))
-    max.shared.lambda <- min(sapply(pcurves, function(pcv){max(pcv$lambda)}))
+    max.shared.lambda <- min(vapply(pcurves, function(pcv){max(pcv$lambda)},0))
     lambdas.all <- sort(lambdas.all[lambdas.all <= max.shared.lambda])
     pcurves.dense <- lapply(pcurves,function(pcv){
-        sapply(seq_len(p),function(jj){
+        vapply(seq_len(p),function(jj){
             interpolated <- approx(pcv$lambda, pcv$s[,jj], xout = lambdas.all)$y
             return(interpolated)
-        })
+        }, rep(0,length(lambdas.all)))
     })
-    avg <- sapply(seq_len(p),function(jj){
-        dim.all <- sapply(seq_along(pcurves.dense),function(i){
+    avg <- vapply(seq_len(p),function(jj){
+        dim.all <- vapply(seq_along(pcurves.dense),function(i){
             pcurves.dense[[i]][,jj]
-        })
+        }, rep(0,length(lambdas.all)))
         return(rowMeans(dim.all))
-    })
+    }, rep(0,length(lambdas.all)))
     avg.curve <- .get_lam(X, avg, stretch=stretch)
-    avg.curve$w <- rowMeans(sapply(pcurves, function(p){ p$w }))
+    avg.curve$w <- rowMeans(vapply(pcurves, function(p){ p$w }, rep(0,n)))
     return(avg.curve)
 }
 # export?
@@ -474,7 +476,7 @@ setMethod(
     return(as.numeric(t(diff) %*% solve(s1 + s2) %*% diff))
 }
 .cumMin <- function(x,time){
-    sapply(seq_along(x),function(i){ min(x[time <= time[i]]) })
+    vapply(seq_along(x),function(i){ min(x[time <= time[i]]) }, 0)
 }
 .percent_shrinkage <- function(crv, share.idx, method = 'cosine'){
     pst <- crv$lambda
@@ -519,14 +521,15 @@ setMethod(
     return(pct.l)
 }
 .shrink_to_avg <- function(pcurve, avg.curve, pct, X, stretch = 2){
+    n <- nrow(pcurve$s)
     p <- ncol(pcurve$s)
     lam <- pcurve$lambda
-    s <- sapply(seq_len(p),function(jj){
+    s <- vapply(seq_len(p),function(jj){
         orig.jj <- pcurve$s[,jj]
         avg.jj <- approx(x = avg.curve$lambda, y = avg.curve$s[,jj], xout = lam,
                          rule = 2)$y
         return(avg.jj * pct + orig.jj * (1-pct))
-    })
+    }, rep(0,n))
     w <- pcurve$w
     pcurve <- .get_lam(X, s, pcurve$tag, stretch = stretch)
     pcurve$w <- w

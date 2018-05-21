@@ -152,11 +152,11 @@ setMethod(f = "getLineages",
         
         ### get the connectivity matrix
         # get cluster centers
-        centers <- t(sapply(clusters,function(clID){
+        centers <- t(vapply(clusters,function(clID){
             w <- clusterLabels[,clID]
             return(colWeightedMeans(X, w = w))
-        }))
-        
+        }, rep(0,ncol(X))))
+
         # determine the distance function
         if(is.null(dist.fun)){
             min.clus.size <- min(colSums(clusterLabels))
@@ -170,13 +170,13 @@ setMethod(f = "getLineages",
         }
         
         ### get pairwise cluster distance matrix
-        D <- as.matrix(sapply(clusters,function(clID1){
-            sapply(clusters,function(clID2){
+        D <- as.matrix(vapply(clusters,function(clID1){
+            vapply(clusters,function(clID2){
                 w1 <- clusterLabels[,clID1]
                 w2 <- clusterLabels[,clID2]
                 return(dist.fun(X, w1, w2))
-            })
-        }))
+            },0)
+        },rep(0,nclus)))
         rownames(D) <- clusters
         colnames(D) <- clusters
         
@@ -246,7 +246,7 @@ setMethod(f = "getLineages",
         trees <- lapply(seq_len(nrow(subtrees)),function(ri){
             colnames(forest)[subtrees[ri,]]
         })
-        trees <- trees[order(sapply(trees,length),decreasing = TRUE)]
+        trees <- trees[order(vapply(trees,length,0),decreasing = TRUE)]
         ntree <- length(trees)
         
         # identify lineages (paths through trees)
@@ -279,13 +279,13 @@ setMethod(f = "getLineages",
                     # else, need a criteria for picking root
                     # highest average length (~parsimony)
                     leaves <- rownames(tree.graph)[degree == 1]
-                    avg.lineage.length <- sapply(leaves,function(l){
+                    avg.lineage.length <- vapply(leaves,function(l){
                         ends <- leaves[leaves != l]
                         paths <- shortest_paths(g, from = l, to = ends, 
                             mode = 'out', 
                             output = 'vpath')$vpath
-                        mean(sapply(paths, length))
-                    })
+                        mean(vapply(paths, length, 0))
+                    }, 0)
                     st <- names(avg.lineage.length)[
                         which.max(avg.lineage.length)]
                     ends <- leaves[leaves != st]
@@ -300,13 +300,13 @@ setMethod(f = "getLineages",
                 # else, need a criteria for picking root
                 # highest average length (~parsimony)
                 leaves <- rownames(tree.graph)[degree == 1]
-                avg.lineage.length <- sapply(leaves,function(l){
+                avg.lineage.length <- vapply(leaves,function(l){
                     ends <- leaves[leaves != l]
                     paths <- shortest_paths(g, from = l, to = ends, 
                         mode = 'out',
                         output = 'vpath')$vpath
-                    mean(sapply(paths, length))
-                })
+                    mean(vapply(paths, length, 0))
+                }, 0)
                 st <- names(avg.lineage.length)[
                     which.max(avg.lineage.length)]
                 ends <- leaves[leaves != st]
@@ -319,13 +319,13 @@ setMethod(f = "getLineages",
             }
         }
         # sort by number of clusters included
-        lineages <- lineages[order(sapply(lineages, length), 
+        lineages <- lineages[order(vapply(lineages, length, 0), 
             decreasing = TRUE)]
         names(lineages) <- paste('Lineage',seq_along(lineages),sep='')
         
         lineageControl <- list()
-        first <- unique(sapply(lineages,function(l){ l[1] }))
-        last <- unique(sapply(lineages,function(l){ l[length(l)] }))
+        first <- unique(vapply(lineages,function(l){ l[1] },''))
+        last <- unique(vapply(lineages,function(l){ l[length(l)] },''))
         
         lineageControl$start.clus <- first
         lineageControl$end.clus <- last
@@ -377,9 +377,9 @@ setMethod(f = "getLineages",
         
         # convert clusterLabels into cluster weights matrix
         clusters <- unique(clusterLabels)
-        clusWeight <- sapply(clusters,function(clID){
+        clusWeight <- vapply(clusters,function(clID){
             as.numeric(clusterLabels == clID)
-        })
+        },rep(0,nrow(X)))
         colnames(clusWeight) <- clusters
         return(getLineages(data = data, clusterLabels = clusWeight,
             reducedDim = reducedDim,

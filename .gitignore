@@ -8,3 +8,4 @@ vignettes/slingshot_cache
 vignettes/R_figure
 vignettes/slingshot_files
 vignettes/slingshot.html
+tests/testthat/Rplots.pdf

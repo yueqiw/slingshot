@@ -65,8 +65,7 @@ setMethod(
             }
         }else{
             type <- c('curves','lineages','both')[pmatch(type,
-                                                         c('curves',
-                                                           'lineages','both'))]
+                c('curves','lineages','both'))]
             if(is.na(type)){
                 stop('Unrecognized type argument.')
             }
@@ -92,10 +91,10 @@ setMethod(
             connectivity <- slingAdjacency(x)
             clusters <- rownames(connectivity)
             nclus <- nrow(connectivity)
-            centers <- t(sapply(clusters,function(clID){
+            centers <- t(vapply(clusters,function(clID){
                 w <- clusterLabels[,clID]
-                return(apply(X, 2, weighted.mean, w = w))
-            }))
+                return(apply(x, 2, weighted.mean, w = w))
+            }, rep(0,ncol(x))))
             rownames(centers) <- clusters
             X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
             clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
@@ -111,10 +110,10 @@ setMethod(
                 ys <- c(ys, centers[,dims[2]])
             }
             if(curves){
-                xs <- c(xs, as.numeric(sapply(slingCurves(x), 
-                                              function(c){ c$s[,dims[1]] })))
-                ys <- c(ys, as.numeric(sapply(slingCurves(x), 
-                                              function(c){ c$s[,dims[2]] })))
+                xs <- c(xs, as.numeric(vapply(slingCurves(x), 
+                    function(c){ c$s[,dims[1]] }, rep(0,nrow(reducedDim(x))))))
+                ys <- c(ys, as.numeric(vapply(slingCurves(x), 
+                    function(c){ c$s[,dims[2]] }, rep(0,nrow(reducedDim(x))))))
             }
             plot(x = NULL, y = NULL, asp = asp,
                  xlim = range(xs), ylim = range(ys),
@@ -306,6 +305,7 @@ plot3d.SlingshotDataSet <- function(x,
         stop("Package 'rgl' is required for 3D plotting.",
              call. = FALSE)
     }
+    n <- nrow(reducedDim(x))
     curves <- FALSE
     lineages <- FALSE
     if(is.null(type)){
@@ -344,10 +344,10 @@ plot3d.SlingshotDataSet <- function(x,
         connectivity <- slingAdjacency(x)
         clusters <- rownames(connectivity)
         nclus <- nrow(connectivity)
-        centers <- t(sapply(clusters,function(clID){
+        centers <- t(vapply(clusters,function(clID){
             w <- clusterLabels[,clID]
-            return(apply(X, 2, weighted.mean, w = w))
-        }))
+            return(apply(x, 2, weighted.mean, w = w))
+        }, rep(0,ncol(x))))
         rownames(centers) <- clusters
         X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
         clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
@@ -364,12 +364,12 @@ plot3d.SlingshotDataSet <- function(x,
             zs <- c(zs, centers[,dims[3]])
         }
         if(curves){
-            xs <- c(xs, as.numeric(sapply(slingCurves(x), function(c){ 
-                c$s[,dims[1]] })))
-            ys <- c(ys, as.numeric(sapply(slingCurves(x), function(c){ 
-                c$s[,dims[2]] })))
-            zs <- c(zs, as.numeric(sapply(slingCurves(x), function(c){ 
-                c$s[,dims[3]] })))
+            xs <- c(xs, as.numeric(vapply(slingCurves(x), function(c){ 
+                c$s[,dims[1]] }, rep(0,n))))
+            ys <- c(ys, as.numeric(vapply(slingCurves(x), function(c){ 
+                c$s[,dims[2]] }, rep(0,n))))
+            zs <- c(zs, as.numeric(vapply(slingCurves(x), function(c){ 
+                c$s[,dims[3]] }, rep(0,n))))
         }
         rgl::plot3d(x = NULL, y = NULL, z = NULL, aspect = aspect,
                     xlim = range(xs), ylim = range(ys), zlim = range(zs),
@@ -554,10 +554,10 @@ pairs.SlingshotDataSet <-
             forest <- slingAdjacency(sds)
             clusters <- rownames(forest)
             nclus <- nrow(forest)
-            centers <- t(sapply(clusters,function(clID){
+            centers <- t(vapply(clusters,function(clID){
                 w <- clusterLabels[,clID]
                 return(apply(x, 2, weighted.mean, w = w))
-            }))
+            }, rep(0,ncol(x))))
             rownames(centers) <- clusters
             linC <- slingParams(sds)
         }

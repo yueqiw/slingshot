@@ -91,11 +91,12 @@ test_that("getLineages works as expected", {
                        slingLineages(sds0)$Lineage2))
   # set start cluster
   sds1 <- getLineages(rd, cl, start.clus = 2)
-  expect_true(all(sapply(slingLineages(sds1),function(l){ l[1] == '2' })))
+  expect_true(all(vapply(slingLineages(sds1),function(l){ l[1] == '2' },
+      TRUE)))
   # set end cluster
   sds2 <- getLineages(rd,cl, start.clus = 1, end.clus = 3)
-  expect_true(any(sapply(slingLineages(sds2),function(l){ (l[1] == '1') && 
-          (l[length(l)] == '3') })))
+  expect_true(any(vapply(slingLineages(sds2),function(l){ (l[1] == '1') && 
+          (l[length(l)] == '3') }, TRUE)))
 })
 
 test_that("getCurves works as expected", {
@@ -103,6 +104,11 @@ test_that("getCurves works as expected", {
   mi <- getLineages(rd, cl)
   mi <- getCurves(mi)
   expect_equal(length(slingCurves(mi)),2)
+  
+  # 3 lineages
+  mi3 <- getLineages(rd, cl, end.clus = '3')
+  mi3 <- getCurves(mi3)
+  expect_equal(length(slingCurves(mi3)),3)
   
   # one dimension
   m1i <- getLineages(rd[,1,drop = FALSE], cl)
@@ -219,5 +225,13 @@ test_that("slingshot works for different input types", {
     # reducedDim provided as matrix
     c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2))
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
+})
+
+test_that("2D plotting functions don't give errors", {
+    data("slingshotExample")
+    sds <- slingshot(rd,cl)
+    
+    plot(sds)
+    lines(sds)
 })
 

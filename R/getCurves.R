@@ -213,29 +213,29 @@ setMethod(f = "getCurves",
         clusters <- colnames(clusterLabels)
         d <- dim(X); n <- d[1]; p <- d[2]
         nclus <- length(clusters)
-        centers <- t(sapply(clusters,function(clID){
-            w <- clusterLabels[, clID]
-            return(matrixStats::colWeightedMeans(X, w = w))
-        }))
+        centers <- t(vapply(clusters,function(clID){
+            w <- clusterLabels[,clID]
+            return(colWeightedMeans(X, w = w))
+        }, rep(0,ncol(X))))
         if(p == 1){
             centers <- t(centers)
             rownames(centers) <- clusters
         }
         rownames(centers) <- clusters
-        W <- sapply(seq_len(L),function(l){
+        W <- vapply(seq_len(L),function(l){
             rowSums(clusterLabels[, lineages[[l]], drop = FALSE])
-        }) # weighting matrix
+        }, rep(0,nrow(X))) # weighting matrix
         rownames(W) <- rownames(X)
         colnames(W) <- names(lineages)[seq_len(L)]
         W.orig <- W
         D <- W; D[,] <- NA
         
         # determine curve hierarchy
-        C <- as.matrix(sapply(lineages[seq_len(L)], function(lin) {
-            sapply(clusters, function(clID) {
+        C <- as.matrix(vapply(lineages[seq_len(L)], function(lin) {
+            vapply(clusters, function(clID) {
                 as.numeric(clID %in% lin)
-            })
-        }))
+            }, 0)
+        }, rep(0,nclus)))
         rownames(C) <- clusters
         segmnts <- unique(C[rowSums(C)>1,,drop = FALSE])
         segmnts <- segmnts[order(rowSums(segmnts),decreasing = FALSE), ,
@@ -383,7 +383,7 @@ setMethod(f = "getCurves",
                 new.pcurve$w <- W[,l]
                 pcurves[[l]] <- new.pcurve
             }
-            D[,] <- sapply(pcurves, function(p){ p$dist })
+            D[,] <- vapply(pcurves, function(p){ p$dist }, rep(0,nrow(X)))
             
             # shrink together lineages near shared clusters
             if(shrink > 0){
@@ -412,9 +412,9 @@ setMethod(f = "getCurves",
                         })
                         avg <- .avg_curves(to.avg, X, stretch = stretch)
                         avg.lines[[i]] <- avg
-                        common.ind <- rowMeans(sapply(to.avg,
-                            function(crv){
-                                crv$w > 0})) == 1
+                        common.ind <- rowMeans(vapply(to.avg,
+                            function(crv){ crv$w > 0 },
+                            rep(TRUE,nrow(X)))) == 1
                         pct.shrink[[i]] <- lapply(to.avg,function(crv){
                             .percent_shrinkage(crv, common.ind, 
                                 method = shrink.method)
@@ -423,9 +423,9 @@ setMethod(f = "getCurves",
                         # shrunk, then the other curve shouldn't be,
                         # either)
                         new.avg.order <- avg.order
-                        all.zero <- sapply(pct.shrink[[i]], function(pij){
+                        all.zero <- vapply(pct.shrink[[i]], function(pij){
                             return(all(pij == 0))
-                        })
+                        }, TRUE)
                         if(any(all.zero)){
                             if(allow.breaks){
                                 new.avg.order[[i]] <- NULL
@@ -478,7 +478,7 @@ setMethod(f = "getCurves",
                     avg.order <- new.avg.order
                 }
             }
-            D[,] <- sapply(pcurves, function(p){ p$dist })
+            D[,] <- vapply(pcurves, function(p){ p$dist }, rep(0,nrow(X)))
             
             dist.new <- sum(D[W>0], na.rm=TRUE)
             hasConverged <- (abs((dist.old - 

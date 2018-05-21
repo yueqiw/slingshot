@@ -7,7 +7,7 @@ set.seed(1234)
 
 test_that("getLineages works for different input types", {
   reducedDim <- matrix(rnorm(100), ncol = 2)
-  clusterLabels <- rep(1:5, each = 10)
+  clusterLabels <- rep(seq_len(5), each = 10)
   
   # matrix / integer
   mi <- getLineages(reducedDim, clusterLabels)
@@ -69,7 +69,8 @@ test_that("getLineages works for different input types", {
                            clusterLabels), 'has zero columns')
   expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], 
                            clusterLabels), 'has zero rows')
-  expect_error(getLineages(reducedDim, clusterLabels[1:10]), 'must equal')
+  expect_error(getLineages(reducedDim, clusterLabels[seq_len(10)]), 
+      'must equal')
   expect_error(getLineages(reducedDim[-(seq_len(nrow(reducedDim))),], 
                            clusterLabels[integer(0)]), 'has zero rows')
   rdna <- reducedDim; rdna[1,1] <- NA
@@ -129,7 +130,7 @@ test_that("getCurves works as expected", {
 
 test_that("slingshot works for different input types", {
     reducedDim <- matrix(rnorm(100), ncol = 2)
-    clusterLabels <- rep(1:5, each = 10)
+    clusterLabels <- rep(seq_len(5), each = 10)
     
     # matrix / integer
     mi <- slingshot(reducedDim, clusterLabels)
@@ -190,7 +191,7 @@ test_that("slingshot works for different input types", {
                            clusterLabels), 'has zero columns')
     expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], 
                            clusterLabels), 'has zero rows')
-    expect_error(slingshot(reducedDim, clusterLabels[1:10]), 'must equal')
+    expect_error(slingshot(reducedDim, clusterLabels[seq_len(10)]), 'must equal')
     expect_error(slingshot(reducedDim[-(seq_len(nrow(reducedDim))),], 
                            clusterLabels[integer(0)]), 'has zero rows')
     rdna <- reducedDim; rdna[1,1] <- NA

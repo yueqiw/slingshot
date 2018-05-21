@@ -161,7 +161,7 @@ setMethod(
 #'   assignments.
 #' @examples
 #' rd <- matrix(data=rnorm(100), ncol=2)
-#' cl <- sample(letters[1:5], 50, replace = TRUE)
+#' cl <- sample(letters[seq_len(5)], 50, replace = TRUE)
 #' sds <- newSlingshotDataSet(rd, cl)
 #' clusterLabels(sds)
 #' @export

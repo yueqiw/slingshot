@@ -123,8 +123,8 @@ setMethod(
         }
         
         if(lineages){
-            for(i in 1:(nclus-1)){
-                for(j in (i+1):nclus){
+            for(i in seq_len(nclus-1)){
+                for(j in seq(i+1,nclus)){
                     if(connectivity[i,j]==1){
                         seg.col <- 1
                         lines(centers[c(i,j),], lwd = lwd, col = seg.col, ...)
@@ -379,8 +379,8 @@ plot3d.SlingshotDataSet <- function(x,
     }
     
     if(lineages){
-        for(i in 1:(nclus-1)){
-            for(j in (i+1):nclus){
+        for(i in seq_len(nclus-1)){
+            for(j in seq(i+1,nclus)){
                 if(connectivity[i,j]==1){
                     rgl::lines3d(x = centers[c(i,j),dims[1]], 
                                  y = centers[c(i,j),dims[2]],
@@ -576,7 +576,7 @@ pairs.SlingshotDataSet <-
                         RColorBrewer::brewer.pal(6, "Dark2")[-5], 
                         RColorBrewer::brewer.pal(8, "Set3")[-c(1,2)])
             } else {
-                cc <- 1:100
+                cc <- seq_len(100)
             }
             col <- cc[apply(clusterLabels(sds),1,which.max)]
         }
@@ -689,8 +689,8 @@ pairs.SlingshotDataSet <-
                             points(as.vector(x[, j]), as.vector(x[, i]), 
                                    col = col, cex = cex, pch=pch, ...)
                             if(lineages){
-                                for(ii in 1:(nclus-1)){
-                                    for(jj in (ii+1):nclus){
+                                for(ii in seq_len(nclus-1)){
+                                    for(jj in seq(ii+1,nclus)){
                                         if(forest[ii,jj]==1){
                                             seg.col <- 1
                                             lines(centers[c(ii,jj),j], 
@@ -732,8 +732,8 @@ pairs.SlingshotDataSet <-
                             points(as.vector(x[, j]), as.vector(x[, i]), 
                                    col = col, cex = cex, pch=pch, ...)
                             if(lineages){
-                                for(ii in 1:(nclus-1)){
-                                    for(jj in (ii+1):nclus){
+                                for(ii in seq_len(nclus-1)){
+                                    for(jj in seq(ii+1,nclus)){
                                         if(forest[ii,jj]==1){
                                             if(clusters[ii] %in% 
                                                linC$start.clus | 

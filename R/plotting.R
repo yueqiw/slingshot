@@ -93,8 +93,8 @@ setMethod(
             nclus <- nrow(connectivity)
             centers <- t(vapply(clusters,function(clID){
                 w <- clusterLabels[,clID]
-                return(apply(x, 2, weighted.mean, w = w))
-            }, rep(0,ncol(reducedDim(sds)))))
+                return(apply(X, 2, weighted.mean, w = w))
+            }, rep(0,ncol(X))))
             rownames(centers) <- clusters
             X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
             clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
@@ -346,8 +346,8 @@ plot3d.SlingshotDataSet <- function(x,
         nclus <- nrow(connectivity)
         centers <- t(vapply(clusters,function(clID){
             w <- clusterLabels[,clID]
-            return(apply(x, 2, weighted.mean, w = w))
-        }, rep(0,ncol(reducedDim(sds)))))
+            return(apply(X, 2, weighted.mean, w = w))
+        }, rep(0,ncol(X))))
         rownames(centers) <- clusters
         X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
         clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 

@@ -233,5 +233,6 @@ test_that("2D plotting functions don't give errors", {
     
     plot(sds)
     lines(sds)
+    pairs(sds)
 })
 

@@ -5,8 +5,8 @@
 \alias{plot3d.SlingshotDataSet}
 \title{Plot Slingshot output in 3D}
 \usage{
-\method{plot3d}{SlingshotDataSet}(x, type = NULL, add = FALSE, dims = 1:3,
-  aspect = "iso", ...)
+\method{plot3d}{SlingshotDataSet}(x, type = NULL, add = FALSE,
+  dims = seq_len(3), aspect = "iso", ...)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}

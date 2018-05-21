@@ -48,7 +48,7 @@ setMethod(
     definition = function(x, type = NULL,
                           show.constraints = FALSE,
                           add = FALSE,
-                          dims = 1:2,
+                          dims = seq_len(2),
                           asp = 1,
                           cex = 2,
                           lwd = 2,
@@ -94,7 +94,7 @@ setMethod(
             centers <- t(vapply(clusters,function(clID){
                 w <- clusterLabels[,clID]
                 return(apply(x, 2, weighted.mean, w = w))
-            }, rep(0,ncol(x))))
+            }, rep(0,ncol(reducedDim(sds)))))
             rownames(centers) <- clusters
             X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
             clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
@@ -162,7 +162,7 @@ setMethod(
     signature = "SlingshotDataSet",
     definition = function(x,
                           type = NULL,
-                          dims = 1:2,
+                          dims = seq_len(2),
                           ...) {
         plot(x, type = type, add = TRUE, dims = dims, ...)
         invisible(NULL)
@@ -298,7 +298,7 @@ setMethod(
 plot3d.SlingshotDataSet <- function(x,
                                     type = NULL,
                                     add = FALSE,
-                                    dims = 1:3,
+                                    dims = seq_len(3),
                                     aspect = 'iso',
                                     ...){
     if (!requireNamespace("rgl", quietly = TRUE)) {
@@ -347,7 +347,7 @@ plot3d.SlingshotDataSet <- function(x,
         centers <- t(vapply(clusters,function(clID){
             w <- clusterLabels[,clID]
             return(apply(x, 2, weighted.mean, w = w))
-        }, rep(0,ncol(x))))
+        }, rep(0,ncol(reducedDim(sds)))))
         rownames(centers) <- clusters
         X <- X[rowSums(clusterLabels) > 0, , drop = FALSE]
         clusterLabels <- clusterLabels[rowSums(clusterLabels) > 0, , 
@@ -496,7 +496,7 @@ plot3d.SlingshotDataSet <- function(x,
 pairs.SlingshotDataSet <-
     function (x, type = NULL, show.constraints = FALSE, col = NULL, 
               pch = 16, cex=1, lwd=2, ...,
-              labels, horInd = 1:nc, verInd = 1:nc,
+              labels, horInd = seq_len(nc), verInd = seq_len(nc),
               lower.panel = FALSE, upper.panel = TRUE,
               diag.panel = NULL, text.panel = textPanel,
               label.pos = 0.5 + has.diag/3, line.main = 3,
@@ -557,7 +557,7 @@ pairs.SlingshotDataSet <-
             centers <- t(vapply(clusters,function(clID){
                 w <- clusterLabels[,clID]
                 return(apply(x, 2, weighted.mean, w = w))
-            }, rep(0,ncol(x))))
+            }, rep(0,ncol(reducedDim(sds)))))
             rownames(centers) <- clusters
             linC <- slingParams(sds)
         }

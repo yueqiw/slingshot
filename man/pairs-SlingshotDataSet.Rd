@@ -6,11 +6,11 @@
 \title{Pairs plot of Slingshot output}
 \usage{
 \method{pairs}{SlingshotDataSet}(x, type = NULL, show.constraints = FALSE,
-  col = NULL, pch = 16, cex = 1, lwd = 2, ..., labels, horInd = 1:nc,
-  verInd = 1:nc, lower.panel = FALSE, upper.panel = TRUE,
-  diag.panel = NULL, text.panel = textPanel, label.pos = 0.5 + has.diag/3,
-  line.main = 3, cex.labels = NULL, font.labels = 1, row1attop = TRUE,
-  gap = 1)
+  col = NULL, pch = 16, cex = 1, lwd = 2, ..., labels,
+  horInd = seq_len(nc), verInd = seq_len(nc), lower.panel = FALSE,
+  upper.panel = TRUE, diag.panel = NULL, text.panel = textPanel,
+  label.pos = 0.5 + has.diag/3, line.main = 3, cex.labels = NULL,
+  font.labels = 1, row1attop = TRUE, gap = 1)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}

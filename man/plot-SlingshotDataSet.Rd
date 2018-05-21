@@ -8,10 +8,10 @@
 \title{Plot Slingshot output}
 \usage{
 \S4method{plot}{SlingshotDataSet,ANY}(x, type = NULL,
-  show.constraints = FALSE, add = FALSE, dims = 1:2, asp = 1, cex = 2,
-  lwd = 2, ...)
+  show.constraints = FALSE, add = FALSE, dims = seq_len(2), asp = 1,
+  cex = 2, lwd = 2, ...)
 
-\S4method{lines}{SlingshotDataSet}(x, type = NULL, dims = 1:2, ...)
+\S4method{lines}{SlingshotDataSet}(x, type = NULL, dims = seq_len(2), ...)
 }
 \arguments{
 \item{x}{a \code{SlingshotDataSet} with results to be plotted.}

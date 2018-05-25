@@ -44,13 +44,13 @@
 #' @param thresh numeric, determines the convergence criterion. Percent change
 #'   in the total distance from cells to their projections along curves must be
 #'   less than \code{thresh}. Default is \code{0.001}, similar to 
-#'   \code{\link{principal.curve}}.
+#'   \code{\link[princurve]{principal.curve}}.
 #' @param maxit numeric, maximum number of iterations, see 
-#'   \code{\link{principal.curve}}.
+#'   \code{\link[princurve]{principal.curve}}.
 #' @param stretch numeric factor by which curves can be extrapolated beyond 
-#'   endpoints. Default is \code{2}, see \code{\link{principal.curve}}.
+#'   endpoints. Default is \code{2}, see \code{\link[princurve]{principal.curve}}.
 #' @param smoother, choice of scatter plot smoother. Same as 
-#'   \code{\link{principal.curve}}, but \code{"lowess"} option is replaced with 
+#'   \code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is replaced with 
 #'   \code{"loess"} for additional flexibility.
 #' @param shrink logical or numeric between 0 and 1, determines whether and how 
 #'   much to shrink branching lineages toward their average prior to the split.
@@ -90,7 +90,7 @@
 #'   returned.
 #'   
 #' @details When there is only a single lineage, the curve-fitting algorithm is
-#'  nearly identical to that of \code{\link{principal.curve}}. When there are 
+#'  nearly identical to that of \code{\link[princurve]{principal.curve}}. When there are 
 #'  multiple lineages and \code{shrink == TRUE}, an additional step is added to
 #'  the iterative procedure, forcing curves to be similar in the neighborhood
 #' of shared points (ie., before they branch).
@@ -139,7 +139,7 @@
 #'   the starting and ending clusters were specified a priori. Additionally, 
 #'   this will always include \code{dist}, the pairwise cluster distance 
 #'   matrix.}
-#'   \item{curves}{A list of \code{\link{principal.curve}} objects.}}
+#'   \item{curves}{A list of \code{\link[princurve]{principal.curve}} objects.}}
 #'   
 #' @examples
 #' data("slingshotExample")

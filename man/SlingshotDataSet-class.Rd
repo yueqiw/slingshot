@@ -92,7 +92,7 @@ names representing a lineage as an ordered set of clusters.}
 \item{\code{adjacency}}{matrix. A binary matrix describing the adjacency 
 between clusters induced by the minimum spanning tree.}
 
-\item{\code{curves}}{list. A list of \code{principal.curve} objects produced by 
+\item{\code{curves}}{list. A list of \code{\link[princurve]{principal.curve}} objects produced by 
 \code{\link{getCurves}}.}
 
 \item{\code{slingParams}}{list. Additional parameters used by Slingshot. These may 
@@ -131,7 +131,7 @@ Denotes how to determine the amount of shrinkage for a branching lineage.
 Accepted values are the same as for \code{kernel} in  the \code{density} 
 function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 \code{"density"}. See \code{\link{getCurves}} for details.}
-\item{Other parameters specified by \code{\link{principal.curve}}}. }}
+\item{Other parameters specified by \code{\link[princurve]{principal.curve}}}. }}
 
 \item{\code{curveWeights}}{matrix. A matrix of cell weights along each lineage.}
 

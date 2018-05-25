@@ -41,16 +41,16 @@ dropped from the further lineage.}
 \item{thresh}{numeric, determines the convergence criterion. Percent change 
 in the total distance from cells to their projections along curves must be 
 less than \code{thresh}. Default is \code{0.001}, similar to 
-\code{\link{principal.curve}}.}
+\code{\link[princurve]{principal.curve}}.}
 
 \item{maxit}{numeric, maximum number of iterations, see 
-\code{\link{principal.curve}}.}
+\code{\link[princurve]{principal.curve}}.}
 
 \item{stretch}{numeric factor by which curves can be extrapolated beyond 
-endpoints. Default is \code{2}, see \code{\link{principal.curve}}.}
+endpoints. Default is \code{2}, see \code{\link[princurve]{principal.curve}}.}
 
 \item{smoother, }{choice of scatter plot smoother. Same as 
-\code{\link{principal.curve}}, but \code{"lowess"} option is replaced with 
+\code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is replaced with 
 \code{"loess"} for additional flexibility.}
 
 \item{shrink.method}{character denoting how to determine the appropriate 
@@ -65,7 +65,7 @@ to the origin should be allowed to have different starting points.}
 An updated \code{\link{SlingshotDataSet}} object containing the 
   oringinal input, arguments provided to \code{getCurves} as well as the 
   following new elements: \itemize{ \item{curves}{A list of
-  \code{\link{principal.curve}} objects.} \item{slingParams}{Additional
+  \code{\link[princurve]{principal.curve}} objects.} \item{slingParams}{Additional
   parameters used for fitting simultaneous principal curves.}}
 }
 \description{
@@ -79,7 +79,7 @@ This function takes a reduced data matrix \code{n} by \code{p},
 }
 \details{
 When there is only a single lineage, the curve-fitting algorithm is 
-  nearly identical to that of \code{\link{principal.curve}}. When there are 
+  nearly identical to that of \code{\link[princurve]{principal.curve}}. When there are 
   multiple lineages and \code{shrink == TRUE}, an additional step is added to
   the iterative procedure, forcing curves to be similar in the neighborhood 
   of shared points (ie., before they branch).

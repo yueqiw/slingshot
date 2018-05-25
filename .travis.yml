@@ -45,9 +45,8 @@ bioc_packages:
 
 ## install and upgrade dependencies
 install:
- - R -e 'install.packages("remotes")'
- - R -e 'remotes::install_deps(dependencies = T, upgrade = T)'
- - R -e 'remotes::install_local(".")'
+ - R -e 'if ("devtools" %in% rownames(installed.packages())) update.packages(oldPkgs = "devtools", ask = FALSE) else install.packages("devtools")'
+ - R -e 'setRepositories(ind = 1:2); devtools::install(dependencies = TRUE, upgrade = TRUE)'
 
 after_success:
   - Rscript -e 'covr::coveralls()'

@@ -13,7 +13,7 @@ Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
             role = c("aut", "cre", "cph")))
 License: Artistic-2.0
 Depends:
-    R (>= 3.4),
+    R (>= 3.5),
     princurve,
     stats
 Imports:

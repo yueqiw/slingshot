@@ -55,9 +55,6 @@
 #'   function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 #'   \code{"density"}. See \code{\link{getCurves}} for details.}
 #'   \item{Other parameters specified by \code{\link[princurve]{principal.curve}}}. }
-#' @slot curveWeights matrix. A matrix of cell weights along each lineage.
-#' @slot pseudotime matrix. A matrix of pseudotime values or cells' weights
-#'   along each lineage.
 #'   
 #' @return The accessor functions \code{reducedDim}, \code{clusterLabels}, 
 #'   \code{lineages}, \code{adjacency}, \code{curves},

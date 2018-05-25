@@ -3,23 +3,31 @@
 \docType{methods}
 \name{plotGenePseudotime}
 \alias{plotGenePseudotime}
-\alias{plotGenePseudotime,character,SlingshotDataSet,matrix-method}
+\alias{plotGenePseudotime,SlingshotDataSet-method}
+\alias{plotGenePseudotime,SingleCellExperiment-method}
 \title{Plot Gene Expression by Pseudotime}
 \usage{
-plotGenePseudotime(gene, sds, exprs, ...)
+plotGenePseudotime(data, ...)
 
-\S4method{plotGenePseudotime}{character,SlingshotDataSet,matrix}(gene, sds,
-  exprs, loess = TRUE, loessCI = TRUE, ...)
+\S4method{plotGenePseudotime}{SlingshotDataSet}(data, gene, exprs,
+  loess = TRUE, loessCI = TRUE, ...)
+
+\S4method{plotGenePseudotime}{SingleCellExperiment}(data, gene, exprs,
+  loess = TRUE, loessCI = TRUE, ...)
 }
 \arguments{
-\item{gene}{character, the name of the gene to be plotted.}
-
-\item{sds}{a \code{SlingshotDataSet} with curves fitted.}
-
-\item{exprs}{matrix of expression values (genes by samples). Must include a 
-row with a row name of \code{gene}.}
+\item{data}{an object containing \code{\link{slingshot}} output, either a
+\code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}}
+object.}
 
 \item{...}{additional parameters to be passed to \code{\link{plot}}.}
+
+\item{gene}{the gene to be plotted. If \code{exprs} is provided, this may be
+either the gene name or its row index in \code{exprs}. Otherwise, this is
+assumed to be a vector of scaled expression values.}
+
+\item{exprs}{the genes-by-samples matrix of scaled expression values (log
+counts or normalized log counts).}
 
 \item{loess}{logical, whether to include a loess fit in each plot (default is
 \code{TRUE}).}
@@ -39,6 +47,6 @@ data("slingshotExample")
 sds <- slingshot(rd, cl, start.clus = "1")
 ex <- matrix(c(rchisq(100,1),rchisq(20,3),rchisq(20,6)),nrow=1)
 rownames(ex) <- 'Gene-1'
-plotGenePseudotime('Gene-1', sds, ex)
+plotGenePseudotime(sds, 'Gene-1', ex)
 
 }

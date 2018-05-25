@@ -1,31 +1,42 @@
 Package: slingshot
 Title: Tools for ordering single-cell sequencing
-Version: 0.1.2-3
-Description: This package provides functions for determining lineage structure
-    and ordering cellular progressions in single-cell sequencing data.
-Authors@R: c(person("Kelly", "Street", email = "kstreet@berkeley.edu",
+Version: 0.99.6
+Description: Provides functions for inferring continuous, branching 
+    lineage structures in low-dimensional data. Slingshot was designed
+    to model developmental trajectories in single-cell RNA sequencing 
+    data and serve as a component in an analysis pipeline after 
+    dimensionality reduction and clustering. It is flexible enough to 
+    handle arbitrarily many branching events and allows for the 
+    incorporation of prior knowledge through supervised graph 
+    construction.
+Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
             role = c("aut", "cre", "cph")))
-Author: Kelly Street [aut, cre, cph]
-Maintainer: Kelly Street <street.kelly@gmail.com>
 License: Artistic-2.0
 Depends:
-    R (>= 3.4),
-    Biobase,
+    R (>= 3.5),
     princurve,
     stats
 Imports:
     ape,
+    clusterExperiment,
     graphics,
     grDevices,
     igraph,
-    methods
+    matrixStats,
+    methods,
+    rgl,
+    SingleCellExperiment,
+    SummarizedExperiment
 Suggests:
     BiocGenerics,
+    destiny,
+    gam,
     knitr,
     splatter,
+    mclust,
     RColorBrewer,
-    rgl,
     rmarkdown,
+    splatter,
     testthat
 Remotes:
     dynverse/splatter

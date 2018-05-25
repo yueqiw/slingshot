@@ -2,7 +2,7 @@
 #' @name plot-SlingshotDataSet
 #' @aliases plot-SlingshotDataSet plot,SlingshotDataSet,ANY-method
 #'   
-#' @description Tools for visualising lineages inferred by \code{slingshot}.
+#' @description Tools for visualizing lineages inferred by \code{slingshot}.
 #'   
 #' @param x a \code{SlingshotDataSet} with results to be plotted.
 #' @param type character, the type of output to be plotted, can be one of 

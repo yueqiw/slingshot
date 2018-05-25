@@ -42,7 +42,7 @@ existing plot.}
 returns \code{NULL}.
 }
 \description{
-Tools for visualising lineages inferred by \code{slingshot}.
+Tools for visualizing lineages inferred by \code{slingshot}.
 }
 \details{
 If \code{type == 'lineages'}, straight line connectors between

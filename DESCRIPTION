@@ -32,7 +32,6 @@ Suggests:
     destiny,
     gam,
     knitr,
-    splatter,
     mclust,
     RColorBrewer,
     rmarkdown,

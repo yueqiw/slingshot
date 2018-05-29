@@ -36,6 +36,8 @@ existing plot.}
 
 \item{lwd}{numeric, the line width, see \code{\link{par}}.}
 
+\item{col}{character or numeric, the line color, see \code{\link{par}}.}
+
 \item{...}{additional parameters to be passed to \code{\link{lines}}.}
 }
 \value{

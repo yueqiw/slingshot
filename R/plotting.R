@@ -18,6 +18,7 @@
 #' @param cex numeric, amount by which points should be magnified, see
 #'   \code{\link{par}}.
 #' @param lwd numeric, the line width, see \code{\link{par}}.
+#' @param col character or numeric, the line color, see \code{\link{par}}.
 #' @param ... additional parameters to be passed to \code{\link{lines}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between

@@ -52,6 +52,7 @@ setMethod(
                           asp = 1,
                           cex = 2,
                           lwd = 2,
+                          col = 1,
                           ...) {
         curves <- FALSE
         lineages <- FALSE
@@ -125,12 +126,11 @@ setMethod(
             for(i in seq_len(nclus-1)){
                 for(j in seq(i+1,nclus)){
                     if(connectivity[i,j]==1){
-                        seg.col <- 1
-                        lines(centers[c(i,j),], lwd = lwd, col = seg.col, ...)
+                        lines(centers[c(i,j),], lwd = lwd, col = col, ...)
                     }
                 }
             }
-            points(centers, cex = cex, pch = 16)
+            points(centers, cex = cex, pch = 16, col = col)
             if(show.constraints){
                 if(any(linC$start.given)){
                     points(centers[clusters %in% 
@@ -148,7 +148,7 @@ setMethod(
         }
         if(curves){
             for(c in slingCurves(x)){
-                lines(c$s[c$tag,dims], lwd = lwd, ...)
+                lines(c$s[c$tag,dims], lwd = lwd, col = col, ...)
             }
         }
         invisible(NULL)

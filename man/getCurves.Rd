@@ -9,7 +9,7 @@
 getCurves(sds, ...)
 
 \S4method{getCurves}{SlingshotDataSet}(sds, shrink = TRUE, extend = "y",
-  reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15,
+  reweight = TRUE, reassign = TRUE, thresh = 0.001, maxit = 15,
   stretch = 2, smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 }
@@ -30,13 +30,16 @@ when constructing the initial, piece-wise linear curve. Accepted values are
 
 \item{reweight}{logical, whether to allow cells shared between lineages to be
 reweighted during curve-fitting. If \code{TRUE}, cells shared between 
-lineages will be weighted by: distance to nearest curve / distance to
-curve.}
+lineages will be iteratively reweighted based on the quantiles of their
+projection distances to each curve. See 'Details' for more.}
 
-\item{drop.multi}{logical, whether to drop shared cells from lineages which 
-do not fit them well. If \code{TRUE}, shared cells with a distance to one 
-lineage above the 90th percentile and another below the 50th will be
-dropped from the further lineage.}
+\item{reassign}{logical, whether to reassign cells to lineages at each
+iteration. If \code{TRUE}, cells will be added to a lineage when their
+projection distance to the curve is less than the median distance for all
+cells currently assigned to the lineage. Additionally, shared cells will be
+removed from a lineage if their projection distance to the curve is above
+the 90th percentile and their weight along the curve is less than
+\code{0.1}.}
 
 \item{thresh}{numeric, determines the convergence criterion. Percent change 
 in the total distance from cells to their projections along curves must be 
@@ -96,7 +99,7 @@ The \code{extend} argument determines how to construct the
   options typically have little to no impact on the final curve, but can
   occasionally help with stability issues.
 
-When \code{shink == TRUE}, we compute a shrinkage curve,
+When \code{shink = TRUE}, we compute a shrinkage curve,
   \eqn{w_l(t)}, for each lineage, a non-increasing function of pseudotime
   that determines how much that lineage should be shrunk toward a shared
   average curve. We set \eqn{w_l(0) = 1}, so that the curves will perfectly
@@ -109,6 +112,13 @@ When \code{shink == TRUE}, we compute a shrinkage curve,
   since we require a decreasing function). Different choices of
   \code{shrink.method} seem to have little impact on the final curves, in 
   most cases.
+
+When \code{reweight = TRUE}, weights for shared cells are based on
+  the quantiles of their projection distances onto each curve. The
+  distances are ranked and converted into quantiles between \code{0} and
+  \code{1}, which are then transformed by \code{1 - q^2}. Each cell's weight
+  along a given lineage is the ratio of this value to the maximum value for
+  this cell across all lineages.
 }
 \examples{
 data("slingshotExample")

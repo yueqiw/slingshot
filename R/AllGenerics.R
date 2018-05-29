@@ -39,15 +39,18 @@
 #'   piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
 #'   See \code{\link{getCurves}} for details.} 
 #'   \item{\code{reweight}}{logical. 
-#'   Indicates whether to reweight cells shared by multiple lineages during 
-#'   curve-fitting. If \code{TRUE}, cells shared between lineages will have 
-#'   lineage-specific weights determined by the ratio: (distance to nearest 
-#'   curve) / (distance to specific curve).} 
-#'   \item{\code{drop.multi}}{logical. 
-#'   Indicates whether to drop shared cells from lineages which do not fit them 
-#'   well. If \code{TRUE}, shared cells with a distance to one lineage above the
-#'   90th percentile and another lineage below the 50th percentile will be 
-#'   dropped from the farther lineage.} 
+#'   Indicates whether to allow cells shared
+#'   between lineages to be reweighted during curve-fitting. If \code{TRUE},
+#'   cells shared between lineages will be iteratively reweighted based on the
+#'   quantiles of their projection distances to each curve.} 
+#'   \item{\code{reassign}}{logical. 
+#'   Indicates whether to reassign cells to
+#'   lineages at each iteration. If \code{TRUE}, cells will be added to a
+#'   lineage when their projection distance to the curve is less than the median
+#'   distance for all cells currently assigned to the lineage. Additionally,
+#'   shared cells will be removed from a lineage if their projection distance to
+#'   the curve is above the 90th percentile and their weight along the curve is
+#'   less than \code{0.1}.}
 #'   \item{\code{shrink.method}}{character. 
 #'   Denotes how to determine the amount of shrinkage for a branching lineage. 
 #'   Accepted values are the same as for \code{kernel} in  the \code{density} 

@@ -70,6 +70,7 @@
 #' @importFrom igraph graph.adjacency
 #' @importFrom igraph shortest_paths
 #' @importFrom ape mst
+#' @import matrixStats
 #'   
 setMethod(f = "getLineages",
     signature = signature(data = "matrix", 

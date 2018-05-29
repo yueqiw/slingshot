@@ -18,12 +18,15 @@
 #'   \code{'y'} (default), \code{'n'}, and \code{'pc1'}. See 'Details' for more.
 #' @param reweight logical, whether to allow cells shared between lineages to be
 #'   reweighted during curve-fitting. If \code{TRUE}, cells shared between 
-#'   lineages will be weighted by: distance to nearest curve / distance to
-#'   curve.
-#' @param drop.multi logical, whether to drop shared cells from lineages which 
-#'   do not fit them well. If \code{TRUE}, shared cells with a distance to one 
-#'   lineage above the 90th percentile and another below the 50th will be
-#'   dropped from the further lineage.
+#'   lineages will be iteratively reweighted based on the quantiles of their
+#'   projection distances to each curve. See 'Details' for more.
+#' @param reassign logical, whether to reassign cells to lineages at each
+#'   iteration. If \code{TRUE}, cells will be added to a lineage when their
+#'   projection distance to the curve is less than the median distance for all
+#'   cells currently assigned to the lineage. Additionally, shared cells will be
+#'   removed from a lineage if their projection distance to the curve is above
+#'   the 90th percentile and their weight along the curve is less than
+#'   \code{0.1}.
 #' @param thresh numeric, determines the convergence criterion. Percent change 
 #'   in the total distance from cells to their projections along curves must be 
 #'   less than \code{thresh}. Default is \code{0.001}, similar to 
@@ -62,7 +65,7 @@
 #'   options typically have little to no impact on the final curve, but can
 #'   occasionally help with stability issues.
 #'   
-#' @details When \code{shink == TRUE}, we compute a shrinkage curve,
+#' @details When \code{shink = TRUE}, we compute a shrinkage curve,
 #'   \eqn{w_l(t)}, for each lineage, a non-increasing function of pseudotime
 #'   that determines how much that lineage should be shrunk toward a shared
 #'   average curve. We set \eqn{w_l(0) = 1}, so that the curves will perfectly
@@ -75,6 +78,13 @@
 #'   since we require a decreasing function). Different choices of
 #'   \code{shrink.method} seem to have little impact on the final curves, in 
 #'   most cases.
+#'   
+#' @details When \code{reweight = TRUE}, weights for shared cells are based on
+#'   the quantiles of their projection distances onto each curve. The
+#'   distances are ranked and converted into quantiles between \code{0} and
+#'   \code{1}, which are then transformed by \code{1 - q^2}. Each cell's weight
+#'   along a given lineage is the ratio of this value to the maximum value for
+#'   this cell across all lineages.
 #'   
 #' @return An updated \code{\link{SlingshotDataSet}} object containing the 
 #'   oringinal input, arguments provided to \code{getCurves} as well as the 
@@ -103,7 +113,7 @@ setMethod(f = "getCurves",
         shrink = TRUE, 
         extend = 'y', 
         reweight = TRUE,
-        drop.multi = TRUE, 
+        reassign = TRUE, 
         thresh = 0.001, maxit = 15, stretch = 2, 
         smoother = 'smooth.spline', 
         shrink.method = 'cosine',
@@ -118,7 +128,7 @@ setMethod(f = "getCurves",
             shrink = shrink,
             extend = extend,
             reweight = reweight,
-            drop.multi = drop.multi,
+            reassign = reassign,
             shrink.method = shrink.method
         )
         
@@ -345,25 +355,39 @@ setMethod(f = "getCurves",
             it <- it + 1
             dist.old <- dist.new
             
+            if(reweight | reassign){
+                Z <- D; Z[,] <- NA
+                colMed <- rep(NA,L)
+                for(l in seq_len(L)){
+                    idx <- W[,l] > 0
+                    Z[idx,l] <- rank(D[idx,l]) / (sum(idx)+1) #avoid 0
+                    colMed[l] <- weightedMedian(D[idx,l], w = W[idx,l])
+                }
+            }
             if(reweight){
-                W <- rowMins(D) / D
+                Z.prime <- 1-Z^2
+                W0 <- W
+                W <- Z.prime / rowMaxs(Z.prime,na.rm = TRUE) #rowMins(D) / D
+                W[is.nan(W)] <- 1 # handle 0/0
+                W[is.na(W)] <- 0
+                W[W > 1] <- 1
+                W[W < 0] <- 0
+                W[W0==0] <- 0
+            }
+            if(reassign){
+                # add if z < .5
+                idx <- t(t(D) < colMed)
+                W[idx] <- 1 #(rowMins(D) / D)[idx]
                 W[is.nan(W)] <- 1 # handle 0/0
                 W[W > 1] <- 1
                 W[W < 0] <- 0
-                W[W.orig==0] <- 0
-            }
-            
-            if(drop.multi){
-                Z <- D; Z[,] <- NA
-                for(l in seq_len(L)){
-                    idx <- W[,l] > 0
-                    Z[idx,l] <- rank(D[idx,l]) / sum(idx)
-                }
+                
+                # drop if z > .9 and w < .1
                 ridx <- rowMaxs(Z, na.rm = TRUE) > .9 & 
-                    rowMins(Z, na.rm = TRUE) <= .5
+                    rowMins(W, na.rm = TRUE) < .1
                 W0 <- W[ridx, ]
                 Z0 <- Z[ridx, ]
-                W0[!is.na(Z0) & Z0 > .9] <- 0
+                W0[!is.na(Z0) & Z0 > .9 & W0 < .1] <- 0
                 W[ridx, ] <- W0
             }
             
@@ -373,8 +397,8 @@ setMethod(f = "getCurves",
                 s <- pcurve$s
                 ord <- order(pcurve$lambda)
                 for(jj in seq_len(p)){
-                    s[, jj] <- smootherFcn(pcurve$lambda, X[,jj], 
-                        w = pcurve$w, ...)[ord]
+                    s[, jj] <- smootherFcn(pcurve$lambda, X[,jj], w = pcurve$w,
+                        ...)[ord]
                 }
                 new.pcurve <- .get_lam(X, s = s, stretch = stretch)
                 new.pcurve$dist <- abs(new.pcurve$dist)
@@ -485,25 +509,39 @@ setMethod(f = "getCurves",
                     dist.new)/dist.old) <= thresh)
         }
         
+        if(reweight | reassign){
+            Z <- D; Z[,] <- NA
+            colMed <- rep(NA,L)
+            for(l in seq_len(L)){
+                idx <- W[,l] > 0
+                Z[idx,l] <- rank(D[idx,l]) / (sum(idx)+1) #avoid 0
+                colMed[l] <- weightedMedian(D[idx,l], w = W[idx,l])
+            }
+        }
         if(reweight){
-            W <- rowMins(D) / D
+            Z.prime <- 1-Z^2
+            W0 <- W
+            W <- Z.prime / rowMaxs(Z.prime,na.rm = TRUE) #rowMins(D) / D
+            W[is.nan(W)] <- 1 # handle 0/0
+            W[is.na(W)] <- 0
+            W[W > 1] <- 1
+            W[W < 0] <- 0
+            W[W0==0] <- 0
+        }
+        if(reassign){
+            # add if z < .5
+            idx <- t(t(D) < colMed)
+            W[idx] <- 1 #(rowMins(D) / D)[idx]
             W[is.nan(W)] <- 1 # handle 0/0
             W[W > 1] <- 1
             W[W < 0] <- 0
-            W[W.orig==0] <- 0
-        }
-        
-        if(drop.multi){
-            Z <- D; Z[,] <- NA
-            for(l in seq_len(L)){
-                idx <- W[,l] > 0
-                Z[idx,l] <- rank(D[idx,l]) / sum(idx)
-            }
+            
+            # drop if z > .9 and w < .1
             ridx <- rowMaxs(Z, na.rm = TRUE) > .9 & 
-                rowMins(Z, na.rm = TRUE) <= .5
+                rowMins(W, na.rm = TRUE) < .1
             W0 <- W[ridx, ]
             Z0 <- Z[ridx, ]
-            W0[!is.na(Z0) & Z0 > .9] <- 0
+            W0[!is.na(Z0) & Z0 > .9 & W0 < .1] <- 0
             W[ridx, ] <- W0
         }
         
@@ -518,19 +556,8 @@ setMethod(f = "getCurves",
             pcurve$pseudotime[pcurve$w==0] <- NA
         }
         
-        #pseudotime <- sapply(pcurves, function(pc) { pc$lambda })
-        #weights <- sapply(seq_len(L), function(l) { W[,l] })
-        #rownames(weights) <- rownames(X)
-        #colnames(weights) <- names(pcurves)
-        #pseudotime[weights == 0] <- NA
-        #rownames(pseudotime) <- rownames(X)
-        #colnames(pseudotime) <- names(pcurves)
-        
-        # sds@curves <- pcurves
         .slingCurves(sds) <- pcurves
-        #sds@pseudotime <- pseudotime
-        #sds@curveWeights <- weights
-        
+
         validObject(sds)
         return(sds)
     })

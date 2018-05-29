@@ -18,7 +18,7 @@
 #' @param cex numeric, amount by which points should be magnified, see
 #'   \code{\link{par}}.
 #' @param lwd numeric, the line width, see \code{\link{par}}.
-#' @param col character or numeric, the line color, see \code{\link{par}}.
+#' @param col character or numeric, color(s) for lines, see \code{\link{par}}.
 #' @param ... additional parameters to be passed to \code{\link{lines}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
@@ -55,6 +55,7 @@ setMethod(
                           lwd = 2,
                           col = 1,
                           ...) {
+        col <- rep(col, length(slingLineages(x)))
         curves <- FALSE
         lineages <- FALSE
         if(is.null(type)){
@@ -148,8 +149,9 @@ setMethod(
             
         }
         if(curves){
-            for(c in slingCurves(x)){
-                lines(c$s[c$tag,dims], lwd = lwd, col = col, ...)
+            for(ii in seq_along(slingCurves(x))){
+                c <- slingCurves(x)[[ii]]
+                lines(c$s[c$tag,dims], lwd = lwd, col = col[ii], ...)
             }
         }
         invisible(NULL)

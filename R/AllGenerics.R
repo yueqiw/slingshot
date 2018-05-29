@@ -56,8 +56,8 @@
 #'   Accepted values are the same as for \code{kernel} in  the \code{density} 
 #'   function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 #'   \code{"density"}. See \code{\link{getCurves}} for details.} 
-#'   \item{Other parameters specified by \code{\link{principal.curve}}}. }
-#' @param curves list. A list of \code{principal.curve} objects produced by 
+#'   \item{Other parameters specified by \code{\link[princurve]{principal.curve}}}. }
+#' @param curves list. A list of \code{\link[princurve]{principal.curve}} objects produced by 
 #'   \code{\link{getCurves}}.
 #'   
 #' @return A \code{SlingshotDataSet} object with all specified values.
@@ -122,6 +122,7 @@ setGeneric(
 )
 
 #' @title Perform lineage inference with Slingshot
+#' @description Perform lineage inference with Slingshot
 #' @name slingshot
 #' @export
 setGeneric(
@@ -132,7 +133,6 @@ setGeneric(
         standardGeneric("slingshot")
     }
 )
-
 
 #' @title Extract the Slingshot lineages
 #' @name slingLineages
@@ -190,7 +190,7 @@ setGeneric(name = "slingParams",
 #'   
 #' @param x an object containing \code{\link{slingshot}} output.
 #' @return the list of smooth lineage curves, each of which is a
-#'   \code{\link{principal.curve}} object.
+#'   \code{\link[princurve]{principal.curve}} object.
 #' @examples
 #' data("slingshotExample")
 #' sds <- slingshot(rd, cl)
@@ -253,9 +253,3 @@ setGeneric(
         standardGeneric("plotGenePseudotime")
     }
 )
-
-# # plot3d generic, in case rgl is not loaded
-# #' @export
-# plot3d <- function(x, ...){
-#     UseMethod('plot3d')
-# }

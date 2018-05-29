@@ -1,5 +1,5 @@
+#' @title Plot Slingshot output 
 #' @name plot-SlingshotDataSet
-#' @title Plot Slingshot output
 #' @aliases plot-SlingshotDataSet plot,SlingshotDataSet,ANY-method
 #'   
 #' @description Tools for visualizing lineages inferred by \code{slingshot}.
@@ -22,7 +22,7 @@
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
 #'   cluster centers will be plotted. If \code{type == 'curves'}, simultaneous
-#'   princiapl curves will be plotted.
+#'   principal curves will be plotted.
 #'   
 #' @details When \code{type} is not specified, the function will first check the
 #'   \code{curves} slot and plot the curves, if present. Otherwise,

@@ -3,32 +3,33 @@
 #----------------------------
 ^.svn
 ^.git
-README[.]md
-NEWS[.]md
+README\.md
+NEWS\.md
 
 #----------------------------
 # Travis-CI et al.
 #----------------------------
-^[.]travis[.]yml$
-^travis-tool[.]sh$
-^pkg-build[.]sh$
-^appveyor[.]yml$
+^\.travis
+^travis-tool\.sh$
+^pkg-build\.sh$
+^appveyor\.yml$
 ^covr-utils.R$
-^[.]coveralls[.]R$
+^\.coveralls\.R$
 
 #----------------------------
 # R related
 #----------------------------
-^cran-comments[.].*$
-^vignettes/.*[.](pdf|PDF)$
-^vignettes/.*[.](r|R)$
-^vignettes/[.]install_extras$
+^cran-comments\..*$
+^vignettes/.*\.(pdf|PDF)$
+^vignettes/.*\.(r|R)$
+^vignettes/\.install_extras$
+^vignettes/.*\.bib$
 ^Makefile$
 ^incl
-^NAMESPACE,.*[.]txt$
+^NAMESPACE,.*\.txt$
 ^nohup.*$
-^[.]devel
-^[.]test
-^[.]check
+^\.devel
+^\.test
+^\.check
 ^.*\.Rproj$
 ^\.Rproj\.user$

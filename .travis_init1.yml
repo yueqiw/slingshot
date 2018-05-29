@@ -17,6 +17,10 @@ cache: packages
 r:
   - bioc-release
   - bioc-devel
+
+env:
+  global:
+    - _R_CHECK_FORCE_SUGGESTS_="FALSE"
   
 # dependency for gsl>copula>zinbwave>splatter
 addons:
@@ -25,23 +29,10 @@ addons:
       - libgsl-dev
 
 ## Turn this to true before submission to CRAN/Bioconductor
-warnings_are_errors: true
+warnings_are_errors: false
 
+r_check_args: "--no-tests --no-manual --no-vignettes --no-build-vignettes --no-examples"
 r_build_args: "--no-build-vignettes"
-r_check_args: "--no-vignettes"
-
-notifications:
-  email:
-    on_success: change
-    on_failure: change
-
-## Code coverage
-r_packages:
-  - covr
-
-## BiocCheck
-bioc_packages:
-  - BiocCheck
 
 ## To appease rgl
 before_script:
@@ -52,8 +43,7 @@ before_script:
 ## install and upgrade dependencies
 install:
  - R -e 'if ("devtools" %in% rownames(installed.packages())) update.packages(oldPkgs = "devtools", ask = FALSE) else install.packages("devtools")'
- - R -e 'setRepositories(ind = 1:2); devtools::install(dependencies = TRUE, upgrade = TRUE)'
+ - R -e 'setRepositories(ind = 1:2); devtools::install()'
 
 after_success:
-  - Rscript -e 'covr::coveralls()'
-  - R CMD BiocCheck .
+  - echo init 1 done!

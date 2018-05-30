@@ -44,8 +44,8 @@ names representing a lineage as an ordered set of clusters.}
 \item{adjacency}{matrix. A binary matrix describing the connectivity 
 between clusters induced by the minimum spanning tree.}
 
-\item{curves}{list. A list of \code{\link[princurve]{principal.curve}} objects produced by 
-\code{\link{getCurves}}.}
+\item{curves}{list. A list of \code{\link[princurve]{principal.curve}}
+objects produced by \code{\link{getCurves}}.}
 
 \item{slingParams}{list. Additional parameters used by Slingshot. These may 
 specify how the minimum spanning tree on clusters was constructed: 
@@ -86,7 +86,8 @@ Denotes how to determine the amount of shrinkage for a branching lineage.
 Accepted values are the same as for \code{kernel} in  the \code{density} 
 function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 \code{"density"}. See \code{\link{getCurves}} for details.} 
-\item{Other parameters specified by \code{\link[princurve]{principal.curve}}}. }}
+\item{Other parameters specified by 
+\code{\link[princurve]{principal.curve}}}. }}
 }
 \value{
 A \code{SlingshotDataSet} object with all specified values.

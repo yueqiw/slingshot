@@ -1,5 +1,5 @@
 #' @rdname getCurves
-#'   
+#' 
 #' @description This function takes a reduced data matrix \code{n} by \code{p}, 
 #'   a vector of cluster identities (optionally including \code{-1}'s for 
 #'   "unclustered"), and a set of lineages consisting of paths through a forest 
@@ -18,14 +18,14 @@
 #'   \code{'y'} (default), \code{'n'}, and \code{'pc1'}. See 'Details' for more.
 #' @param reweight logical, whether to allow cells shared between lineages to be
 #'   reweighted during curve-fitting. If \code{TRUE}, cells shared between 
-#'   lineages will be iteratively reweighted based on the quantiles of their
+#'   lineages will be iteratively reweighted based on the quantiles of their 
 #'   projection distances to each curve. See 'Details' for more.
-#' @param reassign logical, whether to reassign cells to lineages at each
-#'   iteration. If \code{TRUE}, cells will be added to a lineage when their
-#'   projection distance to the curve is less than the median distance for all
+#' @param reassign logical, whether to reassign cells to lineages at each 
+#'   iteration. If \code{TRUE}, cells will be added to a lineage when their 
+#'   projection distance to the curve is less than the median distance for all 
 #'   cells currently assigned to the lineage. Additionally, shared cells will be
-#'   removed from a lineage if their projection distance to the curve is above
-#'   the 90th percentile and their weight along the curve is less than
+#'   removed from a lineage if their projection distance to the curve is above 
+#'   the 90th percentile and their weight along the curve is less than 
 #'   \code{0.1}.
 #' @param thresh numeric, determines the convergence criterion. Percent change 
 #'   in the total distance from cells to their projections along curves must be 
@@ -34,12 +34,13 @@
 #' @param maxit numeric, maximum number of iterations, see 
 #'   \code{\link[princurve]{principal.curve}}.
 #' @param stretch numeric factor by which curves can be extrapolated beyond 
-#'   endpoints. Default is \code{2}, see \code{\link[princurve]{principal.curve}}.
+#'   endpoints. Default is \code{2}, see
+#'   \code{\link[princurve]{principal.curve}}.
 #' @param smoother, choice of scatter plot smoother. Same as 
-#'   \code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is replaced with 
-#'   \code{"loess"} for additional flexibility.
+#'   \code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is
+#'   replaced with \code{"loess"} for additional flexibility.
 #' @param shrink.method character denoting how to determine the appropriate 
-#'   amount of shrinkage for a branching lineage. Accepted values are the same
+#'   amount of shrinkage for a branching lineage. Accepted values are the same 
 #'   as for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}),
 #'   as well as \code{"tricube"} and \code{"density"}. See 'Details' for more.
 #' @param allow.breaks logical, determines whether curves that branch very close
@@ -48,10 +49,10 @@
 #'   \code{smoother}.
 #'   
 #' @details When there is only a single lineage, the curve-fitting algorithm is 
-#'   nearly identical to that of \code{\link[princurve]{principal.curve}}. When there are 
-#'   multiple lineages and \code{shrink == TRUE}, an additional step is added to
-#'   the iterative procedure, forcing curves to be similar in the neighborhood 
-#'   of shared points (ie., before they branch).
+#'   nearly identical to that of \code{\link[princurve]{principal.curve}}. When
+#'   there are multiple lineages and \code{shrink == TRUE}, an additional step
+#'   is added to the iterative procedure, forcing curves to be similar in the
+#'   neighborhood of shared points (ie., before they branch).
 #'   
 #' @details The \code{extend} argument determines how to construct the
 #'   piece-wise linear curve used to initiate the recursive algorithm. The
@@ -88,9 +89,10 @@
 #'   
 #' @return An updated \code{\link{SlingshotDataSet}} object containing the 
 #'   oringinal input, arguments provided to \code{getCurves} as well as the 
-#'   following new elements: \itemize{ \item{curves}{A list of
-#'   \code{\link[princurve]{principal.curve}} objects.} \item{slingParams}{Additional
-#'   parameters used for fitting simultaneous principal curves.}}
+#'   following new elements: \itemize{ \item{curves}{A list of 
+#'   \code{\link[princurve]{principal.curve}} objects.}
+#'   \item{slingParams}{Additional parameters used for fitting simultaneous
+#'   principal curves.}}
 #'   
 #' @references Hastie, T., and Stuetzle, W. (1989). "Principal Curves."
 #'   \emph{Journal of the American Statistical Association}, 84:502--516.

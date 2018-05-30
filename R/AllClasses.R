@@ -16,8 +16,8 @@
 #'   names representing a lineage as an ordered set of clusters.
 #' @slot adjacency matrix. A binary matrix describing the adjacency 
 #'   between clusters induced by the minimum spanning tree.
-#' @slot curves list. A list of \code{\link[princurve]{principal.curve}} objects produced by 
-#'   \code{\link{getCurves}}.
+#' @slot curves list. A list of \code{\link[princurve]{principal.curve}} objects
+#'   produced by \code{\link{getCurves}}.
 #' @slot slingParams list. Additional parameters used by Slingshot. These may 
 #'   specify how the minimum spanning tree on clusters was constructed: 
 #'   \itemize{ 
@@ -57,7 +57,8 @@
 #'   Accepted values are the same as for \code{kernel} in  the \code{density} 
 #'   function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 #'   \code{"density"}. See \code{\link{getCurves}} for details.}
-#'   \item{Other parameters specified by \code{\link[princurve]{principal.curve}}}. }
+#'   \item{Other parameters specified by 
+#'   \code{\link[princurve]{principal.curve}}}. }
 #'   
 #' @return The accessor functions \code{reducedDim}, \code{clusterLabels}, 
 #'   \code{lineages}, \code{adjacency}, \code{curves},

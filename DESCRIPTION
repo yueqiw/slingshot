@@ -12,7 +12,8 @@ Description: Provides functions for inferring continuous, branching
 Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
             role = c("aut", "cre", "cph")),
 	     person("Davide","Risso", role = "aut",email = "risso.davide@gmail.com"),
-             person("Diya","Das", role = "aut", email = "diyadas@berkeley.edu"))
+             person("Diya","Das", role = "aut", email = "diyadas@berkeley.edu"),
+             person("Robrecht","Cannoodt", role = "ctb"))
 License: Artistic-2.0
 Depends:
     R (>= 3.5),

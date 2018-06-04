@@ -358,16 +358,15 @@ setMethod(f = "getCurves",
             dist.old <- dist.new
             
             if(reweight | reassign){
-                Z <- D; Z[,] <- NA
-                colMed <- rep(NA,L)
-                for(l in seq_len(L)){
-                    idx <- W[,l] > 0
-                    Z[idx,l] <- rank(D[idx,l]) / (sum(idx)+1) #avoid 0
-                    colMed[l] <- weightedMedian(D[idx,l], w = W[idx,l])
-                }
+                ordD <- order(D)
+                W.prob <- W/rowSums(W)
+                WrnkD <- cumsum(W.prob[ordD]) / sum(W.prob)
+                Z <- D
+                Z[ordD] <- WrnkD
             }
             if(reweight){
                 Z.prime <- 1-Z^2
+                Z.prime[W==0] <- NA
                 W0 <- W
                 W <- Z.prime / rowMaxs(Z.prime,na.rm = TRUE) #rowMins(D) / D
                 W[is.nan(W)] <- 1 # handle 0/0
@@ -378,12 +377,9 @@ setMethod(f = "getCurves",
             }
             if(reassign){
                 # add if z < .5
-                idx <- t(t(D) < colMed)
+                idx <- Z < .5
                 W[idx] <- 1 #(rowMins(D) / D)[idx]
-                W[is.nan(W)] <- 1 # handle 0/0
-                W[W > 1] <- 1
-                W[W < 0] <- 0
-                
+
                 # drop if z > .9 and w < .1
                 ridx <- rowMaxs(Z, na.rm = TRUE) > .9 & 
                     rowMins(W, na.rm = TRUE) < .1
@@ -512,16 +508,15 @@ setMethod(f = "getCurves",
         }
         
         if(reweight | reassign){
-            Z <- D; Z[,] <- NA
-            colMed <- rep(NA,L)
-            for(l in seq_len(L)){
-                idx <- W[,l] > 0
-                Z[idx,l] <- rank(D[idx,l]) / (sum(idx)+1) #avoid 0
-                colMed[l] <- weightedMedian(D[idx,l], w = W[idx,l])
-            }
+            ordD <- order(D)
+            W.prob <- W/rowSums(W)
+            WrnkD <- cumsum(W.prob[ordD]) / sum(W.prob)
+            Z <- D
+            Z[ordD] <- WrnkD
         }
         if(reweight){
             Z.prime <- 1-Z^2
+            Z.prime[W==0] <- NA
             W0 <- W
             W <- Z.prime / rowMaxs(Z.prime,na.rm = TRUE) #rowMins(D) / D
             W[is.nan(W)] <- 1 # handle 0/0
@@ -532,12 +527,9 @@ setMethod(f = "getCurves",
         }
         if(reassign){
             # add if z < .5
-            idx <- t(t(D) < colMed)
+            idx <- Z < .5
             W[idx] <- 1 #(rowMins(D) / D)[idx]
-            W[is.nan(W)] <- 1 # handle 0/0
-            W[W > 1] <- 1
-            W[W < 0] <- 0
-            
+
             # drop if z > .9 and w < .1
             ridx <- rowMaxs(Z, na.rm = TRUE) > .9 & 
                 rowMins(W, na.rm = TRUE) < .1

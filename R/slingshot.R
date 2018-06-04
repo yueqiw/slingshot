@@ -368,6 +368,11 @@ setMethod(f = "slingshot",
                              ' Continuing with one cluster.')
               clusterLabels <- rep('1', nrow(data))
             }
+            if(! any(c(length(clusterLabels), nrow(clusterLabels)) == 
+                    nrow(data))){
+                stop("clusterLabels must have length or number of rows equal',
+                    'to nrow(data).")
+            }
             return(slingshot(data = data, clusterLabels = clusterLabels,
                              reducedDim = reducedDim,
                              start.clus = start.clus, end.clus = end.clus,

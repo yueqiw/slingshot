@@ -58,7 +58,7 @@ setMethod(
             names(clusterLabels) <- rownames(reducedDim)
         }
         clusW <- table(rownames(reducedDim), clusterLabels)
-        clusW <- clusW[match(rownames(reducedDim),rownames(clusW)),]
+        clusW <- clusW[match(rownames(reducedDim),rownames(clusW)), ,drop=FALSE]
         class(clusW) <- 'matrix'
         return(newSlingshotDataSet(reducedDim, clusW, ...))
     })

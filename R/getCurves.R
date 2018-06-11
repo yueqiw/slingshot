@@ -541,14 +541,9 @@ setMethod(f = "getCurves",
         
         for(l in seq_len(L)){
             class(pcurves[[l]]) <- 'principal.curve'
+            pcurves[[l]]$w <- W[,l]
         }
         names(pcurves) <- paste('curve',seq_along(pcurves),sep='')
-        
-        for(l in seq_len(L)){
-            pcurve$pseudotime <- pcurve$lambda
-            pcurve$w <- W[,l]
-            pcurve$pseudotime[pcurve$w==0] <- NA
-        }
         
         .slingCurves(sds) <- pcurves
 

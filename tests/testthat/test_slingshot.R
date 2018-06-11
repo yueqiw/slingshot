@@ -236,3 +236,32 @@ test_that("2D plotting functions don't give errors", {
     pairs(sds)
 })
 
+test_that("predict works as expected", {
+    sds <- slingshot(rd, cl)
+    pred <- predict(sds)
+    expect_identical(sds, pred)
+    
+    x.mat <- cbind(runif(100, min = -5, max = 10), 
+        runif(100, min = -4, max = 4))
+    pred <- predict(sds, x.mat)
+    expect_true(all(clusterLabels(pred)==0))
+    expect_equal(length(slingLineages(pred)), 0)
+    expect_equal(length(slingCurves(pred)), 2)
+    
+    x.df <- as.data.frame(x.mat)
+    pred <- predict(sds, x.df)
+    expect_equal(length(slingCurves(pred)), 2)
+    
+    # invalid inputs
+    x.text <- x.mat
+    x.text[1,1] <- 'text'
+    expect_error(predict(sds, x.text), 'must only contain numeric values')
+    
+    x.na <- x.mat
+    x.na[1,1] <- NA
+    expect_error(predict(sds, x.na), 'cannot contain missing values')
+    
+    x.big <- cbind(x.mat, rnorm(100))
+    expect_error(predict(sds, x.big),
+        'does not match original number of dimensions')
+})

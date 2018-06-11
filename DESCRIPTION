@@ -14,6 +14,7 @@ Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
 	     person("Davide","Risso", role = "aut",email = "risso.davide@gmail.com"),
              person("Diya","Das", role = "aut", email = "diyadas@berkeley.edu"),
              person("Sandrine","Dudoit", role = "ths", email = "sandrine@stat.berkeley.edu"),
+             person("Koen","Van den Berge", role = "ctb"),
              person("Robrecht","Cannoodt", role = "ctb"))
 License: Artistic-2.0
 Depends:

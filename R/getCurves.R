@@ -30,14 +30,14 @@
 #' @param thresh numeric, determines the convergence criterion. Percent change 
 #'   in the total distance from cells to their projections along curves must be 
 #'   less than \code{thresh}. Default is \code{0.001}, similar to 
-#'   \code{\link[princurve]{principal.curve}}.
+#'   \code{\link[princurve]{principal_curve}}.
 #' @param maxit numeric, maximum number of iterations, see 
-#'   \code{\link[princurve]{principal.curve}}.
+#'   \code{\link[princurve]{principal_curve}}.
 #' @param stretch numeric factor by which curves can be extrapolated beyond 
 #'   endpoints. Default is \code{2}, see
-#'   \code{\link[princurve]{principal.curve}}.
+#'   \code{\link[princurve]{principal_curve}}.
 #' @param smoother, choice of scatter plot smoother. Same as 
-#'   \code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is
+#'   \code{\link[princurve]{principal_curve}}, but \code{"lowess"} option is
 #'   replaced with \code{"loess"} for additional flexibility.
 #' @param shrink.method character denoting how to determine the appropriate 
 #'   amount of shrinkage for a branching lineage. Accepted values are the same 
@@ -49,7 +49,7 @@
 #'   \code{smoother}.
 #'   
 #' @details When there is only a single lineage, the curve-fitting algorithm is 
-#'   nearly identical to that of \code{\link[princurve]{principal.curve}}. When
+#'   nearly identical to that of \code{\link[princurve]{principal_curve}}. When
 #'   there are multiple lineages and \code{shrink == TRUE}, an additional step
 #'   is added to the iterative procedure, forcing curves to be similar in the
 #'   neighborhood of shared points (ie., before they branch).
@@ -90,7 +90,7 @@
 #' @return An updated \code{\link{SlingshotDataSet}} object containing the 
 #'   oringinal input, arguments provided to \code{getCurves} as well as the 
 #'   following new elements: \itemize{ \item{curves}{A list of 
-#'   \code{\link[princurve]{principal.curve}} objects.}
+#'   \code{\link[princurve]{principal_curve}} objects.}
 #'   \item{slingParams}{Additional parameters used for fitting simultaneous
 #'   principal curves.}}
 #'   
@@ -107,6 +107,7 @@
 #' plot(rd, col = cl, asp = 1)
 #' lines(sds, type = 'c', lwd = 3)
 #' 
+#' @importFrom princurve project_to_curve
 #' @export
 #' 
 setMethod(f = "getCurves",
@@ -279,32 +280,32 @@ setMethod(f = "getCurves",
                         pca$rotation[,1], ctr, 
                     ctr + 10*pca$sdev[1] *
                         pca$rotation[,1])
-                curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
+                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
                     stretch = 9999)
                 # do this twice because all points should have projections
                 # on all lineages, but only those points on the lineage
                 # should extend it
-                pcurve <- .get_lam(X, s = curve$s[curve$tag,], stretch=0)
-                pcurve$dist <- abs(pcurve$dist) 
+                pcurve <- project_to_curve(X, s = curve$s[curve$ord,], stretch=0)
+                pcurve$dist_ind <- abs(pcurve$dist_ind) 
                 # ^ force non-negative distances
                 pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
                     na.rm=TRUE)
                 # ^ force pseudotime to start at 0
                 pcurve$w <- W[,l]
                 pcurves[[l]] <- pcurve
-                D[,l] <- abs(pcurve$dist)
+                D[,l] <- abs(pcurve$dist_ind)
                 next
             }
             
             if(extend == 'y'){
-                curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
+                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
                     stretch = 9999)
-                curve$dist <- abs(curve$dist)
+                curve$dist_ind <- abs(curve$dist_ind)
             }
             if(extend == 'n'){
-                curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
+                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
                     stretch = 0)
-                curve$dist <- abs(curve$dist)
+                curve$dist_ind <- abs(curve$dist_ind)
             }
             if(extend == 'pc1'){
                 cl1.idx <- clusterLabels[ , lineages[[l]][1] , 
@@ -330,21 +331,21 @@ setMethod(f = "getCurves",
                     line.initial)
                 line.initial <- rbind(line.initial, 
                     line.initial[K] + pc1.2)
-                curve <- .get_lam(X[idx, ,drop = FALSE], s = line.initial,
+                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
                     stretch = 9999)
-                curve$dist <- abs(curve$dist)
+                curve$dist_ind <- abs(curve$dist_ind)
             }
             
-            pcurve <- .get_lam(X, s = curve$s[curve$tag, ,drop=FALSE], 
+            pcurve <- project_to_curve(X, s = curve$s[curve$ord, ,drop=FALSE], 
                 stretch=0)
             # force non-negative distances
-            pcurve$dist <- abs(pcurve$dist)
+            pcurve$dist_ind <- abs(pcurve$dist_ind)
             # force pseudotime to start at 0
             pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
                 na.rm=TRUE) 
             pcurve$w <- W[,l]
             pcurves[[l]] <- pcurve
-            D[,l] <- abs(pcurve$dist)
+            D[,l] <- abs(pcurve$dist_ind)
         }
         
         # track distances between curves and data points to determine 
@@ -393,19 +394,19 @@ setMethod(f = "getCurves",
             for(l in seq_len(L)){
                 pcurve <- pcurves[[l]]
                 s <- pcurve$s
-                ord <- order(pcurve$lambda)
+                ordL <- order(pcurve$lambda)
                 for(jj in seq_len(p)){
                     s[, jj] <- smootherFcn(pcurve$lambda, X[,jj], w = pcurve$w,
-                        ...)[ord]
+                        ...)[ordL]
                 }
-                new.pcurve <- .get_lam(X, s = s, stretch = stretch)
-                new.pcurve$dist <- abs(new.pcurve$dist)
+                new.pcurve <- project_to_curve(X, s = s, stretch = stretch)
+                new.pcurve$dist_ind <- abs(new.pcurve$dist_ind)
                 new.pcurve$lambda <- new.pcurve$lambda - 
                     min(new.pcurve$lambda, na.rm = TRUE)
                 new.pcurve$w <- W[,l]
                 pcurves[[l]] <- new.pcurve
             }
-            D[,] <- vapply(pcurves, function(p){ p$dist }, rep(0,nrow(X)))
+            D[,] <- vapply(pcurves, function(p){ p$dist_ind }, rep(0,nrow(X)))
             
             # shrink together lineages near shared clusters
             if(shrink > 0){
@@ -500,7 +501,7 @@ setMethod(f = "getCurves",
                     avg.order <- new.avg.order
                 }
             }
-            D[,] <- vapply(pcurves, function(p){ p$dist }, rep(0,nrow(X)))
+            D[,] <- vapply(pcurves, function(p){ p$dist_ind }, rep(0,nrow(X)))
             
             dist.new <- sum(D[W>0], na.rm=TRUE)
             hasConverged <- (abs((dist.old - 
@@ -540,7 +541,7 @@ setMethod(f = "getCurves",
         }
         
         for(l in seq_len(L)){
-            class(pcurves[[l]]) <- 'principal.curve'
+            class(pcurves[[l]]) <- 'principal_curve'
             pcurves[[l]]$w <- W[,l]
         }
         names(pcurves) <- paste('curve',seq_along(pcurves),sep='')

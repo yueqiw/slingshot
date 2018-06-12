@@ -142,17 +142,17 @@ the 90th percentile and their weight along the curve is less than
 \item{thresh}{numeric, determines the convergence criterion. Percent change 
 in the total distance from cells to their projections along curves must be 
 less than \code{thresh}. Default is \code{0.001}, similar to 
-\code{\link[princurve]{principal.curve}}.}
+\code{\link[princurve]{principal_curve}}.}
 
 \item{maxit}{numeric, maximum number of iterations, see 
-\code{\link[princurve]{principal.curve}}.}
+\code{\link[princurve]{principal_curve}}.}
 
 \item{stretch}{numeric factor by which curves can be extrapolated beyond 
 endpoints. Default is \code{2}, see
-\code{\link[princurve]{principal.curve}}.}
+\code{\link[princurve]{principal_curve}}.}
 
 \item{smoother, }{choice of scatter plot smoother. Same as 
-\code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is
+\code{\link[princurve]{principal_curve}}, but \code{"lowess"} option is
 replaced with \code{"loess"} for additional flexibility.}
 
 \item{shrink.method}{character denoting how to determine the appropriate 
@@ -176,7 +176,7 @@ An object of class \code{\link{SlingshotDataSet}} containing the
   whether the starting and ending clusters were specified a priori.
   Additionally, this will always include \code{dist}, the pairwise cluster
   distance matrix.} \item{curves}{A list of
-  \code{\link[princurve]{principal.curve}} objects.}}
+  \code{\link[princurve]{principal_curve}} objects.}}
 }
 \description{
 Perform lineage inference with Slingshot
@@ -211,7 +211,7 @@ Once the \code{connectivity} is known, lineages are identified in
   returned.
 
 When there is only a single lineage, the curve-fitting algorithm is 
-  nearly identical to that of \code{\link[princurve]{principal.curve}}. When
+  nearly identical to that of \code{\link[princurve]{principal_curve}}. When
   there are multiple lineages and \code{shrink == TRUE}, an additional step
   is added to the iterative procedure, forcing curves to be similar in the
   neighborhood of shared points (ie., before they branch).

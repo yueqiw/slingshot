@@ -81,7 +81,7 @@ setMethod(f = "predict",
             rownames(x)[miss.ind] <- paste('newCell',miss.ind,sep='-')
         }
 
-        D.orig <- vapply(curves, function(crv){ crv$dist }, rep(0, n0))
+        D.orig <- vapply(curves, function(crv){ crv$dist_ind }, rep(0, n0))
         W.orig <- vapply(curves, function(crv){ crv$w }, rep(0, n0))
         
         ordD.orig <- order(D.orig)
@@ -101,10 +101,10 @@ setMethod(f = "predict",
         })
         
         crv.proj <- lapply(curves, function(crv){
-            .get_lam(x, crv$s, crv$tag, stretch = 0)
+            project_to_curve(x, crv$s, crv$ord, stretch = 0)
         })
         
-        D.proj <- vapply(crv.proj, function(crv){ crv$dist }, rep(0,nrow(x)))
+        D.proj <- vapply(crv.proj, function(crv){ crv$dist_ind }, rep(0,nrow(x)))
         Z.proj <- D.proj
         Z.proj[,] <- predict(fit, 
             newdata = data.frame(logdists.tofit = as.numeric(log(D.proj+eps))), 

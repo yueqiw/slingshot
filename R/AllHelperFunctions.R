@@ -436,7 +436,7 @@ setMethod(
         }, rep(0,length(lambdas.all)))
         return(rowMeans(dim.all))
     }, rep(0,length(lambdas.all)))
-    avg.curve <- .get_lam(X, avg, stretch=stretch)
+    avg.curve <- project_to_curve(X, avg, stretch=stretch)
     avg.curve$w <- rowMeans(vapply(pcurves, function(p){ p$w }, rep(0,n)))
     return(avg.curve)
 }
@@ -531,31 +531,10 @@ setMethod(
         return(avg.jj * pct + orig.jj * (1-pct))
     }, rep(0,n))
     w <- pcurve$w
-    pcurve <- .get_lam(X, s, pcurve$tag, stretch = stretch)
+    pcurve <- project_to_curve(X, s, pcurve$ord, stretch = stretch)
     pcurve$w <- w
     return(pcurve)
 }
-# export?
-.get_lam <- function(x, s, tag, stretch = 2){
-    storage.mode(x) <- "double"
-    storage.mode(s) <- "double"
-    storage.mode(stretch) <- "double"
-    if (!missing(tag)) 
-        s <- s[tag, ]
-    np <- dim(x)
-    if (length(np) != 2) 
-        stop("get.lam needs a matrix input")
-    n <- np[1]
-    p <- np[2]
-    tt <- .Fortran("getlam", n, p, x, s = x, lambda = double(n), 
-                   tag = integer(n), dist = double(n), as.integer(nrow(s)), 
-                   s, stretch, double(p), double(p), 
-                   PACKAGE = "princurve")[c("s","tag", "lambda", "dist")]
-    #tt$dist <- sum(tt$dist)
-    class(tt) <- "principal.curve"
-    tt
-}
-
 
 
 ################

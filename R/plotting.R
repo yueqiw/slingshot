@@ -151,7 +151,7 @@ setMethod(
         if(curves){
             for(ii in seq_along(slingCurves(x))){
                 c <- slingCurves(x)[[ii]]
-                lines(c$s[c$tag,dims], lwd = lwd, col = col[ii], ...)
+                lines(c$s[c$ord,dims], lwd = lwd, col = col[ii], ...)
             }
         }
         invisible(NULL)
@@ -393,7 +393,7 @@ plot3d.SlingshotDataSet <- function(x,
         }
     }
     if(curves){
-        for(c in slingCurves(x)){ rgl::lines3d(c$s[c$tag,dims], ...) }
+        for(c in slingCurves(x)){ rgl::lines3d(c$s[c$ord,dims], ...) }
     }
     invisible(NULL)
 }
@@ -724,7 +724,7 @@ pairs.SlingshotDataSet <-
                             }
                             if(curves){
                                 for(c in slingCurves(sds)){
-                                    lines(c$s[c$tag,c(j,i)], lwd = lwd, 
+                                    lines(c$s[c$ord,c(j,i)], lwd = lwd, 
                                           col=1, ...)
                                 }
                             }
@@ -764,7 +764,7 @@ pairs.SlingshotDataSet <-
                             }
                             if(curves){
                                 for(c in slingCurves(sds)){ 
-                                    lines(c$s[c$tag,c(j,i)],lwd = lwd, 
+                                    lines(c$s[c$ord,c(j,i)],lwd = lwd, 
                                           col=1, ...) 
                                 }
                             }

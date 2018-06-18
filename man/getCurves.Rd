@@ -9,7 +9,7 @@
 getCurves(sds, ...)
 
 \S4method{getCurves}{SlingshotDataSet}(sds, shrink = TRUE, extend = "y",
-  reweight = TRUE, drop.multi = TRUE, thresh = 0.001, maxit = 15,
+  reweight = TRUE, reassign = TRUE, thresh = 0.001, maxit = 15,
   stretch = 2, smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 }
@@ -30,31 +30,35 @@ when constructing the initial, piece-wise linear curve. Accepted values are
 
 \item{reweight}{logical, whether to allow cells shared between lineages to be
 reweighted during curve-fitting. If \code{TRUE}, cells shared between 
-lineages will be weighted by: distance to nearest curve / distance to
-curve.}
+lineages will be iteratively reweighted based on the quantiles of their 
+projection distances to each curve. See 'Details' for more.}
 
-\item{drop.multi}{logical, whether to drop shared cells from lineages which 
-do not fit them well. If \code{TRUE}, shared cells with a distance to one 
-lineage above the 90th percentile and another below the 50th will be
-dropped from the further lineage.}
+\item{reassign}{logical, whether to reassign cells to lineages at each 
+iteration. If \code{TRUE}, cells will be added to a lineage when their 
+projection distance to the curve is less than the median distance for all 
+cells currently assigned to the lineage. Additionally, shared cells will be
+removed from a lineage if their projection distance to the curve is above 
+the 90th percentile and their weight along the curve is less than 
+\code{0.1}.}
 
 \item{thresh}{numeric, determines the convergence criterion. Percent change 
 in the total distance from cells to their projections along curves must be 
 less than \code{thresh}. Default is \code{0.001}, similar to 
-\code{\link[princurve]{principal.curve}}.}
+\code{\link[princurve]{principal_curve}}.}
 
 \item{maxit}{numeric, maximum number of iterations, see 
-\code{\link[princurve]{principal.curve}}.}
+\code{\link[princurve]{principal_curve}}.}
 
 \item{stretch}{numeric factor by which curves can be extrapolated beyond 
-endpoints. Default is \code{2}, see \code{\link[princurve]{principal.curve}}.}
+endpoints. Default is \code{2}, see
+\code{\link[princurve]{principal_curve}}.}
 
 \item{smoother, }{choice of scatter plot smoother. Same as 
-\code{\link[princurve]{principal.curve}}, but \code{"lowess"} option is replaced with 
-\code{"loess"} for additional flexibility.}
+\code{\link[princurve]{principal_curve}}, but \code{"lowess"} option is
+replaced with \code{"loess"} for additional flexibility.}
 
 \item{shrink.method}{character denoting how to determine the appropriate 
-amount of shrinkage for a branching lineage. Accepted values are the same
+amount of shrinkage for a branching lineage. Accepted values are the same 
 as for \code{kernel} in \code{\link{density}} (default is \code{"cosine"}),
 as well as \code{"tricube"} and \code{"density"}. See 'Details' for more.}
 
@@ -64,9 +68,10 @@ to the origin should be allowed to have different starting points.}
 \value{
 An updated \code{\link{SlingshotDataSet}} object containing the 
   oringinal input, arguments provided to \code{getCurves} as well as the 
-  following new elements: \itemize{ \item{curves}{A list of
-  \code{\link[princurve]{principal.curve}} objects.} \item{slingParams}{Additional
-  parameters used for fitting simultaneous principal curves.}}
+  following new elements: \itemize{ \item{curves}{A list of 
+  \code{\link[princurve]{principal_curve}} objects.}
+  \item{slingParams}{Additional parameters used for fitting simultaneous
+  principal curves.}}
 }
 \description{
 This function takes a reduced data matrix \code{n} by \code{p}, 
@@ -79,10 +84,10 @@ This function takes a reduced data matrix \code{n} by \code{p},
 }
 \details{
 When there is only a single lineage, the curve-fitting algorithm is 
-  nearly identical to that of \code{\link[princurve]{principal.curve}}. When there are 
-  multiple lineages and \code{shrink == TRUE}, an additional step is added to
-  the iterative procedure, forcing curves to be similar in the neighborhood 
-  of shared points (ie., before they branch).
+  nearly identical to that of \code{\link[princurve]{principal_curve}}. When
+  there are multiple lineages and \code{shrink == TRUE}, an additional step
+  is added to the iterative procedure, forcing curves to be similar in the
+  neighborhood of shared points (ie., before they branch).
 
 The \code{extend} argument determines how to construct the
   piece-wise linear curve used to initiate the recursive algorithm. The
@@ -96,7 +101,7 @@ The \code{extend} argument determines how to construct the
   options typically have little to no impact on the final curve, but can
   occasionally help with stability issues.
 
-When \code{shink == TRUE}, we compute a shrinkage curve,
+When \code{shink = TRUE}, we compute a shrinkage curve,
   \eqn{w_l(t)}, for each lineage, a non-increasing function of pseudotime
   that determines how much that lineage should be shrunk toward a shared
   average curve. We set \eqn{w_l(0) = 1}, so that the curves will perfectly
@@ -109,6 +114,13 @@ When \code{shink == TRUE}, we compute a shrinkage curve,
   since we require a decreasing function). Different choices of
   \code{shrink.method} seem to have little impact on the final curves, in 
   most cases.
+
+When \code{reweight = TRUE}, weights for shared cells are based on
+  the quantiles of their projection distances onto each curve. The
+  distances are ranked and converted into quantiles between \code{0} and
+  \code{1}, which are then transformed by \code{1 - q^2}. Each cell's weight
+  along a given lineage is the ratio of this value to the maximum value for
+  this cell across all lineages.
 }
 \examples{
 data("slingshotExample")

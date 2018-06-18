@@ -456,18 +456,19 @@ not assigned to a particular lineage. The `curveWeights` function extracts a
 similar matrix of weights assigning each cell to one or more lineages.
 
 The curves objects can be accessed using the `curves` function, which will
-return a list of `principal.curve` objects. These objects consist of the
+return a list of `principal_curve` objects. These objects consist of the
 following slots:
 
 * `s`: the matrix of points that make up the curve. These correspond to the 
 orthogonal projections of the data points. 
-* `tag`: indices which can be used to
+* `ord`: indices which can be used to
 put the cells along a curve in order based their projections. 
 * `lambda`: arclengths along the curve from the beginning to each cell's
 projection. A matrix of these values is returned by the `slingPseudotime`
 function.
-* `dist`: the squared distances between data points and their projections onto
-the curve.
+* `dist_ind`: the squared distances between data points and their projections
+onto the curve.
+* `dist`: the sum of the squared projection distances.
 * `w`: the vector of weights along this lineage. Cells that were unambiguously
 assigned to this lineage will have a weight of `1`, while cells assigned to
 other lineages will have a weight of `0`. It is possible for cells to have

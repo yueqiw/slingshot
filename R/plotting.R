@@ -18,6 +18,7 @@
 #' @param cex numeric, amount by which points should be magnified, see
 #'   \code{\link{par}}.
 #' @param lwd numeric, the line width, see \code{\link{par}}.
+#' @param col character or numeric, color(s) for lines, see \code{\link{par}}.
 #' @param ... additional parameters to be passed to \code{\link{lines}}.
 #'   
 #' @details If \code{type == 'lineages'}, straight line connectors between
@@ -52,7 +53,9 @@ setMethod(
                           asp = 1,
                           cex = 2,
                           lwd = 2,
+                          col = 1,
                           ...) {
+        col <- rep(col, length(slingLineages(x)))
         curves <- FALSE
         lineages <- FALSE
         if(is.null(type)){
@@ -125,12 +128,11 @@ setMethod(
             for(i in seq_len(nclus-1)){
                 for(j in seq(i+1,nclus)){
                     if(connectivity[i,j]==1){
-                        seg.col <- 1
-                        lines(centers[c(i,j),], lwd = lwd, col = seg.col, ...)
+                        lines(centers[c(i,j),], lwd = lwd, col = col, ...)
                     }
                 }
             }
-            points(centers, cex = cex, pch = 16)
+            points(centers, cex = cex, pch = 16, col = col)
             if(show.constraints){
                 if(any(linC$start.given)){
                     points(centers[clusters %in% 
@@ -147,8 +149,9 @@ setMethod(
             
         }
         if(curves){
-            for(c in slingCurves(x)){
-                lines(c$s[c$tag,dims], lwd = lwd, ...)
+            for(ii in seq_along(slingCurves(x))){
+                c <- slingCurves(x)[[ii]]
+                lines(c$s[c$ord,dims], lwd = lwd, col = col[ii], ...)
             }
         }
         invisible(NULL)
@@ -390,7 +393,7 @@ plot3d.SlingshotDataSet <- function(x,
         }
     }
     if(curves){
-        for(c in slingCurves(x)){ rgl::lines3d(c$s[c$tag,dims], ...) }
+        for(c in slingCurves(x)){ rgl::lines3d(c$s[c$ord,dims], ...) }
     }
     invisible(NULL)
 }
@@ -721,7 +724,7 @@ pairs.SlingshotDataSet <-
                             }
                             if(curves){
                                 for(c in slingCurves(sds)){
-                                    lines(c$s[c$tag,c(j,i)], lwd = lwd, 
+                                    lines(c$s[c$ord,c(j,i)], lwd = lwd, 
                                           col=1, ...)
                                 }
                             }
@@ -761,7 +764,7 @@ pairs.SlingshotDataSet <-
                             }
                             if(curves){
                                 for(c in slingCurves(sds)){ 
-                                    lines(c$s[c$tag,c(j,i)],lwd = lwd, 
+                                    lines(c$s[c$ord,c(j,i)],lwd = lwd, 
                                           col=1, ...) 
                                 }
                             }

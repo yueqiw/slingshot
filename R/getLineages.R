@@ -70,6 +70,7 @@
 #' @importFrom igraph graph.adjacency
 #' @importFrom igraph shortest_paths
 #' @importFrom ape mst
+#' @import matrixStats
 #'   
 setMethod(f = "getLineages",
     signature = signature(data = "matrix", 
@@ -399,6 +400,11 @@ setMethod(f = "getLineages",
             message('No cluster labels provided. Continuing with ',
                 'one cluster.')
             clusterLabels <- rep('1', nrow(data))
+        }
+        if(! any(c(length(clusterLabels), nrow(clusterLabels)) == 
+                nrow(data))){
+            stop("clusterLabels must have length or number of rows equal',
+                'to nrow(data).")
         }
         return(getLineages(data = data, clusterLabels = clusterLabels,
             reducedDim = reducedDim,

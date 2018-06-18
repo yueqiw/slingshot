@@ -9,7 +9,7 @@
 \usage{
 \S4method{plot}{SlingshotDataSet,ANY}(x, type = NULL,
   show.constraints = FALSE, add = FALSE, dims = seq_len(2), asp = 1,
-  cex = 2, lwd = 2, ...)
+  cex = 2, lwd = 2, col = 1, ...)
 
 \S4method{lines}{SlingshotDataSet}(x, type = NULL, dims = seq_len(2), ...)
 }
@@ -35,6 +35,8 @@ existing plot.}
 \code{\link{par}}.}
 
 \item{lwd}{numeric, the line width, see \code{\link{par}}.}
+
+\item{col}{character or numeric, color(s) for lines, see \code{\link{par}}.}
 
 \item{...}{additional parameters to be passed to \code{\link{lines}}.}
 }

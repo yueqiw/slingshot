@@ -16,8 +16,8 @@
 #'   names representing a lineage as an ordered set of clusters.
 #' @slot adjacency matrix. A binary matrix describing the adjacency 
 #'   between clusters induced by the minimum spanning tree.
-#' @slot curves list. A list of \code{\link[princurve]{principal.curve}} objects produced by 
-#'   \code{\link{getCurves}}.
+#' @slot curves list. A list of \code{\link[princurve]{principal_curve}} objects
+#'   produced by \code{\link{getCurves}}.
 #' @slot slingParams list. Additional parameters used by Slingshot. These may 
 #'   specify how the minimum spanning tree on clusters was constructed: 
 #'   \itemize{ 
@@ -40,21 +40,25 @@
 #'   piece-wise linear curve. Accepted values are 'y' (default), 'n', and 'pc1'.
 #'   See \code{\link{getCurves}} for details.} 
 #'   \item{\code{reweight}}{logical. 
-#'   Indicates whether to reweight cells shared by multiple lineages during 
-#'   curve-fitting. If \code{TRUE}, cells shared between lineages will have 
-#'   lineage-specific weights determined by the ratio: (distance to nearest 
-#'   curve) / (distance to specific curve).} 
-#'   \item{\code{drop.multi}}{logical. 
-#'   Indicates whether to drop shared cells from lineages which do not fit them 
-#'   well. If \code{TRUE}, shared cells with a distance to one lineage above the
-#'   90th percentile and another lineage below the 50th percentile will be 
-#'   dropped from the farther lineage.} 
+#'   Indicates whether to allow cells shared
+#'   between lineages to be reweighted during curve-fitting. If \code{TRUE},
+#'   cells shared between lineages will be iteratively reweighted based on the
+#'   quantiles of their projection distances to each curve.} 
+#'   \item{\code{reassign}}{logical. 
+#'   Indicates whether to reassign cells to lineages at each
+#'   iteration. If \code{TRUE}, cells will be added to a lineage when their
+#'   projection distance to the curve is less than the median distance for all
+#'   cells currently assigned to the lineage. Additionally, shared cells will be
+#'   removed from a lineage if their projection distance to the curve is above
+#'   the 90th percentile and their weight along the curve is less than
+#'   \code{0.1}.} 
 #'   \item{\code{shrink.method}}{character. 
 #'   Denotes how to determine the amount of shrinkage for a branching lineage. 
 #'   Accepted values are the same as for \code{kernel} in  the \code{density} 
 #'   function (default is \code{"cosine"}), as well as \code{"tricube"} and 
 #'   \code{"density"}. See \code{\link{getCurves}} for details.}
-#'   \item{Other parameters specified by \code{\link[princurve]{principal.curve}}}. }
+#'   \item{Other parameters specified by 
+#'   \code{\link[princurve]{principal_curve}}}. }
 #'   
 #' @return The accessor functions \code{reducedDim}, \code{clusterLabels}, 
 #'   \code{lineages}, \code{adjacency}, \code{curves},
@@ -163,8 +167,8 @@ setValidity("SlingshotDataSet", function(object) {
             }
         }
         L <- length(slingCurves(object))
-        if(any(vapply(slingCurves(object),class,'') != 'principal.curve')){
-            return("curves must be a list of principal.curve objects.")
+        if(any(vapply(slingCurves(object),class,'') != 'principal_curve')){
+            return("curves must be a list of principal_curve objects.")
         }
         if(!is.null(slingParams(object)$shrink)){
             if(slingParams(object)$shrink < 0 | 
@@ -183,9 +187,9 @@ setValidity("SlingshotDataSet", function(object) {
                 stop("reweight argument must be logical.")
             }
         }
-        if(!is.null(slingParams(object)$drop.multi)){
-            if(!is.logical(slingParams(object)$drop.multi)){
-                stop("drop.multi argument must be logical.")
+        if(!is.null(slingParams(object)$reassign)){
+            if(!is.logical(slingParams(object)$reassign)){
+                stop("reassign argument must be logical.")
             }
         }
     }

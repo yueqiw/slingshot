@@ -1,6 +1,6 @@
 Package: slingshot
 Title: Tools for ordering single-cell sequencing
-Version: 0.99.6
+Version: 0.99.8
 Description: Provides functions for inferring continuous, branching 
     lineage structures in low-dimensional data. Slingshot was designed
     to model developmental trajectories in single-cell RNA sequencing 
@@ -10,11 +10,16 @@ Description: Provides functions for inferring continuous, branching
     incorporation of prior knowledge through supervised graph 
     construction.
 Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
-            role = c("aut", "cre", "cph")))
+            role = c("aut", "cre", "cph")),
+	     person("Davide","Risso", role = "aut",email = "risso.davide@gmail.com"),
+             person("Diya","Das", role = "aut", email = "diyadas@berkeley.edu"),
+             person("Sandrine","Dudoit", role = "ths", email = "sandrine@stat.berkeley.edu"),
+             person("Koen","Van den Berge", role = "ctb"),
+             person("Robrecht","Cannoodt", role = "ctb"))
 License: Artistic-2.0
 Depends:
     R (>= 3.5),
-    princurve,
+    princurve (>= 2.0.2),
     stats
 Imports:
     ape,

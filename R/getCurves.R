@@ -280,12 +280,13 @@ setMethod(f = "getCurves",
                         pca$rotation[,1], ctr, 
                     ctr + 10*pca$sdev[1] *
                         pca$rotation[,1])
-                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
-                    stretch = 9999)
+                curve <- project_to_curve(X[idx, ,drop = FALSE], 
+                    s = line.initial, stretch = 9999)
                 # do this twice because all points should have projections
                 # on all lineages, but only those points on the lineage
                 # should extend it
-                pcurve <- project_to_curve(X, s = curve$s[curve$ord,], stretch=0)
+                pcurve <- project_to_curve(X, s = curve$s[curve$ord,], 
+                    stretch=0)
                 pcurve$dist_ind <- abs(pcurve$dist_ind) 
                 # ^ force non-negative distances
                 pcurve$lambda <- pcurve$lambda - min(pcurve$lambda, 
@@ -298,13 +299,13 @@ setMethod(f = "getCurves",
             }
             
             if(extend == 'y'){
-                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
-                    stretch = 9999)
+                curve <- project_to_curve(X[idx, ,drop = FALSE], 
+                    s = line.initial, stretch = 9999)
                 curve$dist_ind <- abs(curve$dist_ind)
             }
             if(extend == 'n'){
-                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
-                    stretch = 0)
+                curve <- project_to_curve(X[idx, ,drop = FALSE], 
+                    s = line.initial, stretch = 0)
                 curve$dist_ind <- abs(curve$dist_ind)
             }
             if(extend == 'pc1'){
@@ -331,8 +332,8 @@ setMethod(f = "getCurves",
                     line.initial)
                 line.initial <- rbind(line.initial, 
                     line.initial[K] + pc1.2)
-                curve <- project_to_curve(X[idx, ,drop = FALSE], s = line.initial,
-                    stretch = 9999)
+                curve <- project_to_curve(X[idx, ,drop = FALSE], 
+                    s = line.initial, stretch = 9999)
                 curve$dist_ind <- abs(curve$dist_ind)
             }
             

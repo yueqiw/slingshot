@@ -232,8 +232,11 @@ test_that("2D plotting functions don't give errors", {
     sds <- slingshot(rd,cl)
     
     plot(sds)
+    plot(sds, type = "lineages", show.constraints = TRUE)
     lines(sds)
+    lines(sds, type = "lineages", show.constraints = TRUE)
     pairs(sds)
+    pairs(sds, type = "lineages", show.constraints = TRUE)
 })
 
 test_that("predict works as expected", {

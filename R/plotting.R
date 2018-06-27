@@ -558,7 +558,7 @@ pairs.SlingshotDataSet <-
             clusters <- rownames(forest)
             nclus <- nrow(forest)
             centers <- t(vapply(clusters,function(clID){
-                w <- clusterLabels[,clID]
+                w <- clusterLabels(sds)[,clID]
                 return(apply(x, 2, weighted.mean, w = w))
             }, rep(0,ncol(reducedDim(sds)))))
             rownames(centers) <- clusters

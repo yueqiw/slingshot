@@ -65,7 +65,7 @@ slingshot(data, clusterLabels, ...)
   smoother = "smooth.spline", shrink.method = "cosine",
   allow.breaks = TRUE, ...)
 
-\S4method{slingshot}{ClusterExperiment,ANY}(data, clusterLabels = NULL,
+\S4method{slingshot}{ClusterExperiment,ANY}(data, clusterLabels,
   reducedDim = NULL, start.clus = NULL, end.clus = NULL,
   dist.fun = NULL, omega = NULL, lineages = list(), shrink = TRUE,
   extend = "y", reweight = TRUE, reassign = TRUE, thresh = 0.001,

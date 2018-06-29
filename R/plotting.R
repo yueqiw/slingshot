@@ -204,9 +204,11 @@ setMethod(
         loess = TRUE, loessCI = TRUE, ...) {
         if(length(gene) > 1 & is.numeric(gene)){
             y <- gene
+            genename <- deparse(substitute(gene))
         }
         if(length(gene) == 1){
             y <- exprs[gene, ,drop=FALSE][1,]
+            genename <- gene
         }
         pst <- slingPseudotime(data)
         w <- slingCurveWeights(data)
@@ -215,7 +217,7 @@ setMethod(
         par(mfrow = c(L,1))
         for(l in seq_len(L)){
             plot(pst[,l], y, xlab = 'Pseudotime', ylab = 'Expression', 
-                main=paste(gene, ', Lineage ',l, sep=''), ...)
+                main=paste(genename, ', Lineage ',l, sep=''), ...)
             if(loess | loessCI){
                 l <- loess(y ~ pst[,l], weights = w[,l])
             }

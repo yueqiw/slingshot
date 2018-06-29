@@ -237,6 +237,12 @@ test_that("2D plotting functions don't give errors", {
     lines(sds, type = "lineages", show.constraints = TRUE)
     pairs(sds)
     pairs(sds, type = "lineages", show.constraints = TRUE)
+    
+    gene.i <- rchisq(140,1)
+    plotGenePseudotime(sds, gene.i)
+    counts <- matrix(rchisq(280,1), nrow=2)
+    rownames(counts) <- c('gene1','gene2')
+    plotGenePseudotime(sds, 'gene2', counts)
 })
 
 test_that("predict works as expected", {

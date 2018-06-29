@@ -227,9 +227,9 @@ test_that("slingshot works for different input types", {
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
 })
 
-test_that("2D plotting functions don't give errors", {
+test_that("Plotting functions don't give errors", {
     data("slingshotExample")
-    sds <- slingshot(rd,cl)
+    sds <- slingshot(rd,cl, start.clus = '1', end.clus = c('4','5'))
     
     plot(sds)
     plot(sds, type = "lineages", show.constraints = TRUE)
@@ -273,4 +273,10 @@ test_that("predict works as expected", {
     x.big <- cbind(x.mat, rnorm(100))
     expect_error(predict(sds, x.big),
         'does not match original number of dimensions')
+})
+
+test_that("Helper functions work as expected", {
+    data("slingshotExample")
+    sds <- slingshot(rd,cl, start.clus = '1', end.clus = c('4','5'))
+    sds
 })

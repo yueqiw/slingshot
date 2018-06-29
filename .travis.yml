@@ -57,3 +57,4 @@ install:
 after_success:
   - Rscript -e 'covr::coveralls()'
   - R CMD BiocCheck .
+  - Rscript -e 'covr::codecov()'

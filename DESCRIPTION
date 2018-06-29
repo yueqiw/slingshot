@@ -41,7 +41,8 @@ Suggests:
     RColorBrewer,
     rmarkdown,
     splatter,
-    testthat
+    testthat,
+    covr
 VignetteBuilder: knitr
 LazyData: false
 RoxygenNote: 6.0.1

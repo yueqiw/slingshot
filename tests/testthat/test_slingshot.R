@@ -238,6 +238,11 @@ test_that("slingshot works for different input types", {
     slingParams(c0)
     slingPseudotime(c0)
     slingCurveWeights(c0)
+    
+    # with ClusterExperiment objects
+    require(clusterExperiment)
+    ce <- ClusterExperiment(sce, factor(cl), transformation = function(x){x})
+    ce.sling <- slingshot(ce)
 })
 
 test_that("Plotting functions don't give errors", {

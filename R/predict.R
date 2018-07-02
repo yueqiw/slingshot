@@ -104,7 +104,8 @@ setMethod(f = "predict",
             project_to_curve(x, crv$s, crv$ord, stretch = 0)
         })
         
-        D.proj <- vapply(crv.proj, function(crv){ crv$dist_ind }, rep(0,nrow(x)))
+        D.proj <- vapply(crv.proj, function(crv){ crv$dist_ind }, 
+            rep(0,nrow(x)))
         Z.proj <- D.proj
         Z.proj[,] <- predict(fit, 
             newdata = data.frame(logdists.tofit = as.numeric(log(D.proj+eps))), 

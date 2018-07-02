@@ -272,6 +272,11 @@ test_that("Plotting functions don't give errors", {
     plotGenePseudotime(sds, 'gene2', counts)
     
     plotGenePseudotime(sce, 2)
+    
+    rd3 <- cbind(rd, rnorm(140))
+    sds3 <- slingshot(rd3, cl)
+    plot3d(sds3)
+    plot3d(sds3, type = 'lineages')
 })
 
 test_that("predict works as expected", {

@@ -6,6 +6,10 @@ setMethod(
     definition = function(reducedDim, clusterLabels, ...){
         RD <- as.matrix(reducedDim)
         rownames(RD) <- rownames(reducedDim)
+        if(missing(clusterLabels)){
+            message('Unclustered data detected.')
+            clusterLabels <- rep('1', nrow(reducedDim))
+        }
         newSlingshotDataSet(RD, clusterLabels, ...)
     })
 #' @describeIn newSlingshotDataSet returns a \code{SlingshotDataSet} object.

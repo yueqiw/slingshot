@@ -262,8 +262,8 @@ test_that("Plotting functions don't give errors", {
     plot(sds, type = "lineages", show.constraints = TRUE)
     lines(sds)
     lines(sds, type = "lineages", show.constraints = TRUE)
-    pairs(sds)
-    pairs(sds, type = "lineages", show.constraints = TRUE)
+    pairs(sds, lower.panel = TRUE)
+    pairs(sds, lower.panel = TRUE, type = "lineages", show.constraints = TRUE)
     
     gene.i <- rchisq(140,1)
     plotGenePseudotime(sds, gene.i)
@@ -312,6 +312,7 @@ test_that("predict works as expected", {
 test_that("Helper functions work as expected", {
     data("slingshotExample")
     sds <- slingshot(rd,cl, start.clus = '1', end.clus = c('4','5'))
+    show(sds)
 
     expect_equal(length(slingLineages(sds)),2)
     expect_equal(length(slingCurves(sds)),2)
@@ -321,4 +322,28 @@ test_that("Helper functions work as expected", {
     expect_equal(dim(slingPseudotime(sds)), c(140,2))
     expect_equal(dim(slingCurveWeights(sds)), c(140,2))
     expect_equal(dim(reducedDim(sds[1:50])), c(50,2))
+    
+    # newSlingshotDataSet
+
+    # matrix / factor
+    mf <- newSlingshotDataSet(rd, factor(cl))
+    expect_is(mf, "SlingshotDataSet")
+    # matrix / missing
+    expect_message({m0 <- newSlingshotDataSet(rd)},
+        "Unclustered data detected.")
+    expect_is(m0, "SlingshotDataSet")
+    
+    # data frame / character
+    dfc <- newSlingshotDataSet(data.frame(rd))
+    expect_is(dfc, "SlingshotDataSet")
+    # data frame / missing
+    expect_message({df0 <- newSlingshotDataSet(data.frame(rd))},
+        "Unclustered data detected.")
+    expect_is(df0, "SlingshotDataSet")
+    
+    # matrix / matrix
+    cl.mat <- outer(cl, unique(cl), '==') + 0.0
+    rownames(cl.mat) <- NULL
+    colnames(rd) <- NULL
+    expect_error(newSlingshotDataSet(rd, cl.mat[-1,]), 'must equal')
 })

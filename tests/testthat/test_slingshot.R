@@ -233,7 +233,7 @@ test_that("slingshot works for different input types", {
     # cluster labels provided separately
     c0 <- slingshot(sce, clusterLabels = cl)
     expect_equal(dim(slingAdjacency(c0)), c(5,5))
-    expect_true('slingClusters' %in% names(colData(sce)))
+    expect_true('slingClusters' %in% names(colData(c0)))
     # accessor functions
     SlingshotDataSet(c0)
     expect_equal(length(slingLineages(c0)),2)

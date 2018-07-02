@@ -241,8 +241,12 @@ test_that("slingshot works for different input types", {
 })
 
 test_that("Plotting functions don't give errors", {
-    data("slingshotExample")
     sds <- slingshot(rd,cl, start.clus = '1', end.clus = c('4','5'))
+    
+    u <- matrix(rpois(140*50, 5), nrow=50)
+    sce <- SingleCellExperiment(assays=list(counts=u))
+    reducedDims(sce) <- SimpleList(PCA = rd)
+    sce <- slingshot(sce, clusterLabels = cl)
     
     plot(sds)
     plot(sds, type = "lineages", show.constraints = TRUE)
@@ -256,6 +260,8 @@ test_that("Plotting functions don't give errors", {
     counts <- matrix(rchisq(280,1), nrow=2)
     rownames(counts) <- c('gene1','gene2')
     plotGenePseudotime(sds, 'gene2', counts)
+    
+    plotGenePseudotime(sce, 2)
 })
 
 test_that("predict works as expected", {
@@ -297,6 +303,4 @@ test_that("Helper functions work as expected", {
     slingCurves(sds)
     slingParams(sds)
     sds[1:50,]
-    
-
 })

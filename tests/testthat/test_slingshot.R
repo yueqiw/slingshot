@@ -215,13 +215,12 @@ test_that("slingshot works for different input types", {
     
     # with SingleCellExperiment objects
     require(SingleCellExperiment)
-    u <- matrix(rpois(200*50, 5), ncol=50)
-    v <- log2(u + 1)
-    sce <- SingleCellExperiment(assays=list(counts=u, logcounts=v))
+    u <- matrix(rpois(140*50, 5), nrow=50)
+    sce <- SingleCellExperiment(assays=list(counts=u))
     expect_error(slingshot(sce), 'No dimensionality reduction found')
     
-    reducedDims(sce) <- SimpleList(PCA = reducedDim, 
-                                   tSNE = matrix(rnorm(50*2),ncol=2))
+    reducedDims(sce) <- SimpleList(PCA = rd, 
+                                   tSNE = matrix(rnorm(140*2),ncol=2))
     # implicit reducedDim
     c0 <- slingshot(sce)
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
@@ -229,15 +228,21 @@ test_that("slingshot works for different input types", {
     c0 <- slingshot(sce, reducedDim='tSNE')
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
     # reducedDim provided as matrix
-    c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2))
+    c0 <- slingshot(sce, reducedDim = matrix(rnorm(140*2),ncol=2))
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
+    # cluster labels provided separately
+    c0 <- slingshot(sce, clusterLabels = cl)
+    expect_equal(dim(slingAdjacency(c0)), c(5,5))
+    expect_true('slingClusters' %in% names(colData(sce)))
     # accessor functions
     SlingshotDataSet(c0)
-    slingLineages(c0)
-    slingCurves(c0)
-    slingParams(c0)
-    slingPseudotime(c0)
-    slingCurveWeights(c0)
+    expect_equal(length(slingLineages(c0)),2)
+    expect_equal(length(slingCurves(c0)),2)
+    expect_true(all(c('start.clus','end.clus','start.given','end.given',
+        'dist','shrink','extend','reweight','reassign',
+        'shrink.method') %in% names(slingParams(c0)) ))
+    expect_equal(dim(slingPseudotime(c0)), c(140,2))
+    expect_equal(dim(slingCurveWeights(c0)), c(140,2))
     
     # with ClusterExperiment objects
     require(clusterExperiment)
@@ -303,9 +308,12 @@ test_that("Helper functions work as expected", {
     data("slingshotExample")
     sds <- slingshot(rd,cl, start.clus = '1', end.clus = c('4','5'))
 
-    reducedDims(sds)
-    slingLineages(sds)
-    slingCurves(sds)
-    slingParams(sds)
-    sds[1:50,]
+    expect_equal(length(slingLineages(sds)),2)
+    expect_equal(length(slingCurves(sds)),2)
+    expect_true(all(c('start.clus','end.clus','start.given','end.given',
+        'dist','shrink','extend','reweight','reassign',
+        'shrink.method') %in% names(slingParams(sds)) ))
+    expect_equal(dim(slingPseudotime(sds)), c(140,2))
+    expect_equal(dim(slingCurveWeights(sds)), c(140,2))
+    expect_equal(dim(reducedDim(sds[1:50])), c(50,2))
 })

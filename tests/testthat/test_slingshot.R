@@ -181,6 +181,12 @@ test_that("slingshot works for different input types", {
     expect_is(s, "SlingshotDataSet")
     expect_equal(dim(slingAdjacency(s)), c(5,5))
     
+    # diagonal distance measure
+    slingshot(rd, cl, dist.fun = .dist_clusters_diag)
+    # different shrinkage methods
+    slingshot(rd, cl, shrink.method = 'tricube')
+    slingshot(rd, cl, shrink.method = 'density')
+    
     # one cluster
     clus1 <- rep(1,50)
     c1 <- slingshot(reducedDim, clus1)
@@ -225,6 +231,13 @@ test_that("slingshot works for different input types", {
     # reducedDim provided as matrix
     c0 <- slingshot(sce, reducedDim = matrix(rnorm(50*2),ncol=2))
     expect_equal(dim(slingAdjacency(c0)), c(1,1))
+    # accessor functions
+    SlingshotDataSet(c0)
+    slingLineages(c0)
+    slingCurves(c0)
+    slingParams(c0)
+    slingPseudotime(c0)
+    slingCurveWeights(c0)
 })
 
 test_that("Plotting functions don't give errors", {
@@ -278,5 +291,12 @@ test_that("predict works as expected", {
 test_that("Helper functions work as expected", {
     data("slingshotExample")
     sds <- slingshot(rd,cl, start.clus = '1', end.clus = c('4','5'))
-    sds
+
+    reducedDims(sds)
+    slingLineages(sds)
+    slingCurves(sds)
+    slingParams(sds)
+    sds[1:50,]
+    
+
 })

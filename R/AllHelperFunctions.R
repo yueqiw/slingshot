@@ -307,7 +307,7 @@ setMethod(f = "[",
           function(x, i, j)
           {
               rd <- reducedDim(x)[i,j, drop=FALSE]
-              cl <- clusterLabels(x)[i]
+              cl <- clusterLabels(x)[i, , drop=FALSE]
               initialize(x, reducedDim = rd,
                          clusterLabels  = cl,
                          lineages = list(),

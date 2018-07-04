@@ -249,13 +249,19 @@ test_that("slingshot works for different input types", {
     ce <- ClusterExperiment(sce, factor(cl), transformation = function(x){x})
     
     ce.sling <- slingshot(ce)
+    expect_is(ce.sling, "ClusterExperiment")
     ce.sling <- slingshot(ce, reducedDim = 'tSNE')
+    expect_is(ce.sling, "ClusterExperiment")
     ce.sling <- slingshot(ce, reducedDim = matrix(rnorm(140*2),ncol=2))
+    expect_is(ce.sling, "ClusterExperiment")
 
     colData(ce) <- cbind(colData(ce), cl2 = sample(2,140, replace=TRUE))
     ce.sling <- slingshot(ce, 'cluster1')
+    expect_is(ce.sling, "ClusterExperiment")
     ce.sling <- slingshot(ce, 'cl2')
+    expect_is(ce.sling, "ClusterExperiment")
     ce.sling <- slingshot(ce, sample(2,140, replace=TRUE))
+    expect_is(ce.sling, "ClusterExperiment")
 })
 
 test_that("Plotting functions don't give errors", {

@@ -506,7 +506,7 @@ setMethod(f = "getCurves",
             
             dist.new <- sum(D[W>0], na.rm=TRUE)
             hasConverged <- (abs((dist.old - 
-                    dist.new)/dist.old) <= thresh)
+                    dist.new)) <= thresh * dist.old)
         }
         
         if(reweight | reassign){

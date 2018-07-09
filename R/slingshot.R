@@ -392,7 +392,7 @@ setMethod(f = "slingshot",
 #' @export
 setMethod(f = "slingshot",
           signature = signature(data = "ClusterExperiment"),
-          definition = function(data, clusterLabels = NULL, reducedDim = NULL,
+          definition = function(data, clusterLabels, reducedDim = NULL,
                                 start.clus = NULL, end.clus = NULL,
                                 dist.fun = NULL, omega = NULL,
                                 lineages = list(),
@@ -432,7 +432,7 @@ setMethod(f = "slingshot",
                   stop("Slingshot currently works only with base matrices.")
               }
               
-              if(is.null(clusterLabels)){
+              if(missing(clusterLabels)){
                   cl <- primaryClusterNamed(data)
                   if(is.null(cl)){
                       message('No primary clustering found. Continuing ',
@@ -446,7 +446,7 @@ setMethod(f = "slingshot",
                           cl <- colData(data)[[as.character(clusterLabels)]]
                       }else{
                           if(clusterLabels %in% colnames(clusterMatrix(data))){
-                              cl <- clusterMatrix(data)[,
+                              cl <- clusterMatrixNamed(data)[,
                                                     as.character(clusterLabels)]
                           }else{
                               stop(clusterLabels,' not found in colData(data)',

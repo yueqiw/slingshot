@@ -535,7 +535,7 @@ setMethod(
         return(avg.jj * pct + orig.jj * (1-pct))
     }, rep(0,n))
     w <- pcurve$w
-    pcurve <- project_to_curve(X, s[pcurve$ord, drop = FALSE], stretch = stretch)
+    pcurve <- project_to_curve(X, as.matrix(s[pcurve$ord, drop = FALSE]), stretch = stretch)
     pcurve$w <- w
     return(pcurve)
 }

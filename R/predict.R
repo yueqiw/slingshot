@@ -101,7 +101,7 @@ setMethod(f = "predict",
         })
         
         crv.proj <- lapply(curves, function(crv){
-            project_to_curve(x, crv$s, crv$ord, stretch = 0)
+            project_to_curve(x, crv$s[, crv$ord, drop = FALSE], stretch = 0)
         })
         
         D.proj <- vapply(crv.proj, function(crv){ crv$dist_ind }, 

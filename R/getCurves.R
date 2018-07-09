@@ -285,7 +285,7 @@ setMethod(f = "getCurves",
                 # do this twice because all points should have projections
                 # on all lineages, but only those points on the lineage
                 # should extend it
-                pcurve <- project_to_curve(X, s = curve$s[curve$ord,], 
+                pcurve <- project_to_curve(X, s = curve$s[curve$ord, , drop = FALSE], 
                     stretch=0)
                 pcurve$dist_ind <- abs(pcurve$dist_ind) 
                 # ^ force non-negative distances

@@ -19,7 +19,7 @@ Authors@R: c(person("Kelly", "Street", email = "street.kelly@gmail.com",
 License: Artistic-2.0
 Depends:
     R (>= 3.5),
-    princurve (>= 2.0.2),
+    princurve (>= 2.0.4),
     stats
 Imports:
     ape,

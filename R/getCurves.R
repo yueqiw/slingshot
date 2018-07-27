@@ -441,7 +441,7 @@ setMethod(f = "getCurves",
                             rep(TRUE,nrow(X)))) == 1
                         pct.shrink[[i]] <- lapply(to.avg,function(crv){
                             .percent_shrinkage(crv, common.ind, 
-                                method = shrink.method)
+                                method = shrink.method) * shrink
                         })
                         # check for degenerate case (if one curve won't be
                         # shrunk, then the other curve shouldn't be,

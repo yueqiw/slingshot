@@ -120,6 +120,7 @@ setMethod(f = "getCurves",
         thresh = 0.001, maxit = 15, stretch = 2,
         smoother = 'smooth.spline',
         shrink.method = 'cosine',
+        constraint_points = NULL, # single
         allow.breaks = TRUE, ...){
 
         X <- reducedDim(sds)
@@ -200,10 +201,10 @@ setMethod(f = "getCurves",
 
         # DEFINE SMOOTHER FUNCTION
         smootherFcn <- switch(smoother, loess = function(lambda, xj,
-            w = NULL, ...){
+            w = NULL, ..., pointwise=NULL){
             loess(xj ~ lambda, weights = w, ...)$fitted
         }, smooth.spline = function(lambda, xj, w = NULL, ..., df = 5,
-            tol = 1e-4){
+            tol = 1e-4, pointwise=NULL){
             # fit <- smooth.spline(lambda, xj, w = w, ..., df = df,
             #                      tol = tol, keep.data = FALSE)
             fit <- tryCatch({
@@ -214,8 +215,8 @@ setMethod(f = "getCurves",
                     tol = tol, keep.data = FALSE, spar = 1)
             })
             predict(fit, x = lambda)$y
-        }, cobs = function(x, xj, ...){
-            fit = cobs(x, xj, ...)
+        }, cobs = function(x, xj, ..., pointwise=NULL){
+            fit = cobs(x, xj, ..., pointwise=pointwise)
             predict(fit, x, ...)[,2]
         })
 
@@ -399,9 +400,15 @@ setMethod(f = "getCurves",
                 pcurve <- pcurves[[l]]
                 s <- pcurve$s
                 ordL <- order(pcurve$lambda)
+
                 for(jj in seq_len(p)){
+                    if (!is.null(constraint_points)) {
+                        pointwise <- constraint_points[,c(1,2,jj+2)]
+                    } else {
+                        pointwise <- NULL
+                    }
                     s[, jj] <- smootherFcn(pcurve$lambda, X[,jj], w = pcurve$w,
-                        ...)[ordL]
+                        ..., pointwise=pointwise)[ordL]
                 }
                 new.pcurve <- project_to_curve(X, s = s, stretch = stretch)
                 new.pcurve$dist_ind <- abs(new.pcurve$dist_ind)

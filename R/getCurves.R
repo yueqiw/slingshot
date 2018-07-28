@@ -403,7 +403,7 @@ setMethod(f = "getCurves",
 
                 for(jj in seq_len(p)){
                     if (!is.null(constraint_points)) {
-                        pointwise <- constraint_points[,c(1,2,jj+2)]
+                        pointwise <- constraint_points[,c(1,2,jj+2), drop=FALSE]
                     } else {
                         pointwise <- NULL
                     }

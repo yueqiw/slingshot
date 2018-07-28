@@ -214,9 +214,9 @@ setMethod(f = "getCurves",
                     tol = tol, keep.data = FALSE, spar = 1)
             })
             predict(fit, x = lambda)$y
-        }, cobs = function(lambda, xj, ...){
-            fit = cobs(lambda, xj, ...)
-            predict(fit, lambda, ...)[,2]
+        }, cobs = function(x, xj, ...){
+            fit = cobs(x, xj, ...)
+            predict(fit, x, ...)[,2]
         })
 
         # remove unclustered cells

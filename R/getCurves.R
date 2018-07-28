@@ -120,7 +120,7 @@ setMethod(f = "getCurves",
         thresh = 0.001, maxit = 15, stretch = 2,
         smoother = 'smooth.spline',
         shrink.method = 'cosine',
-        constraint_points = NULL, # single
+        origin_point = NULL, # single
         allow.breaks = TRUE, ...){
 
         X <- reducedDim(sds)
@@ -402,8 +402,8 @@ setMethod(f = "getCurves",
                 ordL <- order(pcurve$lambda)
 
                 for(jj in seq_len(p)){
-                    if (!is.null(constraint_points)) {
-                        pointwise <- constraint_points[,c(1,2,jj+2), drop=FALSE]
+                    if (!is.null(origin_point)) {
+                        pointwise <- t(as.matrix(c(0, 0, origin_point[jj])))
                     } else {
                         pointwise <- NULL
                     }

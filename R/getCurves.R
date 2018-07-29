@@ -326,6 +326,11 @@ setMethod(f = "getCurves",
                     s = line.initial, stretch = 0)
                 curve$dist_ind <- abs(curve$dist_ind)
             }
+            if(class(extend) == 'numeric'){
+                curve <- project_to_curve(X[idx, ,drop = FALSE],
+                    s = line.initial, stretch = extend)
+                curve$dist_ind <- abs(curve$dist_ind)
+            }
             if(extend == 'pc1'){
                 cl1.idx <- clusterLabels[ , lineages[[l]][1] ,
                     drop = FALSE] > 0

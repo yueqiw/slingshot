@@ -121,6 +121,7 @@ setMethod(f = "getCurves",
         smoother = 'smooth.spline',
         shrink.method = 'cosine',
         origin_point = NULL, # single
+        initial_lines = NULL, # bypass MST initialization
         allow.breaks = TRUE, ...){
 
         X <- reducedDim(sds)
@@ -267,14 +268,27 @@ setMethod(f = "getCurves",
         }
 
         # initial curves are piecewise linear paths through the tree
+        if (!is.null(initial_lines)) {
+            message("Using provided path rather than MST for smooth curve initialization ")
+            if (class(initial_lines) != 'list') {
+                stop("initial_lines needs to be a list (same order as lineages)")
+            }
+            if (length(initial_lines) != L) {
+                stop("initial_lines needs to have same number of elements as lineages")
+            }
+        }
         pcurves <- list()
         for(l in seq_len(L)){
             idx <- W[,l] > 0
-            line.initial <- centers[clusters %in% lineages[[l]], ,
-                drop = FALSE]
-            line.initial <- line.initial[match(lineages[[l]],
-                rownames(line.initial)),  ,
-                drop = FALSE]
+            if (is.null(initial_lines)) {
+                line.initial <- centers[clusters %in% lineages[[l]], ,
+                    drop = FALSE]
+                line.initial <- line.initial[match(lineages[[l]],
+                    rownames(line.initial)),  ,
+                    drop = FALSE]
+            } else {
+                line.initial <- initial_lines[[l]]
+            }
             K <- nrow(line.initial)
             # special case: single-cluster lineage
             if(K == 1){

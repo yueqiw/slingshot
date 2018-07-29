@@ -287,7 +287,7 @@ setMethod(f = "getCurves",
                     rownames(line.initial)),  ,
                     drop = FALSE]
             } else {
-                line.initial <- initial_lines[[l]]
+                line.initial <- as.matrix(as.data.frame(initial_lines[[l]]))
             }
             K <- nrow(line.initial)
             # special case: single-cluster lineage
